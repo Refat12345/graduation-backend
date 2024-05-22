@@ -7,6 +7,7 @@ use App\Http\Controllers\MedicalSessionController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\MedicalAnalysisController;
 use App\Http\Controllers\PrescriptionController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\DisbursedMaterialController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckPermission;
@@ -127,10 +128,10 @@ Route::post('/addAnalysisType', [MedicalAnalysisController::class, 'addAnalysisT
 Route::get('/getDialysisSessions/{centerId}', [MedicalSessionController::class, 'getDialysisSessions']);
 
 Route::get('getAllMedicalCenters', [UserController::class, 'getAllMedicalCenters']);
-Route::get('getPieCharts/{month}/{year}', [UserController::class, 'getPieCharts']);
+Route::get('getPieCharts/{month}/{year}', [StatisticsController::class, 'getPieCharts']);
 
-Route::get('causeRenalFailure', [UserController::class, 'causeRenalFailure']);
-Route::get('getCenterStatistics', [UserController::class, 'getCenterStatistics']);
+Route::get('causeRenalFailure', [StatisticsController::class, 'causeRenalFailure']);
+Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatistics']);
 
 
 

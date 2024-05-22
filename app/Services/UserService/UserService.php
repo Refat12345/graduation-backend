@@ -44,6 +44,8 @@ use App\Models\DisbursedMaterialsUser;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use Carbon\Carbon;
+
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -72,7 +74,7 @@ class UserService implements UserServiceInterface
 
 // request status : pending,approved,rejected
 
-//  account status material status :
+//  account status material status :       
 //          active
 //          nonActive
 
@@ -87,7 +89,7 @@ class UserService implements UserServiceInterface
      * @return User
      * @throws LogicException
      */
-
+  
 
      public function createUser(array $userData): User
      {
@@ -112,22 +114,22 @@ class UserService implements UserServiceInterface
              'address.countryName' => 'required|string|max:255',
              'centerName' => 'required|string|max:255',
          ]);
-
+     
          if ($validator->fails()) {
              throw new LogicException($validator->errors()->first());
          }
-
-
+     
+        
          try {
             $userData['verificationCode'] = rand(1000, 9999);
 
              $userData['password'] = Hash::make($userData['password']);
              $user = User::create($userData);
-
+         
              $this->createUserTelecoms($user, $userData['telecom']);
              $this->createUserAddress($user, $userData['address']);
              $this->associateUserWithMedicalCenter($user, $userData['centerName']);
-
+     
              DB::commit();
              return $user;
          } catch (\Exception $e) {
@@ -139,12 +141,12 @@ class UserService implements UserServiceInterface
 
 
 
-
+     
      public function createUserTelecoms(User $user, array $telecomData)
      {
         try{
          foreach ($telecomData as $data) {
-
+          
              $data['userID'] = $user->id;
              $telecom = new Telecom($data);
              $user->telecom()->save($telecom);
@@ -155,35 +157,35 @@ class UserService implements UserServiceInterface
         }
      }
 
+ 
+     
 
-
-
-
+ 
      public function createUserAddress(User $user, array $addressData)
      {
-
+    
          $city = City::firstOrCreate(['cityName' => $addressData['cityName']]);
          $country = Country::firstOrCreate(['countryName' => $addressData['countryName']]);
-
+   
          $city->country()->associate($country);
 
          $city->save();
-
+     
          $address = new Address([
              'line' => $addressData['line'],
              'cityID' => $city->id,
-             'userID' => $user->id,
+             'userID' => $user->id, 
          ]);
 
          $user->address()->save($address);
      }
-
+     
 
 
 
      public function createCenterAddress(MedicalCenter $center, array $addressData)
      {
-
+    
          $city = City::firstOrCreate(['cityName' => $addressData['cityName']]);
          if (!$city) {
             throw new Exception('Failed to create or find the city.');
@@ -194,11 +196,11 @@ class UserService implements UserServiceInterface
         }
          $city->country()->associate($country);
          $city->save();
-
+     
          $address = new Address([
              'line' => $addressData['line'],
              'cityID' => $city->id,
-             'centerID' => $center->id,
+             'centerID' => $center->id, 
          ]);
          if (!$address) {
             throw new Exception('Failed to create or find the address.');
@@ -207,7 +209,7 @@ class UserService implements UserServiceInterface
          $center->address()->save($address);
      }
 
-
+     
 
 
      public function associateUserWithMedicalCenter(User $user, string $centerName)
@@ -217,7 +219,7 @@ class UserService implements UserServiceInterface
     $user->medicalCenters()->attach($medicalCenter->id);
 }
 
-
+     
 
 
      public function findUserBy(string $value): Collection
@@ -232,17 +234,17 @@ class UserService implements UserServiceInterface
          } elseif (!empty($value)) {
              $keywords = explode(' ', $value);
              $query = User::query();
-
+     
              foreach ($keywords as $keyword) {
                  $query->orWhere('fullName', 'LIKE', "%{$keyword}%");
              }
-
+     
              return $query->get();
          } else {
              throw new InvalidArgumentException("Invalid search value: {$value}");
          }
      }
-
+     
 
 
 
@@ -296,15 +298,15 @@ public function verifyAccount(User $user, string $verificationCode)
                     $query->where('role', 'patient');
                 }),
             ],
-
+           
             'childrenNumber' => 'required|integer',
             'healthStateChildren' => 'required|string|max:255',
         ]);
-
+    
         if ($validator->fails()) {
             throw new InvalidArgumentException($validator->errors()->first());
         }
-
+    
         DB::transaction(function () use ($data) {
             $generalPatientInfo = GeneralPatientInformation::create($data);
             $maritalStatusData = [
@@ -322,7 +324,7 @@ public function verifyAccount(User $user, string $verificationCode)
     {
         DB::transaction(function () use ($userId, $permissionNames) {
             $user = User::findOrFail($userId);
-
+    
             foreach ($permissionNames as $permissionName) {
                 $permission = Permission::firstOrCreate(['permissionName' => $permissionName]);
                 $user->permissions()->syncWithoutDetaching([$permission->id]);
@@ -351,7 +353,7 @@ public function addPatientCompanionWithTelecom(array $companionData, array $tele
                 'system' => 'required|string|max:255',
                 'value' => 'required|string|max:255',
                 'use' => 'required|string|max:255',
-
+                
             ]);
 
             if ($telecomValidator->fails()) {
@@ -380,7 +382,7 @@ public function addMedicalCenterWithUser(array $centerData)
         'address.line' => 'required|string',
         'address.cityName' => 'required|string|max:255',
         'address.countryName' => 'required|string|max:255',
-
+       
     ]);
 
     if ($validator->fails()) {
@@ -407,7 +409,7 @@ public function addMedicalCenterWithUser(array $centerData)
             Telecom::create($telecom);
         }
 
-
+       
         $this->createCenterAddress($medicalCenter, $centerData['address']);
 
         UserCenter::create([
@@ -424,7 +426,7 @@ public function addMedicalCenterWithUser(array $centerData)
 }
 
 public function getAllMedicalCenters()
-{
+{   
     $medicalCenters = MedicalCenter::with('centertelecoms', 'address')
                                    ->get()
                                    ->map(function ($center) {
@@ -449,7 +451,7 @@ public function getAllMedicalCenters()
 
 public function addGlobalRequest(array $data)
 {
-
+    
     $validator = Validator::make($data, [
         'content' => 'required|string',
         'direction' => 'required|string',
@@ -463,18 +465,18 @@ public function addGlobalRequest(array $data)
         return $validator->errors();
     }
 
-
+   
     $request = new Requests();
     $request->requestStatus = $data['requestStatus'];
-    $request->cause = $data['cause'] ;
+    $request->cause = $data['cause'] ; 
     $request->save();
 
     $user=  auth('user')->user();
-
+  
     $globalRequest = new GlobalRequest();
     $globalRequest->content = $data['content'];
     $globalRequest->direction = $data['direction'];
-    $globalRequest->requestID = $request->id;
+    $globalRequest->requestID = $request->id; 
     $globalRequest->requesterID = $user->id;
     $globalRequest->reciverID = $data['reciverID'];
     $globalRequest->save();
@@ -487,7 +489,7 @@ public function addGlobalRequest(array $data)
 
 public function addPatientTransferRequest(array $data)
 {
-
+   
     $validator = Validator::make($data, [
         'patientID' => 'required|exists:users,id',
         'centerPatientID' => 'required|exists:medical_centers,id',
@@ -519,7 +521,7 @@ public function addPatientTransferRequest(array $data)
 
 public function addRequestModifyAppointment(array $data)
 {
-
+    
     $validator = Validator::make($data, [
         'newTime' => 'required|date_format:Y-m-d H:i:s',
         'appointmentID' => 'required|exists:appointments,id',
@@ -532,13 +534,13 @@ public function addRequestModifyAppointment(array $data)
         return $validator->errors();
     }
 
-
+   
     $request = new Requests();
     $request->requestStatus = $data['requestStatus'];
     $request->cause = $data['cause'] ?? null;
     $request->save();
 
-
+    
     $user=  auth('user')->user();
 
     $requestModifyAppointment = new RequestModifyAppointment();
@@ -556,7 +558,7 @@ public function getAllRequests()
 {
     $user = auth('user')->user();
     $userId = $user->id;
-
+  
     $centerIds = UserCenter::where('userID', $userId)->pluck('centerID')->toArray();
 
     return Requests::whereHas('globalRequest', function ($query) use ($centerIds) {
@@ -577,13 +579,13 @@ public function getAllRequests()
 
  public function addChair(array $data)
  {
-
+    
      $validatedData = Validator::make($data, [
          'chairNumber' => 'required|integer|max:255',
          'roomName' => 'required|string|max:255',
-
+     
      ])->validate();
-
+ 
      $user = auth('user')->user();
      $centerId = UserCenter::where('userID', $user->id)->first()->centerID;
      $chair = new Chair([
@@ -594,21 +596,21 @@ public function getAllRequests()
      $chair->save();
      return $chair;
  }
-
+ 
 
 
 
 
  public function addShift(array $data)
  {
-
+    
     $validatedData = Validator::make($data, [
         'shiftStart' => 'required|date',
         'shiftEnd' => 'required|date|after:shiftStart',
-
-
+        
+        
     ])->validate();
-
+ 
      $user = auth('user')->user();
      $centerId = UserCenter::where('userID', $user->id)->first()->centerID;
      $shift = new Shift([
@@ -720,6 +722,7 @@ public function getDoctorsInShift($shiftId)
 
 
 
+
 public function getCenterUsersByRole($centerId, $role)
 {
     return User::when($centerId != 0, function ($query) use ($centerId) {
@@ -728,22 +731,25 @@ public function getCenterUsersByRole($centerId, $role)
         });
     })
     ->where('role', $role)
-    ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth')
+    ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth') 
     ->with(['telecom' => function ($query) {
-        $query->where('system', 'phone')
+        $query->where('system', 'phone') 
               ->select('userID', 'value');
     }, 'address.city' => function ($query) {
         $query->select('id', 'cityName');
     }])
     ->get()
+    
     ->map(function ($user) {
-        $user->contactNumber = $user->telecom->pluck('value')->first() ?? null;
+        $user->contactNumber = $user->telecom->pluck('value')->first() ?? null; 
         $user->city = $user->address->first()->city->cityName ?? null;
-        $user->age = Carbon::parse($user->dateOfBirth)->age;
+        $user->age = Carbon::parse($user->dateOfBirth)->age; 
         unset($user->telecom, $user->address, $user->dateOfBirth);
         return $user;
     });
 }
+
+
 
 
 
@@ -773,7 +779,7 @@ public function getMedicalCenterDetails($centerId)
 
 public function createNote(array $noteData)
 {
-
+ 
     $validator = Validator::make($noteData, [
         'noteContent' => 'required|string|max:1000',
         'category' => 'required|string|max:255',
@@ -783,12 +789,12 @@ public function createNote(array $noteData)
         //'senderID' => 'required|integer|exists:users,id',
         'receiverID' => 'nullable|integer|exists:users,id',
         'centerID' => 'required|integer|exists:medical_centers,id',
-    ]);
+    ]);   
 
     if ($validator->fails()) {
         throw new LogicException($validator->errors()->first());
     }
-
+   
     $noteData['senderID'] = auth('user')->user()->id;
 
     $note = Note::create($noteData);
@@ -818,14 +824,14 @@ public function getNotesByMedicalCenter($centerId)
 public function updateStatus( $requestId, $newStatus)
 {
     $validator = Validator::make([
-        'request_id' => $requestId,
+        'request_id' => $requestId, 
         'new_status' => $newStatus
     ], [
-        'request_id' => 'required|integer|exists:requests,id',
-        'new_status' => 'required|string|in:pending,approved,rejected',
+        'request_id' => 'required|integer|exists:requests,id', 
+        'new_status' => 'required|string|in:pending,approved,rejected', 
     ]);
 
-
+    
     if ($validator->fails()) {
         throw new InvalidArgumentException($validator->errors()->first());
     }
@@ -838,89 +844,6 @@ public function updateStatus( $requestId, $newStatus)
 
 
 
-
-public function getPieCharts($month, $year)
-{
-    $user = auth('user')->user();
-    $centerId = $user->userCenter->centerID;
-
-    $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-
-    $materials = ['heparin', 'iron', 'epoetin'];
-    $totalValues = [];
-
-    foreach ($materials as $material) {
-        $disbursedValue = DisbursedMaterialsUser::whereHas('disbursedMaterial', function ($query) use ($material) {
-            $query->where('materialName', $material);
-        })->where('centerID', $centerId)
-          ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString])
-          ->sum('quantity');
-
-        $takenValue = MedicineTaken::whereHas('medicine', function ($query) use ($material) {
-            $query->where('name', $material);
-        })->whereHas('dialysisSession', function ($query) use ($centerId) {
-            $query->where('centerID', $centerId);
-        })->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString])
-          ->sum('value');
-
-        $totalValues[$material] = $disbursedValue + $takenValue;
-    }
-
-    return $totalValues;
-}
-
-
-public function causeRenalFailure()
-{
-    $user = auth('user')->user();
-    $centerID = $user->userCenter->centerID;
-
-    $causes = ['diabetes', 'heartDiseases', 'bloodPressure', 'otherDiseases'];
-    $totalCounts = [];
-
-    foreach ($causes as $cause) {
-        $count = User::whereHas('medicalRecord', function ($query) use ($centerID, $cause) {
-            $query->whereHas('user.userCenter', function ($query) use ($centerID) {
-                $query->where('centerID', $centerID);
-            })->where('causeRenalFailure', $cause);
-        })->count();
-
-        $totalCounts[$cause] = $count;
-    }
-
-    return $totalCounts;
-}
-
-
-
-
-public function getCenterStatistics()
-{
-    $user = auth('user')->user();
-    $centerID = $user->userCenter->centerID;
-
-    $statistics = [
-        'patients' => 0,
-        'dialysisSessions' => 0,
-        'waitingList' => 0
-    ];
-
-    $statistics['patients'] = GeneralPatientInformation::whereHas('user', function ($query) use ($centerID) {
-        $query->whereHas('userCenter', function ($query) use ($centerID) {
-            $query->where('centerID', $centerID);
-        });
-    })->where('status', 'accepted')->count();
-
-    $statistics['dialysisSessions'] = DialysisSession::where('centerID', $centerID)->count();
-
-    $statistics['waitingList'] = GeneralPatientInformation::whereHas('user', function ($query) use ($centerID) {
-        $query->whereHas('userCenter', function ($query) use ($centerID) {
-            $query->where('centerID', $centerID);
-        });
-    })->where('status', 'waiting')->count();
-
-    return $statistics;
-}
 
 
 

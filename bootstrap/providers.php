@@ -8,4 +8,5 @@ return [
     App\Providers\MedicalRecordProvider::class,
     App\Providers\PrescriptionProvider::class,
     App\Providers\MaterialProvider::class,
+    App\Providers\StatisticsProvider::class,
 ];

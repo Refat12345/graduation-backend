@@ -538,11 +538,6 @@ public function changeReruestStatus(Request $request)
 
 
 
-
-
-
-
-
 public function getAllMedicalCenters()
 {
     return response()->json(['medicalCenters' => $this->userService->getAllMedicalCenters()], 200);
@@ -552,25 +547,7 @@ public function getAllMedicalCenters()
 
 
 
-public function getPieCharts($month, $year)
-{
-    return response()->json(['pieChart' => $this->userService->getPieCharts($month, $year)], 200);
-}
 
-
-    public function causeRenalFailure()
-    {
-        return response()->json(['causeRenalFailure' => $this->userService->causeRenalFailure()], 200);
-    }
-
-
-    public function getCenterStatistics()
-    {
-        return response()->json([$this->userService->getCenterStatistics()], 200);
-    }
-
-
-    
 
 
 }

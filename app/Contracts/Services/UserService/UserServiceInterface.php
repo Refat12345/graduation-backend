@@ -122,14 +122,6 @@ interface UserServiceInterface
 
 
 
-  
 
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-   
-    public function getPieCharts($month, $year);
-    public function causeRenalFailure();
-    public function getCenterStatistics();
     
 }
