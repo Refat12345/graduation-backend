@@ -91,6 +91,181 @@ class UserService implements UserServiceInterface
      */
   
 
+
+     
+     public function addPatientTransferRequest(array $data)
+     {
+        
+         $validator = Validator::make($data, [
+             'patientID' => 'required|exists:users,id',
+             'centerPatientID' => 'required|exists:medical_centers,id',
+             'destinationCenterID' => 'required|exists:medical_centers,id',
+             'requestStatus' => 'required|in:pending,approved,rejected',
+             'cause' => 'sometimes|required|string'
+         ]);
+     
+         if ($validator->fails()) {
+             return $validator->errors();
+         }
+         $request = new Requests();
+         $request->requestStatus = $data['requestStatus'];
+         $request->cause = $data['cause'] ?? null;
+         $request->save();
+     
+         $patientTransferRequest = new PatientTransferRequest();
+         $patientTransferRequest->patientID = $data['patientID'];
+         $patientTransferRequest->centerPatientID = $data['centerPatientID'];
+         $patientTransferRequest->destinationCenterID = $data['destinationCenterID'];
+         $patientTransferRequest->requestID = $request->id;
+         $patientTransferRequest->save();
+     
+         return $patientTransferRequest;
+     }
+
+
+     public function addGlobalRequest(array $data)
+     {
+         
+         $validator = Validator::make($data, [
+             'content' => 'required|string',
+             'direction' => 'required|string',
+            // 'requesterID' => 'required|exists:users,id',
+             'reciverID' => 'required|exists:users,id',
+             'requestStatus' => 'required|in:pending,approved,rejected',
+             'cause' => 'sometimes|required|string'
+         ]);
+     
+         if ($validator->fails()) {
+             return $validator->errors();
+         }
+     
+        
+         $request = new Requests();
+         $request->requestStatus = $data['requestStatus'];
+         $request->cause = $data['cause'] ; 
+         $request->save();
+     
+         $user=  auth('user')->user();
+       
+         $globalRequest = new GlobalRequest();
+         $globalRequest->content = $data['content'];
+         $globalRequest->direction = $data['direction'];
+         $globalRequest->requestID = $request->id; 
+         $globalRequest->requesterID = $user->id;
+         $globalRequest->reciverID = $data['reciverID'];
+         $globalRequest->save();
+     
+         return $globalRequest;
+     }
+     
+     
+ 
+     
+     
+     
+     
+     public function addRequestModifyAppointment(array $data)
+     {
+         
+         $validator = Validator::make($data, [
+             'newTime' => 'required|date_format:Y-m-d H:i:s',
+             'appointmentID' => 'required|exists:appointments,id',
+           //  'requesterID' => 'required|exists:users,id',
+             'requestStatus' => 'required|in:pending,approved,rejected',
+             'cause' => 'sometimes|required|string'
+         ]);
+     
+         if ($validator->fails()) {
+             return $validator->errors();
+         }
+     
+        
+         $request = new Requests();
+         $request->requestStatus = $data['requestStatus'];
+         $request->cause = $data['cause'] ?? null;
+         $request->save();
+     
+         
+         $user=  auth('user')->user();
+     
+         $requestModifyAppointment = new RequestModifyAppointment();
+         $requestModifyAppointment->newTime = $data['newTime'];
+         $requestModifyAppointment->appointmentID = $data['appointmentID'];
+         $requestModifyAppointment->requestID = $request->id;
+         $requestModifyAppointment->requesterID =  $user->id;
+         $requestModifyAppointment->save();
+     
+         return $requestModifyAppointment;
+     }
+     
+     
+ 
+ 
+ 
+     public function getAllRequests()
+     {
+         $user = auth('user')->user();
+         $userId = $user->id;
+       
+         $centerIds = UserCenter::where('userID', $userId)->pluck('centerID')->toArray();
+     
+         return Requests::whereHas('globalRequest', function ($query) use ($centerIds) {
+             $query->whereIn('requesterID', $centerIds);
+         })
+         ->orWhereHas('patientTransferRequest', function ($query) use ($centerIds) {
+             $query->whereIn('centerPatientID', $centerIds)
+                   ->orWhereIn('destinationCenterID', $centerIds);
+         })
+         ->orWhereHas('requestModifyAppointment', function ($query) use ($centerIds) {
+             $query->whereIn('requesterID', $centerIds);
+         })
+         ->with(['globalRequest', 'patientTransferRequest', 'requestModifyAppointment'])
+         ->get();
+     }
+     
+ 
+ 
+     
+     
+ public function updateStatus( $requestId, $newStatus)
+ {
+     $validator = Validator::make([
+         'request_id' => $requestId, 
+         'new_status' => $newStatus
+     ], [
+         'request_id' => 'required|integer|exists:requests,id', 
+         'new_status' => 'required|string|in:pending,approved,rejected', 
+     ]);
+ 
+     
+     if ($validator->fails()) {
+         throw new InvalidArgumentException($validator->errors()->first());
+     }
+ 
+   $validatedData = $validator->validated();
+ 
+     $requestModel = Requests::findOrFail($validatedData['request_id']);
+     $requestModel->updateRequestStatus($validatedData['new_status']);
+ }
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
      public function createUser(array $userData): User
      {
         DB::beginTransaction();
@@ -449,133 +624,6 @@ public function getAllMedicalCenters()
 }
 
 
-public function addGlobalRequest(array $data)
-{
-    
-    $validator = Validator::make($data, [
-        'content' => 'required|string',
-        'direction' => 'required|string',
-       // 'requesterID' => 'required|exists:users,id',
-        'reciverID' => 'required|exists:users,id',
-        'requestStatus' => 'required|in:pending,approved,rejected',
-        'cause' => 'sometimes|required|string'
-    ]);
-
-    if ($validator->fails()) {
-        return $validator->errors();
-    }
-
-   
-    $request = new Requests();
-    $request->requestStatus = $data['requestStatus'];
-    $request->cause = $data['cause'] ; 
-    $request->save();
-
-    $user=  auth('user')->user();
-  
-    $globalRequest = new GlobalRequest();
-    $globalRequest->content = $data['content'];
-    $globalRequest->direction = $data['direction'];
-    $globalRequest->requestID = $request->id; 
-    $globalRequest->requesterID = $user->id;
-    $globalRequest->reciverID = $data['reciverID'];
-    $globalRequest->save();
-
-    return $globalRequest;
-}
-
-
-
-
-public function addPatientTransferRequest(array $data)
-{
-   
-    $validator = Validator::make($data, [
-        'patientID' => 'required|exists:users,id',
-        'centerPatientID' => 'required|exists:medical_centers,id',
-        'destinationCenterID' => 'required|exists:medical_centers,id',
-        'requestStatus' => 'required|in:pending,approved,rejected',
-        'cause' => 'sometimes|required|string'
-    ]);
-
-    if ($validator->fails()) {
-        return $validator->errors();
-    }
-    $request = new Requests();
-    $request->requestStatus = $data['requestStatus'];
-    $request->cause = $data['cause'] ?? null;
-    $request->save();
-
-    $patientTransferRequest = new PatientTransferRequest();
-    $patientTransferRequest->patientID = $data['patientID'];
-    $patientTransferRequest->centerPatientID = $data['centerPatientID'];
-    $patientTransferRequest->destinationCenterID = $data['destinationCenterID'];
-    $patientTransferRequest->requestID = $request->id;
-    $patientTransferRequest->save();
-
-    return $patientTransferRequest;
-}
-
-
-
-
-public function addRequestModifyAppointment(array $data)
-{
-    
-    $validator = Validator::make($data, [
-        'newTime' => 'required|date_format:Y-m-d H:i:s',
-        'appointmentID' => 'required|exists:appointments,id',
-      //  'requesterID' => 'required|exists:users,id',
-        'requestStatus' => 'required|in:pending,approved,rejected',
-        'cause' => 'sometimes|required|string'
-    ]);
-
-    if ($validator->fails()) {
-        return $validator->errors();
-    }
-
-   
-    $request = new Requests();
-    $request->requestStatus = $data['requestStatus'];
-    $request->cause = $data['cause'] ?? null;
-    $request->save();
-
-    
-    $user=  auth('user')->user();
-
-    $requestModifyAppointment = new RequestModifyAppointment();
-    $requestModifyAppointment->newTime = $data['newTime'];
-    $requestModifyAppointment->appointmentID = $data['appointmentID'];
-    $requestModifyAppointment->requestID = $request->id;
-    $requestModifyAppointment->requesterID =  $user->id;
-    $requestModifyAppointment->save();
-
-    return $requestModifyAppointment;
-}
-
-
-public function getAllRequests()
-{
-    $user = auth('user')->user();
-    $userId = $user->id;
-  
-    $centerIds = UserCenter::where('userID', $userId)->pluck('centerID')->toArray();
-
-    return Requests::whereHas('globalRequest', function ($query) use ($centerIds) {
-        $query->whereIn('requesterID', $centerIds);
-    })
-    ->orWhereHas('patientTransferRequest', function ($query) use ($centerIds) {
-        $query->whereIn('centerPatientID', $centerIds)
-              ->orWhereIn('destinationCenterID', $centerIds);
-    })
-    ->orWhereHas('requestModifyAppointment', function ($query) use ($centerIds) {
-        $query->whereIn('requesterID', $centerIds);
-    })
-    ->with(['globalRequest', 'patientTransferRequest', 'requestModifyAppointment'])
-    ->get();
-}
-
-
 
  public function addChair(array $data)
  {
@@ -622,41 +670,6 @@ public function getAllRequests()
      return $shift;
  }
 
-
- public function addAppointment(array $data)
-    {
-        $validatedData = Validator::make($data, [
-            'appointmentTimeStamp' => 'required|date',
-            'userID' => 'required|exists:users,id',
-            'shiftID' => 'required|exists:shifts,id',
-            'chairID' => 'required|exists:chairs,id',
-            'centerID' => 'required|exists:medical_centers,id'
-        ])->validate();
-
-        $appointment = new Appointment($validatedData);
-        $appointment->save();
-        return $appointment;
-    }
-
-
-
-
-    public function getAppointmentsByCenter($centerId)
-{
-    return Appointment::where('centerID', $centerId)
-                      ->with(['shift', 'chair', 'user'])
-                      ->get();
-}
-
-
-
-
-public function getUserAppointments($userId)
-{
-    return Appointment::where('userID', $userId)
-                      ->with(['shift', 'chair'])
-                      ->get();
-}
 
 
 
@@ -751,15 +764,39 @@ public function getCenterUsersByRole($centerId, $role)
 
 
 
-
-
-
 public function getUserDetails($userId)
 {
-    $user = User::with(['telecom', 'userAddressWithCityAndCountry', 'generalPatientInformation','patientCompanions.telecoms','medicalCenters'])
+    $user = User::with([
+                    'telecom', 
+                    'userAddressWithCityAndCountry.city.country', 
+                    
+                ])
                 ->findOrFail($userId);
 
-    return $user;
+    $userDetails = [
+        'fullName' => $user->fullName,
+        'accountStatus' => $user->accountStatus,
+        'gender' => $user->gender,
+        'nationalNumber' => $user->nationalNumber,
+        'dateOfBirth' => $user->dateOfBirth,
+        'role' => $user->role,
+        'telecom' => $user->telecom->map(function ($telecom) {
+            return [
+                'system' => $telecom->system,
+                'value' => $telecom->value,
+                'use' => $telecom->use
+            ];
+        }),
+        'address' => $user->userAddressWithCityAndCountry ? [
+            'line' => $user->userAddressWithCityAndCountry->line,
+            'use' => $user->userAddressWithCityAndCountry->use,
+            'cityName' => $user->userAddressWithCityAndCountry->city->cityName,
+            'countryName' => $user->userAddressWithCityAndCountry->city->country->countryName
+        ] : null
+      
+    ];
+
+    return $userDetails;
 }
 
 
@@ -818,29 +855,6 @@ public function getNotesByMedicalCenter($centerId)
 
 
 
-
-
-
-public function updateStatus( $requestId, $newStatus)
-{
-    $validator = Validator::make([
-        'request_id' => $requestId, 
-        'new_status' => $newStatus
-    ], [
-        'request_id' => 'required|integer|exists:requests,id', 
-        'new_status' => 'required|string|in:pending,approved,rejected', 
-    ]);
-
-    
-    if ($validator->fails()) {
-        throw new InvalidArgumentException($validator->errors()->first());
-    }
-
-  $validatedData = $validator->validated();
-
-    $requestModel = Requests::findOrFail($validatedData['request_id']);
-    $requestModel->updateRequestStatus($validatedData['new_status']);
-}
 
 
 

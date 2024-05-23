@@ -2,64 +2,68 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
 use Illuminate\Http\Request;
+use App\Contracts\Services\UserService\AppointmentServiceInterface;      
+
+use App\Models\User;
+use App\Models\GlobalRequest;
+use App\Models\PatientTransferRequest;
+use App\Models\RequestModifyAppointment;
+use App\Models\Requests;
 
 class AppointmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    protected $service;
+
+    public function __construct(AppointmentServiceInterface $service) {
+        $this->service = $service;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function createAppointment(Request $request)
     {
-        //
+        try {
+        $appointment = $this->service->addAppointment($request->all());
+        return response()->json([$appointment], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
     }
+    }
+    
+    
+    
+    public function showAppointmentsByCenter($centerId)
+    {
+        try{
+        $appointments = $this->service->getAppointmentsByCenter($centerId);
+        return response()->json([$appointments], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    
+    
+    }
+    
+    
+    
+    public function showUserAppointments($userId)
+    {
+        try { 
+        $appointments = $this->service->getUserAppointments($userId);
+    
+        return response()->json([$appointments], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    }
+    
+    
+    
+    
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Appointment $appointment)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Appointment $appointment)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Appointment $appointment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Appointment $appointment)
-    {
-        //
-    }
 }

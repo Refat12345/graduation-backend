@@ -10,6 +10,8 @@ use App\Models\GlobalRequest;
 use App\Models\PatientTransferRequest;
 use App\Models\RequestModifyAppointment;
 use App\Models\Requests;
+
+
 class UserController extends Controller
 {
     protected $userService;
@@ -20,6 +22,117 @@ class UserController extends Controller
     }
 
  
+
+
+
+    public function createPatientTransferRequest(Request $request)
+    {
+       try{
+        $result = $this->userService->addPatientTransferRequest($request->all());
+
+        if ($result instanceof PatientTransferRequest) {
+            return response()->json([$result], 200);
+        }
+
+        return response()->json([$result], 400);
+    } catch (\Exception $e) {
+           
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    }
+ 
+
+
+
+
+
+
+    public function createRequestModifyAppointment(Request $request)
+    {
+     try {
+        $result = $this->userService->addRequestModifyAppointment($request->all());
+        if ($result instanceof RequestModifyAppointment) {
+            return response()->json([$result], 200);
+        }
+        return response()->json([$result], 400);
+
+    } catch (\Exception $e) {
+           
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    }
+
+
+
+
+    public function createGlobalRequest(Request $request)
+    {
+        try{
+    
+        $result = $this->userService->addGlobalRequest($request->all());
+    
+        if ($result instanceof GlobalRequest) {
+            return response()->json([$result], 200);
+        }
+    
+        return response()->json([$result], 400);
+    } catch (\Exception $e) {
+           
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    }
+
+
+
+
+    public function getAllRequests()
+    {
+        try{
+
+        $allRequests = $this->userService->getAllRequests();
+       
+        return response()->json([$allRequests], 200);
+    } catch (\Exception $e) {
+           
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    }
+
+
+
+
+    // new_status : pending,approved,rejected
+public function changeReruestStatus(Request $request)
+{
+
+    
+    try {
+    $requestId = $request->input('request_id');
+    $newStatus = $request->input('new_status');
+
+    $this->userService->updateStatus($requestId, $newStatus);
+    return response()->json(['message' => 'Request status updated successfully'], 200);
+    }
+
+ catch (Exception $e) {
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public function createUser(Request $request)
@@ -197,78 +310,6 @@ public function associateUserWithMedicalCenter(Request $request)
 
     //////////////////// Request ///////////////////////////////////
 
-    public function createPatientTransferRequest(Request $request)
-    {
-       try{
-        $result = $this->userService->addPatientTransferRequest($request->all());
-
-        if ($result instanceof PatientTransferRequest) {
-            return response()->json([$result], 200);
-        }
-
-        return response()->json([$result], 400);
-    } catch (\Exception $e) {
-           
-        return response()->json(['error' => $e->getMessage()], 400);
-    }
-    }
-
-
-
-
-    public function createRequestModifyAppointment(Request $request)
-    {
-     try {
-        $result = $this->userService->addRequestModifyAppointment($request->all());
-        if ($result instanceof RequestModifyAppointment) {
-            return response()->json([$result], 200);
-        }
-        return response()->json([$result], 400);
-
-    } catch (\Exception $e) {
-           
-        return response()->json(['error' => $e->getMessage()], 400);
-    }
-    }
-
-
-
-
-    public function createGlobalRequest(Request $request)
-    {
-        try{
-    
-        $result = $this->userService->addGlobalRequest($request->all());
-    
-        if ($result instanceof GlobalRequest) {
-            return response()->json([$result], 200);
-        }
-    
-        return response()->json([$result], 400);
-    } catch (\Exception $e) {
-           
-        return response()->json(['error' => $e->getMessage()], 400);
-    }
-    }
-
-
-
-
-    public function getAllRequests()
-    {
-        try{
-
-        $allRequests = $this->userService->getAllRequests();
-       
-        return response()->json([$allRequests], 200);
-    } catch (\Exception $e) {
-           
-        return response()->json(['error' => $e->getMessage()], 400);
-    }
-    }
-
-
-
 
 /////////////////////////   shift & chair  //////////////
 public function createChair(Request $request)
@@ -301,50 +342,6 @@ public function createShift(Request $request)
 
 
 ///////////////// appointments //////////////////////
-
-
-
-public function createAppointment(Request $request)
-{
-    try {
-    $appointment = $this->userService->addAppointment($request->all());
-    return response()->json([$appointment], 200);
-} catch (\Exception $e) {
-           
-    return response()->json(['error' => $e->getMessage()], 400);
-}
-}
-
-
-
-public function showAppointmentsByCenter($centerId)
-{
-    try{
-    $appointments = $this->userService->getAppointmentsByCenter($centerId);
-    return response()->json([$appointments], 200);
-} catch (\Exception $e) {
-           
-    return response()->json(['error' => $e->getMessage()], 400);
-}
-
-
-}
-
-
-
-public function showUserAppointments($userId)
-{
-    try { 
-    $appointments = $this->userService->getUserAppointments($userId);
-
-    return response()->json([$appointments], 200);
-} catch (\Exception $e) {
-           
-    return response()->json(['error' => $e->getMessage()], 400);
-}
-}
-
-
 
 
 
@@ -508,24 +505,7 @@ public function getNotesByMedicalCenter($centerId)
 
 
 
-// new_status : pending,approved,rejected
-public function changeReruestStatus(Request $request)
-{
 
-    
-    try {
-    $requestId = $request->input('request_id');
-    $newStatus = $request->input('new_status');
-
-    $this->userService->updateStatus($requestId, $newStatus);
-    return response()->json(['message' => 'Request status updated successfully'], 200);
-    }
-
- catch (Exception $e) {
-    return response()->json(['error' => $e->getMessage()], 400);
-}
-    
-}
 
 
 

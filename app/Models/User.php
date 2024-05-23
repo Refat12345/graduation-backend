@@ -118,14 +118,14 @@ public function doctorSessionsWithRelatedData()
     
 
 
-        public function telecom(): HasMany
+        public function telecom()
         {
             return $this->hasMany(Telecom::class, 'userID', 'id');
         }
     
 
 
-        public function address(): HasMany
+        public function address()
         {
             return $this->hasMany(Address::class, 'userID', 'id');
         }

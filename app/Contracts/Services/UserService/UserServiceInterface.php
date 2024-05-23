@@ -20,6 +20,18 @@ interface UserServiceInterface
      */
 
 
+
+
+
+
+     public function addPatientTransferRequest(array $data);
+     public function addRequestModifyAppointment(array $data);
+     public function getAllRequests();
+     public function addGlobalRequest(array $data);
+     public function updateStatus( $requestId, $newStatus);
+ 
+ 
+
      
          public function createUser(array $userData): User;
 
@@ -81,11 +93,6 @@ interface UserServiceInterface
     ////////////////////////////// Request /////////////////////////////
 
 
-    public function addPatientTransferRequest(array $data);
-    public function addRequestModifyAppointment(array $data);
-    public function getAllRequests();
-
-
     
 /////////////////////////   shift & chair  //////////////
 
@@ -96,9 +103,7 @@ interface UserServiceInterface
 
 
     //////////// appointment ///////////
-    public function addAppointment(array $data);
-    public function getAppointmentsByCenter($centerId);
-    public function getUserAppointments($userId);
+
 
 
 /////////////////////// shift ////////////////////////

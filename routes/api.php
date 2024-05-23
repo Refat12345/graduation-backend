@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MedicalSessionController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\MedicalAnalysisController;
+use App\Http\Controllers\RequestController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\DisbursedMaterialController;
@@ -49,9 +51,9 @@ Route::post('/shifts', [UserController::class, 'createShift']);
 
 
 
-Route::post('/appointments', [UserController::class, 'createAppointment']);
-Route::get('/centerappointments/{centerId}', [UserController::class, 'showAppointmentsByCenter']);
-Route::get('/userappointments/{userId}', [UserController::class, 'showUserAppointments']);
+Route::post('/appointments', [AppointmentController::class, 'createAppointment']);
+Route::get('/centerappointments/{centerId}', [AppointmentController::class, 'showAppointmentsByCenter']);
+Route::get('/userappointments/{userId}', [AppointmentController::class, 'showUserAppointments']);
 
 
 
