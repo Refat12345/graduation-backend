@@ -29,10 +29,9 @@ Route::post('/change', [UserController::class, 'changeStatus']);
 Route::post('add-general-patient-info', [UserController::class, 'addGeneralPatientInformation']);
 Route::post('add-patient-companion', [UserController::class, 'addPatientCompanion']);
 Route::post('assign-permissions', [UserController::class, 'assignPermissions']);
-
+Route::get('getUserPermissions/{userId}', [UserController::class, 'getUserPermissions']);
 
 Route::post('/createMedicalCenter', [UserController::class, 'createMedicalCenter']);
-
 
 
 
@@ -77,9 +76,8 @@ Route::get('/getNotesByMedicalCenter/{centerId}', [UserController::class, 'getNo
 
 
 
+Route::get('/getDialysisSessionDetails/{sessionId}', [MedicalSessionController::class, 'getDialysisSessionDetails']);
 Route::post('/createDialysisSession', [MedicalSessionController::class, 'createDialysisSession']);
-
-
 
 
 

@@ -81,6 +81,7 @@ interface UserServiceInterface
 
     public function addGeneralPatientInformationWithMaritalStatus(array $data);
     public function addPermissionsToUser($userId, array $permissions);
+    public function getUserPermissions($userId);
     public function addPatientCompanionWithTelecom(array $companionData, array $telecomData); 
 
 

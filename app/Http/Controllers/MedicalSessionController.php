@@ -33,6 +33,17 @@ class MedicalSessionController extends Controller
         }
     }
 
+    
+    public function getDialysisSessionDetails($sessionsId)
+    {
+        try {
+            $sessions = $this->medicalSessionService->getCompleteDialysisSessionDetails($sessionsId);
+            return response()->json(['dialysisSession' => $sessions], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
 
     public function createDialysisSession(Request $request)
 {

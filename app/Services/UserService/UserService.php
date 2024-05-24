@@ -348,6 +348,7 @@ class UserService implements UserServiceInterface
      
          $address = new Address([
              'line' => $addressData['line'],
+             'use' => $addressData['use'],
              'cityID' => $city->id,
              'userID' => $user->id, 
          ]);
@@ -374,6 +375,7 @@ class UserService implements UserServiceInterface
      
          $address = new Address([
              'line' => $addressData['line'],
+             'use' => $addressData['use'],
              'cityID' => $city->id,
              'centerID' => $center->id, 
          ]);
@@ -508,6 +510,20 @@ public function verifyAccount(User $user, string $verificationCode)
     }
 
 
+    public function getUserPermissions($userId)
+    {
+        $user = User::findOrFail($userId);
+        return $user->permissions()->pluck('permissionName');
+    }
+    
+
+
+
+
+
+
+
+
 public function addPatientCompanionWithTelecom(array $companionData, array $telecomDataArray)
 {
     $companionValidator = Validator::make($companionData, [
@@ -600,6 +616,9 @@ public function addMedicalCenterWithUser(array $centerData)
     }
 }
 
+
+
+
 public function getAllMedicalCenters()
 {   
     $medicalCenters = MedicalCenter::with('centertelecoms', 'address')
@@ -622,6 +641,8 @@ public function getAllMedicalCenters()
 
     return $medicalCenters;
 }
+
+
 
 
 

@@ -143,8 +143,58 @@ class MedicalSessionService implements MedicalSessionServiceInterface
                                   });
     
        
+                                  
         return $dialysisSessions;
     }
+
+
+
+
+
+
+
+public function getCompleteDialysisSessionDetails($sessionId)
+{
+    $dialysisSession = DialysisSession::with(['medicineTakens', 'bloodPressureMeasurements', 'appointment'])
+                                      ->find($sessionId);
+
+    if (!$dialysisSession) {
+        throw new ModelNotFoundException('Dialysis session not found.');
+    }
+
+    $completeDetails = [
+
+        'nurse' => $dialysisSession->nurse->fullName,
+        'center' => $dialysisSession->medicalCenter->centerName,
+        'doctor' => $dialysisSession->doctor->fullName,
+       
+        'sessionStartTime' => $dialysisSession->sessionStartTime  ,
+        'sessionEndTime' => $dialysisSession->sessionEndTime   ,
+        'weightBeforeSession' => $dialysisSession->weightBeforeSession   ,
+       
+        'weightAfterSession' => $dialysisSession->weightAfterSession   ,
+        'totalWithdrawalRate' => $dialysisSession->totalWithdrawalRate   ,
+        'withdrawalRateHourly' => $dialysisSession->withdrawalRateHourly   ,
+        'pumpSpeed' => $dialysisSession->pumpSpeed   ,
+        'filterColor' => $dialysisSession->filterColor   ,
+        'filterType' => $dialysisSession->filterType   ,
+
+        'vascularConnection' => $dialysisSession->vascularConnection   ,
+        'naConcentration' => $dialysisSession->naConcentration   ,
+        'venousPressure' => $dialysisSession->venousPressure   ,
+        'status' => $dialysisSession->status   ,
+
+        'medicines' => $dialysisSession->medicineTakens->toArray(),
+        'bloodPressures' => $dialysisSession->bloodPressureMeasurements->toArray(),
+        'sessionNotes' => $dialysisSession->notes->toArray(),
+        'chair' => $dialysisSession->appointment->chair->toArray(),
+      
+    ];
+
+    return $completeDetails;
+}
+
+
     
     
     
@@ -190,6 +240,8 @@ class MedicalSessionService implements MedicalSessionServiceInterface
 
 
     
+
+
 public function getDialysisSessions($centerId)
 {
     $query = DialysisSession::with(['patient', 'nurse', 'chair', 'room']);
@@ -213,10 +265,5 @@ public function getDialysisSessions($centerId)
                                });
 
     return response()->json(['dialysisSessions' => $dialysisSessions]);
-}
-
-    
-    
-    
-    
+}   
 }

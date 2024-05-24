@@ -290,6 +290,16 @@ public function associateUserWithMedicalCenter(Request $request)
     }
 
 
+    public function getUserPermissions($userId)
+    {
+
+        try {
+            $permissions = $this->userService->getUserPermissions($userId);
+            return response()->json(['permissions' => $permissions]);
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
 
 
     public function createMedicalCenter(Request $request)

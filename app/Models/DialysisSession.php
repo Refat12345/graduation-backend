@@ -69,4 +69,13 @@ class DialysisSession extends Model
     }
 
 
+    
+
+    public function appointment()
+{
+    return $this->hasOne(Appointment::class, 'sessionID', 'id');
+}
+
+
+
 }
