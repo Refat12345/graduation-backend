@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contracts\Services\UserService\MedicalRecordServiceInterface;
 use Illuminate\Http\Request;
-
+use Log;
 
 class MedicalRecordController extends Controller
 {
@@ -20,12 +20,13 @@ class MedicalRecordController extends Controller
 
 public function createMedicalRecord(Request $request)
 {
+  
     try {
        
 
         $medicalRecord = $this->medicalRecordService->createMedicalRecord($request->all());
      
-
+        Log::info('Medical Record: ', (array) $medicalRecord);
         return response()->json([$medicalRecord], 200);
         
     } catch (LogicException $e) {

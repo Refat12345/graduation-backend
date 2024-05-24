@@ -27,6 +27,7 @@ class CheckRole
  
         public function handle($request, Closure $next, ...$roles)
         {
+           
 
             $user=  auth('user')->user();
             if (!$user) {
