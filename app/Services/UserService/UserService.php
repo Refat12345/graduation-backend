@@ -265,54 +265,52 @@ class UserService implements UserServiceInterface
 
 
 
-
-     public function createUser(array $userData): User
-     {
-        DB::beginTransaction();
-         $validator = Validator::make($userData, [
-             'fullName' => 'required|string|max:255',
-             'password' => 'required|string|min:8',
-             'nationalNumber' => 'required|string|max:11|unique:users',
-             'dateOfBirth' => 'required|date',
-             'gender' => 'required|in:male,female,other',
-             'accountStatus' => 'required|string|max:255',
-             'role' => 'required|string|max:255',
-           //  'verificationCode' => 'nullable|string|max:255',
-             'telecom' => 'required|array',
-             'telecom.*.system' => 'required|string|max:255',
-             'telecom.*.value' => 'required|string|max:255',
-             'telecom.*.use' => 'required|string|max:255',
-             'address' => 'required|array',
-             'address.line' => 'required|string|max:255',
-             'address.use' => 'required|string|max:255',
-             'address.cityName' => 'required|string|max:255',
-             'address.countryName' => 'required|string|max:255',
-             'centerName' => 'required|string|max:255',
-         ]);
-     
-         if ($validator->fails()) {
-             throw new LogicException($validator->errors()->first());
-         }
-     
-        
-         try {
-            $userData['verificationCode'] = rand(1000, 9999);
-
-             $userData['password'] = Hash::make($userData['password']);
-             $user = User::create($userData);
-         
-             $this->createUserTelecoms($user, $userData['telecom']);
-             $this->createUserAddress($user, $userData['address']);
-             $this->associateUserWithMedicalCenter($user, $userData['centerName']);
-     
-             DB::commit();
-             return $user;
-         } catch (\Exception $e) {
-             DB::rollBack();
-             throw new LogicException('Error creating user: ' . $e->getMessage());
-         }
+ public function createUser(array $userData): User
+ {
+     DB::beginTransaction();
+     $validator = Validator::make($userData, [
+         'fullName' => 'required|string|max:255',
+         'password' => 'required|string|min:8',
+         'nationalNumber' => 'required|string|max:11|unique:users',
+         'dateOfBirth' => 'required|date',
+         'gender' => 'required|in:male,female,other',
+         'accountStatus' => 'required|string|max:255',
+         'role' => 'required|string|max:255',
+         'telecom' => 'required|array',
+         'telecom.*.system' => 'required|string|max:255',
+         'telecom.*.value' => 'required|string|max:255',
+         'telecom.*.use' => 'required|string|max:255',
+         'address' => 'required|array',
+         'address.*.line' => 'required|string|max:255',
+         'address.*.use' => 'required|string|max:255',
+         'address.*.cityName' => 'required|string|max:255',
+         'address.*.countryName' => 'required|string|max:255',
+         'centerName' => 'required|string|max:255',
+     ]);
+ 
+     if ($validator->fails()) {
+         throw new LogicException($validator->errors()->first());
      }
-
+ 
+     try {
+         $userData['verificationCode'] = rand(1000, 9999);
+         $userData['password'] = Hash::make($userData['password']);
+         $user = User::create($userData);
+ 
+         $this->createUserTelecoms($user, $userData['telecom']);
+         foreach ($userData['address'] as $addressData) {
+             $this->createUserAddress($user, $addressData);
+         }
+         $this->associateUserWithMedicalCenter($user, $userData['centerName']);
+ 
+         DB::commit();
+         return $user;
+     } catch (\Exception $e) {
+         DB::rollBack();
+         throw new LogicException('Error creating user: ' . $e->getMessage());
+     }
+ }
+ 
 
 
 
