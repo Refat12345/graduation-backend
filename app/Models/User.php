@@ -156,7 +156,7 @@ public function doctorSessionsWithRelatedData()
 
         public function userAddressWithCityAndCountry()
         {
-            return $this->hasOne(Address::class, 'userID', 'id')
+            return $this->hasMany(Address::class, 'userID', 'id')
                         ->with(['city' => function ($query) {
                             $query->with('country');
                         }]);

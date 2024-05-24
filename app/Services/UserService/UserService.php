@@ -790,7 +790,6 @@ public function getUserDetails($userId)
     $user = User::with([
                     'telecom', 
                     'userAddressWithCityAndCountry.city.country', 
-                    
                 ])
                 ->findOrFail($userId);
 
@@ -807,18 +806,29 @@ public function getUserDetails($userId)
                 'value' => $telecom->value,
                 'use' => $telecom->use
             ];
-        }),
-        'address' => $user->userAddressWithCityAndCountry ? [
-            'line' => $user->userAddressWithCityAndCountry->line,
-            'use' => $user->userAddressWithCityAndCountry->use,
-            'cityName' => $user->userAddressWithCityAndCountry->city->cityName,
-            'countryName' => $user->userAddressWithCityAndCountry->city->country->countryName
-        ] : null
-      
+        })->toArray(),
+        'address' => []
     ];
+
+    // تحقق من أن العلاقة تعود بمجموعة من العناوين
+
+        foreach ($user->userAddressWithCityAndCountry as $address) {
+            // تحقق من أن كل عنصر هو كائن قبل الوصول إلى خصائصه
+           
+                $userDetails['address'][] = [
+                    'line' => $address->line,
+                    'use' => $address->use,
+                    'cityName' => $address->city->cityName,
+                    'countryName' => $address->city->country->countryName
+                ];
+            
+        }
+    
 
     return $userDetails;
 }
+
+
 
 
 
