@@ -21,8 +21,10 @@ class MedicalRecordController extends Controller
 public function createMedicalRecord(Request $request)
 {
     try {
+       
 
         $medicalRecord = $this->medicalRecordService->createMedicalRecord($request->all());
+     
 
         return response()->json([$medicalRecord], 200);
         
@@ -40,6 +42,8 @@ public function showMedicalRecord($userID)
   
     return response()->json([ 'medicalRecord' => $this->medicalRecordService->getMedicalRecordWithDetails($userID)], 200);
 }
+
+
 
 
 

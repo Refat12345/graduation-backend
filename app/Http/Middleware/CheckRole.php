@@ -27,14 +27,20 @@ class CheckRole
  
         public function handle($request, Closure $next, ...$roles)
         {
+
+            $user=  auth('user')->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        
             $hasRole = false;
             foreach ($roles as $role) {
-                if ($request->user() && $request->user()->hasRole($role)) {
+                if ($user->hasRole($role)) {
                     $hasRole = true;
                     break; 
                 }
             }
-            if ($hasRole) {
+            if (!$hasRole) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
             return $next($request);

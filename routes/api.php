@@ -107,7 +107,7 @@ Route::get('/getDisbursedMaterialsForCenterInTimeRange', [DisbursedMaterialContr
 
 /////////////////////////////////////////////////////
 
-Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
+
 Route::post('/createAllergicCondition', [MedicalRecordController::class, 'createAllergicCondition']);
 
 
@@ -135,10 +135,15 @@ Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatis
 
 
 
-$roles = ['admin', 'doctor', 'nurse'];
+$roles = [ 'admin'];
 $permissions = ['view-dashboard', 'edit-dashboard', 'view-reports'];
 
 
+
+Route::middleware(CheckRole::class . ':' . implode(',', $roles))->group(function () {
+   
+    Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
+});
 
 
 

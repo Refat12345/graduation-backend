@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->append(EnsureFrontendRequestsAreStateful::class);
-        $middleware->append(CheckRole::class);
+       // $middleware->append(CheckRole::class);
         $middleware->append(CheckPermission::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
