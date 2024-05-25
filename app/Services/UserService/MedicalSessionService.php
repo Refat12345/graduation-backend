@@ -153,9 +153,50 @@ class MedicalSessionService implements MedicalSessionServiceInterface
 
 
 
+// public function getCompleteDialysisSessionDetails($sessionId)
+// {
+//     $dialysisSession = DialysisSession::with(['medicineTakens', 'bloodPressureMeasurements', 'appointment'])
+//                                       ->find($sessionId);
+
+//     if (!$dialysisSession) {
+//         throw new ModelNotFoundException('Dialysis session not found.');
+//     }
+
+//     $completeDetails = [
+
+//         'nurse' => $dialysisSession->nurse->fullName,
+//         'center' => $dialysisSession->medicalCenter->centerName,
+//         'doctor' => $dialysisSession->doctor->fullName,
+       
+//         'sessionStartTime' => $dialysisSession->sessionStartTime  ,
+//         'sessionEndTime' => $dialysisSession->sessionEndTime   ,
+//         'weightBeforeSession' => $dialysisSession->weightBeforeSession   ,
+       
+//         'weightAfterSession' => $dialysisSession->weightAfterSession   ,
+//         'totalWithdrawalRate' => $dialysisSession->totalWithdrawalRate   ,
+//         'withdrawalRateHourly' => $dialysisSession->withdrawalRateHourly   ,
+//         'pumpSpeed' => $dialysisSession->pumpSpeed   ,
+//         'filterColor' => $dialysisSession->filterColor   ,
+//         'filterType' => $dialysisSession->filterType   ,
+
+//         'vascularConnection' => $dialysisSession->vascularConnection   ,
+//         'naConcentration' => $dialysisSession->naConcentration   ,
+//         'venousPressure' => $dialysisSession->venousPressure   ,
+//         'status' => $dialysisSession->status   ,
+
+//         'medicines' => $dialysisSession->medicineTakens->toArray(),
+//         'bloodPressures' => $dialysisSession->bloodPressureMeasurements->toArray(),
+//         'sessionNotes' => $dialysisSession->notes->toArray(),
+//         'chair' => $dialysisSession->appointment->chair->toArray(),
+      
+//     ];
+
+//     return $completeDetails;
+// }
+
 public function getCompleteDialysisSessionDetails($sessionId)
 {
-    $dialysisSession = DialysisSession::with(['medicineTakens', 'bloodPressureMeasurements', 'appointment'])
+    $dialysisSession = DialysisSession::with(['medicineTakens.medicine', 'bloodPressureMeasurements', 'appointment'])
                                       ->find($sessionId);
 
     if (!$dialysisSession) {
@@ -163,37 +204,35 @@ public function getCompleteDialysisSessionDetails($sessionId)
     }
 
     $completeDetails = [
-
         'nurse' => $dialysisSession->nurse->fullName,
         'center' => $dialysisSession->medicalCenter->centerName,
         'doctor' => $dialysisSession->doctor->fullName,
-       
-        'sessionStartTime' => $dialysisSession->sessionStartTime  ,
-        'sessionEndTime' => $dialysisSession->sessionEndTime   ,
-        'weightBeforeSession' => $dialysisSession->weightBeforeSession   ,
-       
-        'weightAfterSession' => $dialysisSession->weightAfterSession   ,
-        'totalWithdrawalRate' => $dialysisSession->totalWithdrawalRate   ,
-        'withdrawalRateHourly' => $dialysisSession->withdrawalRateHourly   ,
-        'pumpSpeed' => $dialysisSession->pumpSpeed   ,
-        'filterColor' => $dialysisSession->filterColor   ,
-        'filterType' => $dialysisSession->filterType   ,
-
-        'vascularConnection' => $dialysisSession->vascularConnection   ,
-        'naConcentration' => $dialysisSession->naConcentration   ,
-        'venousPressure' => $dialysisSession->venousPressure   ,
-        'status' => $dialysisSession->status   ,
-
-        'medicines' => $dialysisSession->medicineTakens->toArray(),
+        'sessionStartTime' => $dialysisSession->sessionStartTime,
+        'sessionEndTime' => $dialysisSession->sessionEndTime,
+        'weightBeforeSession' => $dialysisSession->weightBeforeSession,
+        'weightAfterSession' => $dialysisSession->weightAfterSession,
+        'totalWithdrawalRate' => $dialysisSession->totalWithdrawalRate,
+        'withdrawalRateHourly' => $dialysisSession->withdrawalRateHourly,
+        'pumpSpeed' => $dialysisSession->pumpSpeed,
+        'filterColor' => $dialysisSession->filterColor,
+        'filterType' => $dialysisSession->filterType,
+        'vascularConnection' => $dialysisSession->vascularConnection,
+        'naConcentration' => $dialysisSession->naConcentration,
+        'venousPressure' => $dialysisSession->venousPressure,
+        'status' => $dialysisSession->status,
+        'medicines' => $dialysisSession->medicineTakens->map(function ($medicineTaken) {
+            return [
+                'medicineName' => $medicineTaken->medicine->name,
+                'value' => $medicineTaken->value,
+            ];
+        })->toArray(),
         'bloodPressures' => $dialysisSession->bloodPressureMeasurements->toArray(),
         'sessionNotes' => $dialysisSession->notes->toArray(),
         'chair' => $dialysisSession->appointment->chair->toArray(),
-      
     ];
 
     return $completeDetails;
 }
-
 
     
     

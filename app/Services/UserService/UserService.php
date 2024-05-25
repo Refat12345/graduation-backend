@@ -246,6 +246,10 @@ class UserService implements UserServiceInterface
  
      $requestModel = Requests::findOrFail($validatedData['request_id']);
      $requestModel->updateRequestStatus($validatedData['new_status']);
+
+
+
+
  }
  
  
@@ -386,6 +390,7 @@ class UserService implements UserServiceInterface
          $center->address()->save($address);
      }
 
+     
      
 
 
@@ -757,6 +762,9 @@ public function getDoctorsInShift($shiftId)
 }
 
 
+
+
+
 public function getCenterUsersByRole($centerId, $role, $pat)
 {
     return User::when($centerId != 0, function ($query) use ($centerId) {
@@ -786,15 +794,6 @@ public function getCenterUsersByRole($centerId, $role, $pat)
         return $user;
     });
 }
-
-
-
-
-
-
-
-
-
 
 
 
