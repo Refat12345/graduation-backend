@@ -57,7 +57,8 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
 
     public function createMedicalRecord(array $MedicalRecordData)
     {
-    
+      
+      
         $validator = Validator::make($MedicalRecordData, [
             'dialysisStartDate' => 'required|date',
             'dryWeight' => 'required|numeric',
@@ -119,6 +120,8 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
             DB::rollBack();
             throw new LogicException('Error creating MedicalRecord: ' . $e->getMessage());
         }
+
+      
     }
     
     
