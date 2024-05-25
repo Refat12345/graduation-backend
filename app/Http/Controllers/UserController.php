@@ -398,10 +398,10 @@ public function showDoctorsInShift($shiftId)
 
 
 
-public function getCenterUsersByRole( $centerId, $role)
+public function getCenterUsersByRole( $centerId, $role , $pat)
 {
     try{
-    $staff = $this->userService->getCenterUsersByRole($centerId, $role);
+    $staff = $this->userService->getCenterUsersByRole($centerId, $role, $pat);
     return response()->json([$staff], 200);
 } catch (\Exception $e) {
            

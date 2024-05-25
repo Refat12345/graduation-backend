@@ -757,9 +757,7 @@ public function getDoctorsInShift($shiftId)
 }
 
 
-
-
-public function getCenterUsersByRole($centerId, $role)
+public function getCenterUsersByRole($centerId, $role, $pat)
 {
     return User::when($centerId != 0, function ($query) use ($centerId) {
         $query->whereHas('userCenter', function ($subQuery) use ($centerId) {
@@ -774,8 +772,12 @@ public function getCenterUsersByRole($centerId, $role)
     }, 'address.city' => function ($query) {
         $query->select('id', 'cityName');
     }])
+    ->when($role === 'patient', function ($query) use ($pat) {
+        $query->whereHas('generalPatientInformation', function ($subQuery) use ($pat) {
+            $subQuery->where('status', $pat); 
+        });
+    })
     ->get()
-    
     ->map(function ($user) {
         $user->contactNumber = $user->telecom->pluck('value')->first() ?? null; 
         $user->city = $user->address->first()->city->cityName ?? null;
@@ -784,6 +786,43 @@ public function getCenterUsersByRole($centerId, $role)
         return $user;
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+// public function getCenterUsersByRole($centerId, $role)
+// {
+//     return User::when($centerId != 0, function ($query) use ($centerId) {
+//         $query->whereHas('userCenter', function ($subQuery) use ($centerId) {
+//             $subQuery->where('centerID', $centerId);
+//         });
+//     })
+//     ->where('role', $role)
+//     ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth') 
+//     ->with(['telecom' => function ($query) {
+//         $query->where('system', 'phone') 
+//               ->select('userID', 'value');
+//     }, 'address.city' => function ($query) {
+//         $query->select('id', 'cityName');
+//     }])
+//     ->get()
+    
+//     ->map(function ($user) {
+//         $user->contactNumber = $user->telecom->pluck('value')->first() ?? null; 
+//         $user->city = $user->address->first()->city->cityName ?? null;
+//         $user->age = Carbon::parse($user->dateOfBirth)->age; 
+//         unset($user->telecom, $user->address, $user->dateOfBirth);
+//         return $user;
+//     });
+// }
 
 
 

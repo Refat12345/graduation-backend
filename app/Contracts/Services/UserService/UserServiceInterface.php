@@ -74,7 +74,7 @@ interface UserServiceInterface
     public function verifyAccount(User $user, string $verificationCode);
 
 
-
+   
 
 
 //////////////////////////////////////// new ////////////////////////////////////////////
@@ -115,7 +115,7 @@ interface UserServiceInterface
 
 
  
-    public function getCenterUsersByRole($centerId, $role);
+    public function getCenterUsersByRole($centerId, $role ,$pat);
 
     public function getUserDetails($userId);
     public function getMedicalCenterDetails($centerId);
