@@ -125,7 +125,7 @@ Route::post('/addAnalysisType', [MedicalAnalysisController::class, 'addAnalysisT
 
 
 
-Route::get('/getDialysisSessions/{centerId}', [MedicalSessionController::class, 'getDialysisSessions']);
+Route::get('/getDialysisSessions/{centerId}/{month}/{year}', [MedicalSessionController::class, 'getDialysisSessions']);
 
 Route::get('getAllMedicalCenters', [UserController::class, 'getAllMedicalCenters']);
 Route::get('getPieCharts/{month}/{year}', [StatisticsController::class, 'getPieCharts']);

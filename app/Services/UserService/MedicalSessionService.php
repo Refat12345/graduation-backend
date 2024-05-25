@@ -120,33 +120,33 @@ class MedicalSessionService implements MedicalSessionServiceInterface
         }
     }
     
-    public function getDialysisSessionsWithChairInfo($centerId)
+    public function getDialysisSessionsWithChairInfo($centerId, $month, $year)
     {
+        $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
         $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair'])
-                            ->whereHas('session', function ($query) use ($centerId) {
-                                if ($centerId > 0) {
-                                    $query->where('centerID', $centerId);
-                                }
-                            });
+            ->whereHas('session', function ($sessionQuery) use ($centerId, $dateString) {
+                if ($centerId > 0) {
+                    $sessionQuery->where('centerID', $centerId);
+                }
+                $sessionQuery->whereRaw('DATE_FORMAT(sessionEndTime, "%Y-%m") = ?', [$dateString]);
+            });
     
         $dialysisSessions = $query->get()
-                                  ->map(function ($appointment) {
-                                      return [
-                                          'id' => $appointment->session->id,
-                                          'patientName' => $appointment->session->patient->fullName,
-                                          'nurseName' => $appointment->session->nurse->fullName,
-                                          'sessionStartTime' => $appointment->session->sessionStartTime,
-                                          'sessionEndTime' => $appointment->session->sessionEndTime,
-                                          'chair' => $appointment->chair->chairNumber,
-                                          'roomName' => $appointment->chair->roomName
-                                      ];
-                                  });
+            ->map(function ($appointment) {
+                return [
+                    'id' => $appointment->session->id,
+                    'patientName' => $appointment->session->patient->fullName,
+                    'nurseName' => $appointment->session->nurse->fullName,
+                    'sessionStartTime' => $appointment->session->sessionStartTime,
+                    'sessionEndTime' => $appointment->session->sessionEndTime,
+                    'chair' => $appointment->chair->chairNumber,
+                    'roomName' => $appointment->chair->roomName
+                ];
+            });
     
-       
-                                  
         return $dialysisSessions;
     }
-
+    
 
 
 

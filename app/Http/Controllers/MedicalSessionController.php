@@ -23,10 +23,10 @@ class MedicalSessionController extends Controller
 
 
 
-    public function getDialysisSessions($centerId)
+    public function getDialysisSessions($centerId, $month, $year)
     {
         try {
-            $sessions = $this->medicalSessionService->getDialysisSessionsWithChairInfo($centerId);
+            $sessions = $this->medicalSessionService->getDialysisSessionsWithChairInfo($centerId, $month, $year);
             return response()->json(['dialysisSessions' => $sessions], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
