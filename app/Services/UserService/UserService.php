@@ -303,6 +303,8 @@ class UserService implements UserServiceInterface
          }
          $this->associateUserWithMedicalCenter($user, $userData['centerName']);
  
+
+         
          DB::commit();
          return $user;
      } catch (\Exception $e) {
