@@ -747,6 +747,8 @@ public function getDoctorsInShift($shiftId)
         $query->where('shiftID', $shiftId);
     })->get();
 
+
+
     if ($doctors->isEmpty()) {
         return 'لا يوجد ممرضين معينين لهذه الوردية';
     }
