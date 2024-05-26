@@ -203,6 +203,9 @@ public function getCompleteDialysisSessionDetails($sessionId)
         throw new ModelNotFoundException('Dialysis session not found.');
     }
 
+
+    
+
     $completeDetails = [
         'nurse' => $dialysisSession->nurse->fullName,
         'center' => $dialysisSession->medicalCenter->centerName,
