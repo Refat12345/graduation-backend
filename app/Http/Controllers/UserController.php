@@ -398,7 +398,7 @@ public function showDoctorsInShift($shiftId)
 
 
 
-public function getCenterUsersByRole( $centerId, $role , $pat)
+public function getCenterUsersByRole( $centerId, $role , $pat=null)
 {
     try{
     $staff = $this->userService->getCenterUsersByRole($centerId, $role, $pat);
