@@ -762,9 +762,6 @@ public function getDoctorsInShift($shiftId)
 }
 
 
-
-
-
 public function getCenterUsersByRole($centerId, $role, $pat)
 {
     return User::when($centerId != 0, function ($query) use ($centerId) {
