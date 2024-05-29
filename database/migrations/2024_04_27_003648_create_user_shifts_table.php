@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('userID')->references('id')->on('users');
             $table->timestamps();
 
-            $table->index(['userID', 'shiftID']);
+           $table->index(['userID', 'shiftID']);
         });
     }
 

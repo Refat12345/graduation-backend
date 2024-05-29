@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreign('userID')->references('id')->on('users');
             $table->timestamps();
 
-            $table->index(['userID', 'analysisTypeID']);
+           $table->index(['userID', 'analysisTypeID']);
         });
     }
 

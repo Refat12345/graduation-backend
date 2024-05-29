@@ -18,14 +18,22 @@ return new class extends Migration
             $table->unsignedBigInteger('userID')->nullable();
             $table->unsignedBigInteger('centerID')->nullable();
             $table->unsignedBigInteger('cityID')->nullable();
+            $table->unsignedBigInteger('PatientCompanionID')->nullable();
+
+            $table->foreign('PatientCompanionID')->references('id')->on('patient_companions');
             $table->foreign('userID')->references('id')->on('users');
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->foreign('cityID')->references('id')->on('cities');
             $table->timestamps();
 
-            $table->index('cityID');
-            $table->index('userID');
-            $table->index(['line', 'cityID', 'userID']);
+           $table->index('cityID');
+           $table->index('userID');
+
+           $table->index('centerID');
+           $table->index('PatientCompanionID');
+         
+
+       //  $table->index(['line', 'cityID', 'userID'], 'add');
         });
     }
 

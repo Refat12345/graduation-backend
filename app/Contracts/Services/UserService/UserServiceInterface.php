@@ -128,6 +128,6 @@ interface UserServiceInterface
 
 
 
-
+    public function addPatientInfo(array $data);
     
 }

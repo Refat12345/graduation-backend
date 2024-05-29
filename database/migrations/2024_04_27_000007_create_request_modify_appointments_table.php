@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreign('appointmentID')->references('id')->on('appointments');
             $table->timestamps();
 
-            $table->index('appointmentID');
+           $table->index('appointmentID');
         });
     }
 

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('medicalRecordID')->references('id')->on('medical_records');
             $table->timestamps();
 
-            $table->index('medicalRecordID');
+           $table->index('medicalRecordID');
         });
     }
 

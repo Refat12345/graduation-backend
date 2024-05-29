@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('unitOfMeasurement');
             $table->timestamps();
 
-            $table->index('analysisName');
+           $table->index('analysisName');
         });
     }
 

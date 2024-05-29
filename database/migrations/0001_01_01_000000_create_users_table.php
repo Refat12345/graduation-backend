@@ -25,8 +25,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('nationalNumber');
-            $table->index('fullName');
-            $table->index('accountStatus');
+             $table->index('fullName');
+             $table->index('accountStatus');
 
 
         });

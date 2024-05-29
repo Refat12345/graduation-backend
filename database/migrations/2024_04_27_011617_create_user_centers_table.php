@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->timestamps();
 
-            $table->index('userID');
-            $table->index('centerID');
+           $table->index('userID');
+           $table->index('centerID');
         });
     }
 

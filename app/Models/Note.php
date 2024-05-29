@@ -13,22 +13,22 @@ class Note extends Model
     'sessionID', 'senderID', 'receiverID', 'centerID'];
 
   
-    public function dialysisSession(): BelongsTo
+    public function dialysisSession()
     {
         return $this->belongsTo(DialysisSession::class, 'sessionID', 'id');
     }
 
-    public function sender(): BelongsTo
+    public function sender()
     {
         return $this->belongsTo(User::class, 'senderID', 'id');
     }
 
-    public function receiver(): BelongsTo
+    public function receiver()
     {
         return $this->belongsTo(User::class, 'receiverID', 'id');
     }
 
-    public function medicalCenter(): BelongsTo
+    public function medicalCenter()
     {
         return $this->belongsTo(MedicalCenter::class, 'centerID', 'id');
     }

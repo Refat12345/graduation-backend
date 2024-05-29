@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreign('patientID')->references('id')->on('users');
             $table->timestamps();
             
-            $table->index('patientID');
+           $table->index('patientID');
         });
     }
 

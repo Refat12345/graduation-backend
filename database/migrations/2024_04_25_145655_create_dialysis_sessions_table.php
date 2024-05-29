@@ -37,7 +37,7 @@ return new class extends Migration
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->timestamps();
 
-            $table->index(['centerID', 'patientID', 'doctorID', 'nurseID']);
+           $table->index(['centerID', 'patientID', 'doctorID', 'nurseID']);
         });
     }
 

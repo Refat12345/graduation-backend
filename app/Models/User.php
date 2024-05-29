@@ -130,6 +130,13 @@ public function doctorSessionsWithRelatedData()
             return $this->hasMany(Address::class, 'userID', 'id');
         }
     
+        public function userAddressWithCityAndCountry()
+        {
+            return $this->hasMany(Address::class, 'userID', 'id')
+                        ->with(['city' => function ($query) {
+                            $query->with('country');
+                        }]);
+        }
 
 
         // public function generalPatientInformation(): HasOne
@@ -154,14 +161,7 @@ public function doctorSessionsWithRelatedData()
 
 
 
-        public function userAddressWithCityAndCountry()
-        {
-            return $this->hasMany(Address::class, 'userID', 'id')
-                        ->with(['city' => function ($query) {
-                            $query->with('country');
-                        }]);
-        }
-
+ 
 
         public function generalPatientInformation()
         {

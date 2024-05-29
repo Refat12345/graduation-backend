@@ -10,22 +10,22 @@ class PatientTransferRequest extends Model
 {
     protected $fillable = ['patientID', 'centerPatientID', 'destinationCenterID', 'requestID'];
     
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class, 'patientID', 'id');
     }
     
-    public function centerPatient(): BelongsTo
+    public function centerPatient()
     {
         return $this->belongsTo(MedicalCenter::class, 'centerPatientID', 'id');
     }
     
-    public function destinationCenter(): BelongsTo
+    public function destinationCenter()
     {
         return $this->belongsTo(MedicalCenter::class, 'destinationCenterID', 'id');
     }
     
-    public function request(): BelongsTo
+    public function request()
     {
         return $this->belongsTo(Requests::class, 'requestID', 'id');
     }

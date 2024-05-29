@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('permissionID')->constrained('permissions');
             $table->timestamps();
 
-            $table->index('userID');
-            $table->index('permissionID');
+           $table->index('userID');
+           $table->index('permissionID');
         });
     }
 

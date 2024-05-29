@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('medicineID')->references('id')->on('medicines');
             $table->timestamps();
 
-            $table->index('sessionID');
+           $table->index('sessionID');
         });
     }
 

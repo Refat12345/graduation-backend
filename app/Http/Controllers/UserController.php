@@ -125,6 +125,25 @@ public function changeReruestStatus(Request $request)
 
 
 
+public function addPatientInfo(Request $request)
+    {
+        try {
+
+      
+            $patientData = $request->all();
+            $this->userService->addPatientInfo($patientData);
+
+         
+            return response()->json(['message' => 'Patient information added successfully'], 200);
+        } catch (\Exception $e) {
+ 
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+
+
+
 
 
 

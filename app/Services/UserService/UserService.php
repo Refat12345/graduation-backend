@@ -201,29 +201,64 @@ class UserService implements UserServiceInterface
      
  
  
- 
      public function getAllRequests()
      {
          $user = auth('user')->user();
          $userId = $user->id;
-       
+     
          $centerIds = UserCenter::where('userID', $userId)->pluck('centerID')->toArray();
      
-         return Requests::whereHas('globalRequest', function ($query) use ($centerIds) {
+         $requests = Requests::whereHas('globalRequest', function ($query) use ($centerIds) {
              $query->whereIn('requesterID', $centerIds);
          })
          ->orWhereHas('patientTransferRequest', function ($query) use ($centerIds) {
              $query->whereIn('centerPatientID', $centerIds)
-                   ->orWhereIn('destinationCenterID', $centerIds);
+                 ->orWhereIn('destinationCenterID', $centerIds);
          })
          ->orWhereHas('requestModifyAppointment', function ($query) use ($centerIds) {
              $query->whereIn('requesterID', $centerIds);
          })
          ->with(['globalRequest', 'patientTransferRequest', 'requestModifyAppointment'])
          ->get();
-     }
      
- 
+         return $this->mapRequests($requests);
+     }
+
+
+
+
+
+     public function mapRequests($requests)
+{
+    return $requests->map(function ($request) {
+        $processedRequest = [
+            'id' => $request->id,
+            'requestStatus' => $request->requestStatus,
+            'cause' => $request->cause,
+        ];
+
+        if ($request->globalRequest) {
+            $processedRequest['type'] = 'Global';
+            $processedRequest['content'] = $request->globalRequest->content;
+          //  $processedRequest['direction'] = $request->globalRequest->direction;
+           $processedRequest['sender'] = $request->globalRequest->requester;
+           // $processedRequest['reciver'] = $request->globalRequest->reciver;
+        } elseif ($request->patientTransferRequest) {
+            $processedRequest['type'] = 'Patient Transfer';
+            $processedRequest['patientName'] = $request->patientTransferRequest->user->fullName;
+          //  $processedRequest['centerPatientName'] = $request->patientTransferRequest->centerPatient->centerName;
+            $processedRequest['destinationCenterName'] = $request->patientTransferRequest->destinationCenter->centerName;
+        } elseif ($request->requestModifyAppointment) {
+            $processedRequest['type'] = 'Modify Appointment';
+            $processedRequest['newTime'] = $request->requestModifyAppointment->newTime;
+        }
+        
+
+
+        return $processedRequest;
+    });
+}
+
  
      
      
@@ -318,7 +353,29 @@ class UserService implements UserServiceInterface
  }
  
 
+ public function createUserAddress(User $user, array $addressData)
+ {
 
+     $city = City::firstOrCreate(['cityName' => $addressData['cityName']]);
+     $country = Country::firstOrCreate(['countryName' => $addressData['countryName']]);
+
+     $city->country()->associate($country);
+
+     $city->save();
+ 
+     $address = new Address([
+         'line' => $addressData['line'],
+         'use' => $addressData['use'],
+         'cityID' => $city->id,
+         'userID' => $user->id, 
+     ]);
+
+     $user->address()->save($address);
+ }
+ 
+
+
+ 
 
      
      public function createUserTelecoms(User $user, array $telecomData)
@@ -340,26 +397,6 @@ class UserService implements UserServiceInterface
      
 
  
-     public function createUserAddress(User $user, array $addressData)
-     {
-    
-         $city = City::firstOrCreate(['cityName' => $addressData['cityName']]);
-         $country = Country::firstOrCreate(['countryName' => $addressData['countryName']]);
-   
-         $city->country()->associate($country);
-
-         $city->save();
-     
-         $address = new Address([
-             'line' => $addressData['line'],
-             'use' => $addressData['use'],
-             'cityID' => $city->id,
-             'userID' => $user->id, 
-         ]);
-
-         $user->address()->save($address);
-     }
-     
 
 
 
@@ -563,6 +600,123 @@ public function addPatientCompanionWithTelecom(array $companionData, array $tele
 }
 
 
+
+
+
+public function addPatientInfo(array $data)
+{
+    $validator = Validator::make($data, [
+        'maritalStatus' => 'required|string|max:255',
+        'nationality' => 'required|string|max:255',
+        'status' => 'required|string|max:255',
+        'reasonOfStatus' => 'required|string|max:255',
+        'educationalLevel' => 'required|string|max:255',
+        'generalIncome' => 'required|numeric',
+        'incomeType' => 'required|string|max:255',
+        'sourceOfIncome' => 'required|string|max:255',
+        'workDetails' => 'required|string|max:255',
+        'residenceType' => 'required|string|max:255',
+        'fullName' => 'required|string|max:255',
+        'degreeOfKinship' => 'required|string|max:255',
+
+        'address' => 'required|array',
+        'address.*.line' => 'required|string|max:255',
+        'address.*.use' => 'required|string|max:255',
+        'address.*.cityName' => 'required|string|max:255',
+        'address.*.countryName' => 'required|string|max:255',
+
+
+        'patientID' => [
+            'required',
+            'integer',
+            Rule::exists('users', 'id')->where(function ($query) {
+                $query->where('role', 'patient');
+            }),
+        ],
+        'childrenNumber' => 'required|integer',
+        'healthStateChildren' => 'required|string|max:255',
+    
+    ]);
+
+    foreach ($data['telecomDataArray'] as $telecomData) {
+        $telecomValidator = Validator::make($telecomData, [
+            'system' => 'required|string|max:255',
+            'value' => 'required|string|max:255',
+            'use' => 'required|string|max:255',
+        ]);
+
+        if ($telecomValidator->fails()) {
+            throw new InvalidArgumentException($telecomValidator->errors()->first());
+        }
+    }
+
+    if ($validator->fails()) {
+        throw new InvalidArgumentException('Validation failed.');
+    }
+
+    DB::transaction(function () use ($data) {
+        $generalPatientInfo = GeneralPatientInformation::create($data);
+        $maritalStatusData = [
+            'childrenNumber' => $data['childrenNumber'],
+            'healthStateChildren' => $data['healthStateChildren'],
+            'generalPatientInformationID' => $generalPatientInfo->id
+        ];
+        MaritalStatus::create($maritalStatusData);
+
+
+        $companionData = [
+            'fullName' => $data['fullName'],
+            'degreeOfKinship' => $data['degreeOfKinship'],
+            'userID' => $data['patientID'],
+
+        ];
+
+        $patientCompanion = PatientCompanion::create($companionData);
+
+        foreach ($data['telecomDataArray'] as $telecomData) {
+            $telecomData['patientCompanionID'] = $patientCompanion->id;
+            Telecom::create($telecomData);
+        }
+
+        foreach ($data['address'] as $addressData) {
+            $this->createCompanionAddress($patientCompanion, $addressData);
+        }
+    });
+
+
+
+    
+}
+
+
+public function createCompanionAddress(PatientCompanion $user, array $addressData)
+{
+
+    $city = City::firstOrCreate(['cityName' => $addressData['cityName']]);
+    $country = Country::firstOrCreate(['countryName' => $addressData['countryName']]);
+
+    $city->country()->associate($country);
+
+    $city->save();
+
+    $address = new Address([
+        'line' => $addressData['line'],
+        'use' => $addressData['use'],
+        'cityID' => $city->id,
+        'addressID' => $user->id, 
+    ]);
+
+    $user->address()->save($address);
+}
+
+
+
+
+
+
+
+
+
 public function addMedicalCenterWithUser(array $centerData)
 {
     $validator = Validator::make($centerData, [
@@ -593,6 +747,7 @@ public function addMedicalCenterWithUser(array $centerData)
         if (!$medicalCenter) {
             throw new LogicException('No medical center associated with the user.');
         }
+   
 
         $medicalCenter->update([
                 'centerName' => $centerData['centerName'],
@@ -851,10 +1006,10 @@ public function getUserDetails($userId)
         'address' => []
     ];
 
-    // تحقق من أن العلاقة تعود بمجموعة من العناوين
+
 
         foreach ($user->userAddressWithCityAndCountry as $address) {
-            // تحقق من أن كل عنصر هو كائن قبل الوصول إلى خصائصه
+     
            
                 $userDetails['address'][] = [
                     'line' => $address->line,
@@ -915,21 +1070,34 @@ public function createNote(array $noteData)
 
 
 
+// public function getNotesByMedicalCenter($centerId)
+// {
+//     $notes = Note::where('centerID', $centerId)->get();
+//     return $notes;
+// }
+
+
+
+
 public function getNotesByMedicalCenter($centerId)
 {
     $notes = Note::where('centerID', $centerId)->get();
+    return $notes->map(function ($note) {
+        return [
+            'senderID' => $note->senderID,
+            'receiverID' => $note->receiverID ? $note->receiverID : null, 
+            'noteContent' => $note->noteContent,
+            'category' => $note->category,
+            'type' => $note->type,
+            'date' => $note->date,
+            'sessionID' => $note->sessionID,
+            'senderName' => $note->sender->fullName, 
+         
 
-    return $notes;
+            'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
+        ];
+    });
 }
-
-
-
-
-
-
-
-
-
 
 
 

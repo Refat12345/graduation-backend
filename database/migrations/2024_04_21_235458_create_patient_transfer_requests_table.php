@@ -23,7 +23,8 @@ return new class extends Migration
             $table->foreign('requestID')->references('id')->on('requests');
             $table->timestamps();
 
-            $table->index(['patientID', 'centerPatientID', 'destinationCenterID']);
+           $table->index(['patientID', 'centerPatientID', 'destinationCenterID'], 'patientTransfer');
+
         });
     }
 

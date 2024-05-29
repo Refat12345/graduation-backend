@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('sessionID')->references('id')->on('dialysis_sessions');
             $table->timestamps();
 
-            $table->index('sessionID');
+           $table->index('sessionID');
         });
     }
 

@@ -9,17 +9,17 @@ class GlobalRequest extends Model
 {
     protected $fillable = ['content', 'direction', 'requestID', 'requesterID', 'reciverID'];
     
-    public function request(): BelongsTo
+    public function request()
     {
         return $this->belongsTo(Requests::class, 'requestID', 'id');
     }
     
-    public function requester(): BelongsTo
+    public function requester()
     {
         return $this->belongsTo(User::class, 'requesterID', 'id');
     }
     
-    public function reciver(): BelongsTo
+    public function reciver()
     {
         return $this->belongsTo(User::class, 'reciverID', 'id');
     }

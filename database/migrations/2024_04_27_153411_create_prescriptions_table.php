@@ -21,7 +21,9 @@ return new class extends Migration
             $table->timestamps();
 
 
-            $table->index(['patientID', 'doctorID']);
+           
+
+           $table->index(['patientID', 'doctorID'], 'presc');
         });
     }
 

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('titer');
             $table->timestamps();
 
-            $table->index('name');
+           $table->index('name');
         });
     }
 

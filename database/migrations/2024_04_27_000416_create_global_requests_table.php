@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('reciverID')->references('id')->on('users');
             $table->timestamps();
             
-            $table->index(['requesterID', 'reciverID']);
+           $table->index(['requesterID', 'reciverID']);
         });
     }
 

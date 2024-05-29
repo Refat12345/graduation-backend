@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('generalPatientInformationID');
             $table->foreign('generalPatientInformationID')->references('id')->on('general_patient_informations');
             $table->timestamps();
-            $table->index('generalPatientInformationID');
+           $table->index('generalPatientInformationID');
         });
     }
 

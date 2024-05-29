@@ -28,7 +28,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('centerID');
-            $table->index(['senderID', 'receiverID']);
+          
+
+           $table->index(['senderID', 'receiverID'], 'req');
         });
     }
 

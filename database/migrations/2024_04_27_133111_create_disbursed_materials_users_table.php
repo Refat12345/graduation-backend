@@ -23,8 +23,11 @@ return new class extends Migration
             $table->foreign('disbursedMaterialID')->references('id')->on('disbursed_materials');
             $table->timestamps();
 
-            $table->index(['userID', 'centerID', 'disbursedMaterialID']);
-            $table->index(['centerID', 'created_at']);
+        
+           $table->index(['centerID', 'created_at']);
+
+           $table->index(['userID', 'centerID', 'disbursedMaterialID'], 'disbursed');
+          
         });
         
     }

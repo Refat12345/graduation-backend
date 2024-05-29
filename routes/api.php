@@ -93,7 +93,7 @@ Route::get('/getPatientPrescriptions', [PrescriptionController::class, 'getPatie
 
 Route::post('/change-request-status', [UserController::class, 'changeReruestStatus']);
 
-
+Route::post('/addPatientInfo', [UserController::class, 'addPatientInfo']);
 
 
 Route::post('/createDisbursedMaterial', [DisbursedMaterialController::class, 'createDisbursedMaterial']);

@@ -9,7 +9,7 @@ class Address extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['use', 'line', 'userID', 'centerID', 'cityID'];
+    protected $fillable = ['use', 'line', 'userID', 'centerID', 'cityID' , 'PatientCompanionID'];
     
     public function user(): BelongsTo
     {
@@ -26,5 +26,9 @@ class Address extends Model
         return $this->belongsTo(City::class, 'cityID', 'id');
     }
 
+    public function PatientCompanion()
+    {
+        return $this->belongsTo(City::class, 'PatientCompanionID', 'id');
+    }
 
 }
