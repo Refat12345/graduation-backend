@@ -451,7 +451,7 @@ public function showMedicalCenterDetails( $centerId)
 {
     try{
     $CenterDetails = $this->userService->getMedicalCenterDetails($centerId);
-    return response()->json([$CenterDetails], 200);
+    return response()->json(['CenterDetails' =>$CenterDetails], 200);
 } catch (\Exception $e) {
            
     return response()->json(['error' => $e->getMessage()], 400);

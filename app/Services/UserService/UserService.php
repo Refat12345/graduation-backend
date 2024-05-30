@@ -1076,18 +1076,39 @@ public function getMedicalCenterDetails($centerId)
 
     $contactDetails = $medicalCenter->centertelecoms;
 
-    return [
+    $details = [
        'centerName' => $medicalCenter->centerName,
        'description' => $medicalCenter->description,
        'charityName' => $medicalCenter->charityName,
+       'adminName' => $managerName,
+       'totalChairs' => $totalChairs,
+       'totalNurses' => $totalNurses,
+       'totalDoctors' => $totalDoctors,
+       'shifts' => $totalShifts,
+        
+      
+       'telecom' => $contactDetails,
 
-        'totalNurses' => $totalNurses,
-        'totalDoctors' => $totalDoctors,
-        'shifts' => $totalShifts,
-        'totalChairs' => $totalChairs,
-        'adminName' => $managerName,
-        'telecom' => $contactDetails,
+       'address' => []
     ];
+
+
+    foreach ($medicalCenter->address as $address) {
+     
+           
+        $details['address'][] = [
+            'line' => $address->line,
+            'use' => $address->use,
+            'cityName' => $address->city->cityName,
+            'countryName' => $address->city->country->countryName
+        ];
+    
+}
+
+return  $details;
+
+
+
 }
 
 
