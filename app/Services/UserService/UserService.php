@@ -1056,6 +1056,36 @@ public function getUserDetails($userId)
 
 // }
 
+
+
+
+
+public function createNote(array $noteData)
+{
+ 
+    $validator = Validator::make($noteData, [
+        'noteContent' => 'required|string|max:1000',
+        'category' => 'required|string|max:255',
+        'type' => 'required|string|max:255',
+        'date' => 'required|date',
+        'sessionID' => 'nullable|integer|exists:dialysis_sessions,id',
+        //'senderID' => 'required|integer|exists:users,id',
+        'receiverID' => 'nullable|integer|exists:users,id',
+        'centerID' => 'required|integer|exists:medical_centers,id',
+    ]);   
+
+    if ($validator->fails()) {
+        throw new LogicException($validator->errors()->first());
+    }
+   
+    $noteData['senderID'] = auth('user')->user()->id;
+
+    $note = Note::create($noteData);
+
+    return $note;
+}
+
+
 public function getMedicalCenterDetails($centerId)
 {
     $medicalCenter = MedicalCenter::with([
@@ -1110,36 +1140,6 @@ return  $details;
 
 
 }
-
-
-
-
-public function createNote(array $noteData)
-{
- 
-    $validator = Validator::make($noteData, [
-        'noteContent' => 'required|string|max:1000',
-        'category' => 'required|string|max:255',
-        'type' => 'required|string|max:255',
-        'date' => 'required|date',
-        'sessionID' => 'nullable|integer|exists:dialysis_sessions,id',
-        //'senderID' => 'required|integer|exists:users,id',
-        'receiverID' => 'nullable|integer|exists:users,id',
-        'centerID' => 'required|integer|exists:medical_centers,id',
-    ]);   
-
-    if ($validator->fails()) {
-        throw new LogicException($validator->errors()->first());
-    }
-   
-    $noteData['senderID'] = auth('user')->user()->id;
-
-    $note = Note::create($noteData);
-
-    return $note;
-}
-
-
 
 
 
