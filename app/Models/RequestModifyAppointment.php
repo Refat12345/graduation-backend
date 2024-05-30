@@ -9,17 +9,17 @@ class RequestModifyAppointment extends Model
 {
     protected $fillable = ['newTime', 'requestID', 'requesterID', 'appointmentID'];
     
-    public function request(): BelongsTo
+    public function request()
     {
         return $this->belongsTo(Requests::class, 'requestID', 'id');
     }
     
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class, 'requesterID', 'id');
     }
     
-    public function appointment(): BelongsTo
+    public function appointment()
     {
         return $this->belongsTo(Appointment::class, 'appointmentID', 'id');
     }

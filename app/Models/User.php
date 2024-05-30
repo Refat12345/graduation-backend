@@ -24,7 +24,12 @@ class User extends Authenticatable
         ];
 
 
-
+        public function getAdminName()
+        {
+            if ($this->role === 'admin') {
+                return $this->attributes['fullName'];
+            }
+        }
 
 //////////////////////  جدول الجلسات بدون باقي التفاصيل //////////////////////////
 

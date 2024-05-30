@@ -39,7 +39,7 @@ class MedicalCenter extends Model
 
 
 
-    public function centerAppointmentsWithShiftAndChair(): HasOne 
+    public function centerAppointmentsWithShiftAndChair()
     {
         return $this->hasMany(Appointment::class, 'centerID', 'id')
                     ->with(['shift', 'chair']);
@@ -64,7 +64,15 @@ class MedicalCenter extends Model
             return $this->hasMany(Address::class, 'centerID', 'id');
         }
     
-     
+        public function shifts()
+        {
+            return $this->hasMany(Shift::class, 'centerID', 'id');
+        }
+
+        public function chairs()
+        {
+            return $this->hasMany(Chair::class, 'centerID', 'id');
+        }
 
 /////////////////////////// belongsToMany ///////////////////////////////
 
@@ -74,10 +82,7 @@ class MedicalCenter extends Model
         return $this->belongsToMany(User::class, 'user_centers', 'centerID', 'userID');
     }
 
-
-
-
-
+ 
 
 
 ////////////////////////////////////////////////////////////////////////

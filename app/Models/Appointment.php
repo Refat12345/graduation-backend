@@ -12,6 +12,15 @@ class Appointment extends Model
  
     protected $fillable = ['appointmentTimeStamp', 'userID', 'shiftID', 'chairID','centerID', 'sessionID'];
     
+
+    public function updateappointmentTime($new)
+    {
+        $this->appointmentTimeStamp = $new;
+        $this->save();
+    }
+
+
+
     public function user()
     {
         return $this->belongsTo(User::class, 'userID', 'id');

@@ -19,8 +19,9 @@ use App\Models\UserCenter;
 use App\Models\GlobalRequest;
 use App\Models\PatientTransferRequest;
 use App\Models\RequestModifyAppointment;
-use App\Models\Requests;
 use App\Models\Appointment;
+use App\Models\Requests;
+use App\Models\ointmentointment;
 use App\Models\Shift;
 use App\Models\Chair;
 use App\Models\UserShift;
@@ -259,8 +260,7 @@ class UserService implements UserServiceInterface
     });
 }
 
- 
-     
+
      
  public function updateStatus( $requestId, $newStatus)
  {
@@ -282,6 +282,23 @@ class UserService implements UserServiceInterface
      $requestModel = Requests::findOrFail($validatedData['request_id']);
      $requestModel->updateRequestStatus($validatedData['new_status']);
 
+     if ($requestModel->globalRequest) { 
+
+
+
+     }
+     elseif ($requestModel->patientTransferRequest) { 
+
+
+     }
+     elseif ($requestModel->requestModifyAppointment  && $newStatus === 'approved'  ) {
+
+      
+       $appointment= Appointment::findOrFail($requestModel->requestModifyAppointment->appointment->id);
+    
+         $appointment->updateappointmentTime($requestModel->requestModifyAppointment->newTime);
+      
+     }
 
 
 
@@ -1028,16 +1045,51 @@ public function getUserDetails($userId)
 
 
 
+// 
+// public function getMedicalCenterDetails($centerId)
+// {
+
+//     $medicalCenter = MedicalCenter::with(['centertelecoms', 'centerAddressWithCityAndCountry'])
+//     ->findOrFail($centerId);
+
+//     return $medicalCenter;
+
+// }
 
 public function getMedicalCenterDetails($centerId)
 {
+    $medicalCenter = MedicalCenter::with([
+        'centertelecoms',
+        'centerAddressWithCityAndCountry',
+       
+    ])->findOrFail($centerId);
 
-    $medicalCenter = MedicalCenter::with(['centertelecoms', 'centerAddressWithCityAndCountry'])
-    ->findOrFail($centerId);
+    $totalNurses = $medicalCenter->users->where('role', 'nurse')->count();
+    $totalDoctors = $medicalCenter->users->where('role', 'doctor')->count();
 
-    return $medicalCenter;
+    $totalShifts = $medicalCenter->shifts;
 
+    $totalChairs = $medicalCenter->chairs->count();
+
+    $managerName = $medicalCenter->users->where('role', 'admin')->pluck('fullName')->implode(', ');
+
+
+    $contactDetails = $medicalCenter->centertelecoms;
+
+    return [
+       'centerName' => $medicalCenter->centerName,
+       'description' => $medicalCenter->description,
+       'charityName' => $medicalCenter->charityName,
+
+        'totalNurses' => $totalNurses,
+        'totalDoctors' => $totalDoctors,
+        'shifts' => $totalShifts,
+        'totalChairs' => $totalChairs,
+        'adminName' => $managerName,
+        'telecom' => $contactDetails,
+    ];
 }
+
 
 
 

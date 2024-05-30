@@ -110,7 +110,7 @@ public function changeReruestStatus(Request $request)
     $requestId = $request->input('request_id');
     $newStatus = $request->input('new_status');
 
-    $this->userService->updateStatus($requestId, $newStatus);
+     $this->userService->updateStatus($requestId, $newStatus);
     return response()->json(['message' => 'Request status updated successfully'], 200);
     }
 
