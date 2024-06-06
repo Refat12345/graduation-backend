@@ -29,6 +29,7 @@ use App\Models\DialysisSession;
 use App\Models\Note;
 use App\Models\Medicine;
 use App\Models\MedicineTaken;
+use App\Models\Logging;
 use App\Models\BloodPressureMeasurement;
 use App\Models\MedicalRecord;
 use App\Models\Prescription;
@@ -1171,6 +1172,29 @@ public function getNotesByMedicalCenter($centerId)
         ];
     });
 }
+
+
+
+public function getlogs($centerId)
+{
+    $logs = Logging::where('centerID', $centerId)->get();
+    $formattedLogs = $logs->map(function ($log) {
+        return [
+            'operation' => $log->operation,
+            'destinationOfOperation' => $log->destinationOfOperation ?? null, 
+            'oldData' => $log->oldData,
+            'newData' => $log->newData,
+            'sessionID' => $log->sessionID,
+            'affectedUser' => $log->affectedUser->fullName, 
+            'affectorUser' => $log->affectorUser->fullName,
+            'affectedUserID' => $log->affectedUser->id, 
+            'affectorUserID' => $log->affectorUser->id 
+        ];
+    });
+
+    return $formattedLogs ;
+}
+
 
 
 

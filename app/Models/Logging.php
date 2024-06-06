@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Logging extends Model
 {
+    protected $table = 'logging';
     use HasFactory;
 
     protected $fillable = [
@@ -15,7 +16,7 @@ class Logging extends Model
         'destinationOfOperation',
         'oldData',
         'newData',
-        'date',
+    
         'affectedUserID',
         'affectorUserID',
         'sessionID',

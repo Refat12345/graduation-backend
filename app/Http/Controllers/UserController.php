@@ -481,14 +481,26 @@ public function getNotesByMedicalCenter($centerId)
 {
     try {
     $notes = $this->userService->getNotesByMedicalCenter($centerId);
-    return response()->json([$notes], 200);
+    return response()->json(['notes' =>$notes], 200);
 } catch (\Exception $e) {
            
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
 
+public function getlogs($centerId)
+{
+    try {
 
+    $logs = $this->userService->getlogs($centerId);
+    return response()->json(['logs' => $logs], 200);
+
+} catch (\Exception $e) {
+           
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+
+}
 
 
 

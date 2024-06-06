@@ -26,6 +26,10 @@ return new class extends Migration
             $table->foreign('affectorUserID')->references('id')->on('users');
             $table->foreign('sessionID')->references('id')->on('dialysis_sessions');
 
+
+            $table->unsignedBigInteger('centerID');
+            $table->foreign('centerID')->references('id')->on('medical_centers');
+
             $table->timestamps();
         });
     }
