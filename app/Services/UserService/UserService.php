@@ -1188,7 +1188,8 @@ public function getlogs($centerId)
             'affectedUser' => $log->affectedUser->fullName, 
             'affectorUser' => $log->affectorUser->fullName,
             'affectedUserID' => $log->affectedUser->id, 
-            'affectorUserID' => $log->affectorUser->id 
+            'affectorUserID' => $log->affectorUser->id , 
+            'date' => $log->created_at->format('Y-m-d')
         ];
     });
 
