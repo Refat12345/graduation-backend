@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('analysisName');
             $table->integer('recurrenceInterval');
-            $table->string('unitOfMeasurement');
+            $table->string('unitOfMeasurement')->nullable();
             $table->timestamps();
 
            $table->index('analysisName');

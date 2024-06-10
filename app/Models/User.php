@@ -24,6 +24,15 @@ class User extends Authenticatable
         ];
 
 
+
+
+        public function generalPatientInformation()
+        {
+            return $this->hasOne(GeneralPatientInformation::class, 'patientID', 'id')
+                        ->with(['maritalStatus']);
+        }
+
+
         public function getAdminName()
         {
             if ($this->role === 'admin') {
@@ -45,13 +54,15 @@ class User extends Authenticatable
             return $this->hasMany(DialysisSession::class, 'nurseID', 'id');
         }
 
-
         
         public function doctorSessions(): HasMany
         {
             return $this->hasMany(DialysisSession::class, 'doctorID', 'id');
         }
 
+
+
+        
 ///////////////////////////////////////end/////////////////////////////////////////////
         
 
@@ -168,11 +179,7 @@ public function doctorSessionsWithRelatedData()
 
  
 
-        public function generalPatientInformation()
-        {
-            return $this->hasOne(GeneralPatientInformation::class, 'patientID', 'id')
-                        ->with(['maritalStatus']);
-        }
+   
 
 
 

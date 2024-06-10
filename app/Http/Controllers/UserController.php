@@ -158,6 +158,11 @@ public function addPatientInfo(Request $request)
     {
         try{
         $userData = $request->all();
+
+        $role = isset($userData['role']) ? $userData['role'] : null;
+
+  
+      
         $user = $this->userService->createUser($userData);
         return response()->json([$user], 200);
     } catch (\Exception $e) {
@@ -168,32 +173,39 @@ public function addPatientInfo(Request $request)
 
    
 
+
     public function loginUser(Request $request)
-    {
-     try{
+{
+    try {
         $nationalNumber = $request->input('nationalNumber');
         $password = $request->input('password');
         $user = $this->userService->loginUser($nationalNumber, $password);
-        if ($user) {
-            $token = $user->createToken('myauth')->plainTextToken;
-      
-            return response()->json([
-                'status' => true,
-                'message' => 'welcome',
-                'token' => $token,
-                'data' => $user,
-              
-            ], 200);
-        }  else {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+        
+        if (!$user) {
+            throw new \Exception('Invalid nationalNumber or password');
         }
+
+        return response()->json(['user' => $user], 200);
     } catch (\Exception $e) {
-           
         return response()->json(['error' => $e->getMessage()], 400);
     }
+}
+
+
+
+
+public function getUserByVerificationCode(Request $request)
+{
+    try {
+        $verificationCode = $request->input('verificationCode');
+      
+        $user = $this->userService->getUserByVerificationCode($verificationCode);
+        
+        return response()->json(['user' => $user], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
     }
-
-
+}
   
 
     public function findUser(Request $request)
@@ -242,19 +254,42 @@ public function associateUserWithMedicalCenter(Request $request)
   
 
 
-    public function verifyUser(Request $request)
-    {
-        try {
-            $user = auth('user')->user();
-            $verificationCode = $request->input('verificationCode');
-            $this->userService->verifyAccount($user, $verificationCode);
-            return response()->json(['message' => 'Account verified successfully.']);
+    // public function verifyUser(Request $request)
+    // {
+    //     try {
+          
+    //         $verificationCode = $request->input('verificationCode');
+    //         $password = $request->input('password');
+    //       $user=  $this->userService->verifyAccount($verificationCode,$password);
+    //         return response()->json(['message' => 'Account verified successfully.','user' =>$user]);
 
-        } catch (\Exception $e) {
+    //     } catch (\Exception $e) {
            
-            return response()->json(['error' => $e->getMessage()], 400);
+    //         return response()->json(['error' => $e->getMessage()], 400);
+    //     }
+    // }
+
+    public function verifyUser(Request $request)
+{
+    try {
+        $verificationCode = $request->input('verificationCode');
+        $password = $request->input('password');
+        $result = $this->userService->verifyAccount($verificationCode, $password);
+
+        if ($result) {
+            return response()->json([
+                'message' => 'Account verified successfully',
+                'user' =>   $result
+            ]);
         }
+
+        return response()->json(['error' => 'Login failed'], 400);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
     }
+}
+
 
 
 

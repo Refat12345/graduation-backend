@@ -106,7 +106,7 @@ public function createAnalysisType(array $AnalysisTypeData)
             Rule::unique('analysis_types', 'analysisName'),
         ],
         'recurrenceInterval' => 'required|Integer',
-        'unitOfMeasurement' => 'required|string|max:255',
+     'unitOfMeasurement' => 'nullable|string|max:255',
     ]);
 
     if ($validator->fails()) {

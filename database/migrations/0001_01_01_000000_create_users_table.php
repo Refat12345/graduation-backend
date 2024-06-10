@@ -15,18 +15,17 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id(); 
             $table->string('fullName');
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('nationalNumber')->unique();
             $table->date('dateOfBirth');
             $table->string('gender');
-            $table->string('accountStatus');
+            $table->string('accountStatus')->default('nonActive');
             $table->string('role');
             $table->string('verificationCode')->nullable();
             $table->timestamps();
-
             $table->index('nationalNumber');
-             $table->index('fullName');
-             $table->index('accountStatus');
+            $table->index('fullName');
+            $table->index('accountStatus');
 
 
         });

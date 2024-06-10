@@ -20,8 +20,9 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 Route::post('/login', [UserController::class, 'loginUser']);
 Route::post('/search', [UserController::class, 'findUser']);
 Route::post('/createUser', 'App\Http\Controllers\UserController@createUser');
-Route::post('/verify', [UserController::class, 'verifyUser']);
 
+Route::post('/getUserByVerificationCode', [UserController::class, 'getUserByVerificationCode']);
+Route::post('/verify', [UserController::class, 'verifyUser']);
 Route::post('/change', [UserController::class, 'changeStatus']);
 
 
@@ -132,6 +133,8 @@ Route::get('getPieCharts/{month?}/{year?}', [StatisticsController::class, 'getPi
 
 Route::get('causeRenalFailure', [StatisticsController::class, 'causeRenalFailure']);
 Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatistics']);
+
+
 
 
 

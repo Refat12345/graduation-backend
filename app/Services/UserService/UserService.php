@@ -92,8 +92,72 @@ class UserService implements UserServiceInterface
      * @throws LogicException
      */
   
+ public function createUser(array $userData): User
+ {
+     DB::beginTransaction();
+     $validator = Validator::make($userData, [
+         'fullName' => 'required|string|max:255',
+       //  'password' => 'required|string|min:8',
+         'nationalNumber' => 'required|string|max:11|unique:users',
+         'dateOfBirth' => 'required|date',
+         'gender' => 'required|in:male,female,other',
+       //  'accountStatus' => 'required|string|max:255',
+         'role' => 'required|string|max:255',
+         'telecom' => 'required|array',
+         'telecom.*.system' => 'required|string|max:255',
+         'telecom.*.value' => 'required|string|max:255',
+         'telecom.*.use' => 'required|string|max:255',
+         'address' => 'required|array',
+         'address.*.line' => 'required|string|max:255',
+         'address.*.use' => 'required|string|max:255',
+         'address.*.cityName' => 'required|string|max:255',
+         'address.*.countryName' => 'required|string|max:255',
+         'centerName' => 'required|string|max:255',
+          'permissionNames' => 'array'
+     ]);
+ 
+     if ($validator->fails()) {
+         throw new LogicException($validator->errors()->first());
+     }
+ 
+     try {
+         $userData['verificationCode'] = rand(100000, 999999);
+        // $userData['password'] = Hash::make($userData['password']);
+         $user = User::create($userData);
+ 
+         $this->createUserTelecoms($user, $userData['telecom']);
+         foreach ($userData['address'] as $addressData) {
+             $this->createUserAddress($user, $addressData);
+         }
+         $this->associateUserWithMedicalCenter($user, $userData['centerName']);
+         if ($userData['role'] === 'secretary') {
+          
+            $this->addPermissionsToUser($user->id, $userData['permissionNames']);
+        }
 
+         
+         DB::commit();
 
+       
+         return $user;
+     } catch (\Exception $e) {
+         DB::rollBack();
+         throw new LogicException('Error creating user: ' . $e->getMessage());
+     }
+ }
+ 
+
+     public function addPermissionsToUser($userId, array $permissionNames)
+     {
+         DB::transaction(function () use ($userId, $permissionNames) {
+             $user = User::findOrFail($userId);
+     
+             foreach ($permissionNames as $permissionName) {
+                 $permission = Permission::firstOrCreate(['permissionName' => $permissionName]);
+                 $user->permissions()->syncWithoutDetaching([$permission->id]);
+             }
+         });
+     }
      
      public function addPatientTransferRequest(array $data)
      {
@@ -322,55 +386,6 @@ class UserService implements UserServiceInterface
 
 
 
- public function createUser(array $userData): User
- {
-     DB::beginTransaction();
-     $validator = Validator::make($userData, [
-         'fullName' => 'required|string|max:255',
-         'password' => 'required|string|min:8',
-         'nationalNumber' => 'required|string|max:11|unique:users',
-         'dateOfBirth' => 'required|date',
-         'gender' => 'required|in:male,female,other',
-         'accountStatus' => 'required|string|max:255',
-         'role' => 'required|string|max:255',
-         'telecom' => 'required|array',
-         'telecom.*.system' => 'required|string|max:255',
-         'telecom.*.value' => 'required|string|max:255',
-         'telecom.*.use' => 'required|string|max:255',
-         'address' => 'required|array',
-         'address.*.line' => 'required|string|max:255',
-         'address.*.use' => 'required|string|max:255',
-         'address.*.cityName' => 'required|string|max:255',
-         'address.*.countryName' => 'required|string|max:255',
-         'centerName' => 'required|string|max:255',
-     ]);
- 
-     if ($validator->fails()) {
-         throw new LogicException($validator->errors()->first());
-     }
- 
-     try {
-         $userData['verificationCode'] = rand(1000, 9999);
-         $userData['password'] = Hash::make($userData['password']);
-         $user = User::create($userData);
- 
-         $this->createUserTelecoms($user, $userData['telecom']);
-         foreach ($userData['address'] as $addressData) {
-             $this->createUserAddress($user, $addressData);
-         }
-         $this->associateUserWithMedicalCenter($user, $userData['centerName']);
- 
-
-         
-         DB::commit();
-         return $user;
-     } catch (\Exception $e) {
-         DB::rollBack();
-         throw new LogicException('Error creating user: ' . $e->getMessage());
-     }
- }
- 
-
  public function createUserAddress(User $user, array $addressData)
  {
 
@@ -493,24 +508,55 @@ public function changeAccountStatus(User $user, string $newStatus)
 
 
 
-public function verifyAccount(User $user, string $verificationCode)
+public function getUserByVerificationCode(string $verificationCode)
 {
-    if ($user->verificationCode === $verificationCode) {
-        $user->update(['accountStatus' => 'verified']);
-    } else {
+   
+    $user = User::where('verificationCode', $verificationCode)->first();
+    
+    if (!$user) {
+        throw new LogicException('User not found for this verification code');
+    }
+
+    return [
+        'fullName' => $user->fullName,
+        'nationalNumber' => $user->nationalNumber,
+        'verificationCode' => $user->verificationCode,
+       
+    ];
+}
+public function verifyAccount(string $verificationCode, string $password)
+{
+    $user = User::where('verificationCode', $verificationCode)->first();
+    
+    if (!$user) {
         throw new LogicException('Verification code is invalid.');
     }
+
+    $hashedPassword = Hash::make($password);
+    $user->update([
+        'accountStatus' => 'verified',
+        'password' => $hashedPassword,
+        'verificationCode' => null,
+    ]);
+
+    return $this->loginUser($user->nationalNumber, $password);
 }
 
 
-    public function loginUser(string $nationalNumber, string $password): ?User
-    {
-        if (Auth::attempt(['nationalNumber' => $nationalNumber, 'password' => $password])) {
-            return Auth::user();
-        }
 
-        return null;
+public function loginUser(string $nationalNumber, string $password)
+{
+    if (Auth::attempt(['nationalNumber' => $nationalNumber, 'password' => $password])) {
+        $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $user->token = $token;
+        return $user;
     }
+
+    return null;
+
+}
 
 
 
@@ -557,17 +603,7 @@ public function verifyAccount(User $user, string $verificationCode)
 
 
 
-    public function addPermissionsToUser($userId, array $permissionNames)
-    {
-        DB::transaction(function () use ($userId, $permissionNames) {
-            $user = User::findOrFail($userId);
-    
-            foreach ($permissionNames as $permissionName) {
-                $permission = Permission::firstOrCreate(['permissionName' => $permissionName]);
-                $user->permissions()->syncWithoutDetaching([$permission->id]);
-            }
-        });
-    }
+
 
 
     public function getUserPermissions($userId)
@@ -1037,6 +1073,17 @@ public function getUserDetails($userId)
                 ];
             
         }
+
+    if ($user->role === 'patient') {
+        $generalPatientInformation = $user->generalPatientInformation;
+        if ($generalPatientInformation) {
+            $userDetails['generalInformation'] = 
+                $generalPatientInformation;
+              
+                
+           
+        }
+    }
     
 
     return $userDetails;

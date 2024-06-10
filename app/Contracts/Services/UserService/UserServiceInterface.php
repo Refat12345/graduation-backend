@@ -35,7 +35,7 @@ interface UserServiceInterface
      
          public function createUser(array $userData): User;
 
-         public function loginUser(string $nationalNumber, string $password): ?User;
+         public function loginUser(string $nationalNumber, string $password);
   
 
 
@@ -71,9 +71,9 @@ interface UserServiceInterface
     public function findUserBy(string $value): Collection;
 
     public function changeAccountStatus(User $user, string $newStatus);
-    public function verifyAccount(User $user, string $verificationCode);
+    public function getUserByVerificationCode(string $verificationCode);
 
-
+    public function verifyAccount( string $verificationCode,string $password);
    
 
 
