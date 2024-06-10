@@ -125,26 +125,56 @@ class StatisticsService implements StatisticsServiceInterface {
 
     
     
+    // public function causeRenalFailure()
+    // {
+    //     $user = auth('user')->user();
+    //     $centerID = $user->userCenter->centerID;
+    
+    //     $causes = ['diabetes', 'heartDiseases', 'bloodPressure', 'otherDiseases'];
+    //     $totalCounts = [];
+    
+    //     foreach ($causes as $cause) {
+    //         $count = User::whereHas('medicalRecord', function ($query) use ($centerID, $cause) {
+    //             $query->whereHas('user.userCenter', function ($query) use ($centerID) {
+    //                 $query->where('centerID', $centerID);
+    //             })->where('causeRenalFailure', $cause);
+    //         })->count();
+    
+    //         $totalCounts[$cause] = $count;
+    //     }
+    
+    //     return $totalCounts;
+    // }
+
     public function causeRenalFailure()
-    {
-        $user = auth('user')->user();
-        $centerID = $user->userCenter->centerID;
-    
-        $causes = ['diabetes', 'heartDiseases', 'bloodPressure', 'otherDiseases'];
-        $totalCounts = [];
-    
-        foreach ($causes as $cause) {
-            $count = User::whereHas('medicalRecord', function ($query) use ($centerID, $cause) {
-                $query->whereHas('user.userCenter', function ($query) use ($centerID) {
-                    $query->where('centerID', $centerID);
-                })->where('causeRenalFailure', $cause);
-            })->count();
-    
-            $totalCounts[$cause] = $count;
-        }
-    
-        return $totalCounts;
+{
+    $user = auth('user')->user();
+    $centerID = $user->userCenter->centerID;
+
+    $causes = ['diabetes', 'heartDiseases', 'bloodPressure'];
+    $totalCounts = [];
+
+    foreach ($causes as $cause) {
+        $count = User::whereHas('medicalRecord', function ($query) use ($centerID, $cause) {
+            $query->whereHas('user.userCenter', function ($query) use ($centerID) {
+                $query->where('centerID', $centerID);
+            })->where('causeRenalFailure', $cause);
+        })->count();
+
+        $totalCounts[$cause] = $count;
     }
+
+    $otherCount = User::whereHas('medicalRecord', function ($query) use ($centerID, $causes) {
+        $query->whereHas('user.userCenter', function ($query) use ($centerID) {
+            $query->where('centerID', $centerID);
+        })->whereNotIn('causeRenalFailure', $causes);
+    })->count();
+
+    $totalCounts['otherDiseases'] = $otherCount;
+
+    return $totalCounts;
+}
+
     
     
     
