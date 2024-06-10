@@ -156,6 +156,7 @@ public function getMedicalAnalysisWithAnalysisType($userID)
                                           return [
                                               'analysisName' => $analysis->analysisType->analysisName,
                                               'value' => $analysis->value,
+                                              'unitOfMeasurement' => $analysis->analysisType->unitOfMeasurement ?? 'null',
                                               'analysisDate' => $analysisDate->format('Y-m-d'), 
                                               'quarter' => $quarterArabic,
                                               'notes' => $analysis->notes
