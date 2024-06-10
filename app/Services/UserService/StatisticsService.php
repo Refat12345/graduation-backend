@@ -59,35 +59,70 @@ class StatisticsService implements StatisticsServiceInterface {
 
 
 
-    public function getPieCharts($month, $year)
-    {
-        $user = auth('user')->user();
-        $centerId = $user->userCenter->centerID;
+    // public function getPieCharts($month, $year)
+    // {
+    //     $user = auth('user')->user();
+    //     $centerId = $user->userCenter->centerID;
     
-        $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
     
-        $materials = ['heparin', 'iron', 'epoetin'];
-        $totalValues = [];
+    //     $materials = ['heparin', 'iron', 'epoetin'];
+    //     $totalValues = [];
     
-        foreach ($materials as $material) {
-            $disbursedValue = DisbursedMaterialsUser::whereHas('disbursedMaterial', function ($query) use ($material) {
-                $query->where('materialName', $material);
-            })->where('centerID', $centerId)
-              ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString])
-              ->sum('quantity');
+    //     foreach ($materials as $material) {
+    //         $disbursedValue = DisbursedMaterialsUser::whereHas('disbursedMaterial', function ($query) use ($material) {
+    //             $query->where('materialName', $material);
+    //         })->where('centerID', $centerId)
+    //           ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString])
+    //           ->sum('quantity');
     
-            $takenValue = MedicineTaken::whereHas('medicine', function ($query) use ($material) {
-                $query->where('name', $material);
-            })->whereHas('dialysisSession', function ($query) use ($centerId) {
-                $query->where('centerID', $centerId);
-            })->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString])
-              ->sum('value');
+    //         $takenValue = MedicineTaken::whereHas('medicine', function ($query) use ($material) {
+    //             $query->where('name', $material);
+    //         })->whereHas('dialysisSession', function ($query) use ($centerId) {
+    //             $query->where('centerID', $centerId);
+    //         })->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString])
+    //           ->sum('value');
     
-            $totalValues[$material] = $disbursedValue + $takenValue;
+    //         $totalValues[$material] = $disbursedValue + $takenValue;
+    //     }
+    
+    //     return $totalValues;
+    // }
+
+    public function getPieCharts($month = null, $year = null)
+{
+    $user = auth('user')->user();
+    $centerId = $user->userCenter->centerID;
+    
+    $materials = ['heparin', 'iron', 'epoetin'];
+    $totalValues = [];
+    
+    foreach ($materials as $material) {
+        $disbursedQuery = DisbursedMaterialsUser::whereHas('disbursedMaterial', function ($query) use ($material) {
+            $query->where('materialName', $material);
+        })->where('centerID', $centerId);
+        
+        $takenQuery = MedicineTaken::whereHas('medicine', function ($query) use ($material) {
+            $query->where('name', $material);
+        })->whereHas('dialysisSession', function ($query) use ($centerId) {
+            $query->where('centerID', $centerId);
+        });
+        
+        if ($month !== null && $year !== null) {
+            $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $disbursedQuery->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString]);
+            $takenQuery->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString]);
         }
-    
-        return $totalValues;
+
+        $disbursedValue = $disbursedQuery->sum('quantity');
+        $takenValue = $takenQuery->sum('value');
+        
+        $totalValues[$material] = $disbursedValue + $takenValue;
     }
+    
+    return $totalValues;
+}
+
     
     
     public function causeRenalFailure()

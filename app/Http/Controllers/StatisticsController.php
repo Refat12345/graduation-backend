@@ -18,11 +18,10 @@ class StatisticsController extends Controller {
     public function __construct(StatisticsServiceInterface $service) {
         $this->service = $service;
     }
-
-    public function getPieCharts($month, $year)
-{
-    return response()->json(['pieChart' => $this->service->getPieCharts($month, $year)], 200);
-}
+    public function getPieCharts($month = null, $year = null)
+    {
+        return response()->json(['pieChart' => $this->service->getPieCharts($month, $year)], 200);
+    }
 
 
     public function causeRenalFailure()

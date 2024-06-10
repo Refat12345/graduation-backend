@@ -264,7 +264,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
                                       ->where('userID', $userID)->first();
     
         if (!$medicalRecord) {
-            return response()->json(['error' => 'Medical record not found'], 404);
+            return 'لا يوجد سجل طبي لهذاالمريض';
         }
     
         $formattedRecord = [
