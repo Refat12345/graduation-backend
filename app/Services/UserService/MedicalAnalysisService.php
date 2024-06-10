@@ -127,22 +127,45 @@ public function createAnalysisType(array $AnalysisTypeData)
 
 
 
+
 public function getMedicalAnalysisWithAnalysisType($userID)
 {
     $medicalAnalyses = MedicalAnalysis::with('analysisType')
                                       ->where('userID', $userID)
                                       ->get()
                                       ->map(function ($analysis) {
+                                          $analysisDate = Carbon::parse($analysis->analysisDate);
+                                          $quarter = $analysisDate->quarter;
+                                          
+                                          $quarterArabic = '';
+                                          switch ($quarter) {
+                                              case 1:
+                                                  $quarterArabic = 'الربع الأول';
+                                                  break;
+                                              case 2:
+                                                  $quarterArabic = 'الربع الثاني';
+                                                  break;
+                                              case 3:
+                                                  $quarterArabic = 'الربع الثالث';
+                                                  break;
+                                              case 4:
+                                                  $quarterArabic = 'الربع الرابع';
+                                                  break;
+                                          }
+
                                           return [
-                                              'analysisName' => $analysis->analysisType->analysisName, 
+                                              'analysisName' => $analysis->analysisType->analysisName,
                                               'value' => $analysis->value,
-                                              'analysisDate' => $analysis->analysisDate, 
+                                              'analysisDate' => $analysisDate->format('Y-m-d'), 
+                                              'quarter' => $quarterArabic,
                                               'notes' => $analysis->notes
                                           ];
                                       });
 
-    return $medicalAnalyses ;
+    return $medicalAnalyses;
 }
+
+
 
 
 
