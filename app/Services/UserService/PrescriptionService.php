@@ -113,8 +113,9 @@ public function getPrescriptionsByPatient(User $patient): Collection
                 return [
                     'status' => $prescriptionMedicine->status, 
                     'name' => $medicine->name,
-                    'dateOfStart' => $prescriptionMedicine->dateOfStart,
-                    'dateOfEnd' => $prescriptionMedicine->dateOfEnd,
+                    'dateOfStart' =>  $dateOfStart = $prescriptionMedicine->dateOfStart instanceof Carbon ? $prescriptionMedicine->dateOfStart : Carbon::parse($prescriptionMedicine->dateOfStart)->format('Y-m-d'),
+                    'dateOfEnd' =>  $dateOfEnd = $prescriptionMedicine->dateOfEnd instanceof Carbon ? $prescriptionMedicine->dateOfEnd : Carbon::parse($prescriptionMedicine->dateOfEnd)->format('Y-m-d'),
+                    
                     'details' => $prescriptionMedicine->details
                 ];
             })
@@ -123,6 +124,7 @@ public function getPrescriptionsByPatient(User $patient): Collection
 
     return  $prescriptions;
 }
+
 
 
 
