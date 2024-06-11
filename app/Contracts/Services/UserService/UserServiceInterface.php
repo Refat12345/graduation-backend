@@ -117,7 +117,7 @@ interface UserServiceInterface
 
 
 
-
+    public function createCenterTelecoms($centerId, array $telecomsData);
     public function createNote(array $userData);
    // public function getNotesByMedicalCenter($centerId);
     

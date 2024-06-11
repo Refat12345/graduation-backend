@@ -911,30 +911,58 @@ public function getAllMedicalCenters()
 
 public function addShift(array $data)
 {
-    
     $validatedData = Validator::make($data, [
-        'shiftStart' => 'required|date_format:H:i', // تحديد تنسيق الوقت
-        'shiftEnd' => 'required|date_format:H:i|after:shiftStart', // تحديد تنسيق الوقت والتحقق من أن shiftEnd بعد shiftStart
+        'shiftStart' => 'required|date_format:H:i', 
+        'shiftEnd' => 'required|date_format:H:i|after:shiftStart', 
         'name' => 'required|string|max:255',
-        
     ])->validate();
 
     $user = auth('user')->user();
     $centerId = UserCenter::where('userID', $user->id)->first()->centerID;
-    
-    // تحويل الوقت إلى نوع البيانات time قبل حفظه في الداتابيس
+
+    $shiftStart = Carbon::createFromFormat('H:i', $validatedData['shiftStart'])->toTimeString();
+    $shiftEnd = Carbon::createFromFormat('H:i', $validatedData['shiftEnd'])->toTimeString();
+
     $shift = new Shift([
-        'shiftStart' => Carbon::createFromFormat('H:i', $validatedData['shiftStart']),
-        'shiftEnd' => Carbon::createFromFormat('H:i', $validatedData['shiftEnd']),
+        'shiftStart' => $shiftStart,
+        'shiftEnd' => $shiftEnd,
         'name' => $validatedData['name'],
         'centerID' => $centerId
     ]);
-    
+
+
     $shift->save();
     return $shift;
 }
 
+    public function createCenterTelecoms($centerId, array $telecomsData)
+    {
+        $center = MedicalCenter::find($centerId);
+        if (!$center) {
+            throw new ModelNotFoundException('Medical Center not found');
+        }
 
+        $createdTelecoms = [];
+
+        foreach ($telecomsData as $data) {
+            $validator = Validator::make($data, [
+                'system' => 'required|string|max:255',
+                'value' => 'required|string|max:255|unique:telecoms,value',
+                'use' => 'nullable|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $telecom = new Telecom($validator->validated());
+            $center->centertelecoms()->save($telecom);
+
+            $createdTelecoms[] = $telecom;
+        }
+
+        return $createdTelecoms;
+    }
 
 
 public function assignUserToShift(array $data)

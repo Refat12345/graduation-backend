@@ -71,7 +71,7 @@ Route::get('/user/{userId}', [UserController::class, 'showUserDetails']);
 Route::get('/center/{centerId}', [UserController::class, 'showMedicalCenterDetails']);
 
 
-
+Route::post('/createCenterTelecoms', [UserController::class, 'createCenterTelecoms']);
 Route::post('/createNote', [UserController::class, 'createNote']);
 Route::get('/getNotesByMedicalCenter/{centerId}', [UserController::class, 'getNotesByMedicalCenter']);
 Route::get('/getlogs/{centerId}', [UserController::class, 'getlogs']);

@@ -389,6 +389,29 @@ public function createChair(Request $request)
 }
 
 
+public function createCenterTelecoms(Request $request)
+{
+    try{
+    $validatedData = $request->validate([
+        'centerID' => 'required|exists:medical_centers,id',
+        'telecoms' => 'required|array',
+        'telecoms.*.system' => 'required|string|max:255',
+        'telecoms.*.value' => 'required|string|max:255|unique:telecoms,value',
+        'telecoms.*.use' => 'nullable|string|max:255',
+    ]);
+
+    $centerId = $validatedData['centerID'];
+    $telecomsData = $validatedData['telecoms'];
+
+    $data = $this->userService->createCenterTelecoms($centerId, $telecomsData);
+
+    return response()->json(['data' => $data], 200);
+
+} catch (\Exception $e) {
+    return response()->json(['error' => 'An unexpected error occurred', 'message' => $e->getMessage()], 500);
+}
+}
+
 
 
 public function createShift(Request $request)
