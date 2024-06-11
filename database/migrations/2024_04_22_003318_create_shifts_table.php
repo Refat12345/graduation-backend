@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamp('shiftStart')->nullable();
             $table->timestamp('shiftEnd')->nullable();
+            $table->string('name')->nullable();
             $table->unsignedBigInteger('centerID');
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->timestamps();

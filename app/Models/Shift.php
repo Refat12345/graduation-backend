@@ -9,7 +9,7 @@ class Shift extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['shiftStart', 'shiftEnd', 'centerID'];
+    protected $fillable = ['shiftStart', 'shiftEnd','name', 'centerID'];
     
     public function medicalCenter(): BelongsTo
     {

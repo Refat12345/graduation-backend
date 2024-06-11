@@ -544,6 +544,7 @@ public function verifyAccount(string $verificationCode, string $password)
 
 
 
+
 public function loginUser(string $nationalNumber, string $password)
 {
     if (Auth::attempt(['nationalNumber' => $nationalNumber, 'password' => $password])) {
@@ -890,7 +891,7 @@ public function getAllMedicalCenters()
     $validatedData = Validator::make($data, [
         'shiftStart' => 'required|date',
         'shiftEnd' => 'required|date|after:shiftStart',
-        
+        'name' => 'required|string|max:255',
         
     ])->validate();
  
@@ -899,6 +900,7 @@ public function getAllMedicalCenters()
      $shift = new Shift([
          'shiftStart' => $validatedData['shiftStart'],
          'shiftEnd' => $validatedData['shiftEnd'],
+         'name' => $validatedData['name'],
          'centerID' => $centerId
      ]);
      $shift->save();

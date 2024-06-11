@@ -29,9 +29,8 @@ interface UserServiceInterface
      public function getAllRequests();
      public function addGlobalRequest(array $data);
      public function updateStatus( $requestId, $newStatus);
-
-    public function createUser(array $userData): User;
-    public function loginUser(string $nationalNumber, string $password);
+     public function createUser(array $userData): User;
+     public function loginUser(string $nationalNumber, string $password);
   
 
 

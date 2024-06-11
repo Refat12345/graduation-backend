@@ -130,6 +130,9 @@ public function createAnalysisType(array $AnalysisTypeData)
 
 public function getMedicalAnalysisWithAnalysisType($userID)
 {
+  
+    Carbon::setLocale('ar');
+
     $medicalAnalyses = MedicalAnalysis::with('analysisType')
                                       ->where('userID', $userID)
                                       ->get()
@@ -153,11 +156,17 @@ public function getMedicalAnalysisWithAnalysisType($userID)
                                                   break;
                                           }
 
+                                         
+                                          $day = $analysisDate->format('d'); 
+                                          $month = $analysisDate->locale('ar')->translatedFormat('F'); 
+                                          $year = $analysisDate->format('Y'); 
+                                          $formattedDate = $day . '-' . $month . '-' . $year;
+
                                           return [
                                               'analysisName' => $analysis->analysisType->analysisName,
                                               'value' => $analysis->value,
                                               'unitOfMeasurement' => $analysis->analysisType->unitOfMeasurement ?? 'null',
-                                              'analysisDate' => $analysisDate->format('YYY-mm-dd'), 
+                                              'analysisDate' => $formattedDate, 
                                               'quarter' => $quarterArabic,
                                               'notes' => $analysis->notes
                                           ];
@@ -165,9 +174,4 @@ public function getMedicalAnalysisWithAnalysisType($userID)
 
     return $medicalAnalyses;
 }
-
-
-
-
-
 }
