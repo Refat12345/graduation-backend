@@ -912,13 +912,15 @@ public function getAllMedicalCenters()
 public function addShift(array $data)
 {
     $validatedData = Validator::make($data, [
+       
+        'centerID' => 'required|integer|exists:medical_centers,id',
         'shiftStart' => 'required|date_format:H:i', 
         'shiftEnd' => 'required|date_format:H:i|after:shiftStart', 
         'name' => 'required|string|max:255',
     ])->validate();
 
-    $user = auth('user')->user();
-    $centerId = UserCenter::where('userID', $user->id)->first()->centerID;
+  //  $user = auth('user')->user();
+    //$centerId = UserCenter::where('userID', $user->id)->first()->centerID;
 
     $shiftStart = Carbon::createFromFormat('H:i', $validatedData['shiftStart'])->toTimeString();
     $shiftEnd = Carbon::createFromFormat('H:i', $validatedData['shiftEnd'])->toTimeString();
@@ -927,7 +929,7 @@ public function addShift(array $data)
         'shiftStart' => $shiftStart,
         'shiftEnd' => $shiftEnd,
         'name' => $validatedData['name'],
-        'centerID' => $centerId
+        'centerID' =>  $validatedData['centerID'],
     ]);
 
 
