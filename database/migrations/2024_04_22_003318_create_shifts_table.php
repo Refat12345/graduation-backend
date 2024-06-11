@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
-            $table->timestamp('shiftStart')->nullable();
-            $table->timestamp('shiftEnd')->nullable();
+           // $table->timestamp('shiftStart')->nullable();
+           // $table->timestamp('shiftEnd')->nullable();
+
+            $table->time('shiftStart')->nullable();
+            $table->time('shiftEnd')->nullable();
+
+
+
             $table->string('name')->nullable();
             $table->unsignedBigInteger('centerID');
             $table->foreign('centerID')->references('id')->on('medical_centers');

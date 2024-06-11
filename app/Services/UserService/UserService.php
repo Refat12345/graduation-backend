@@ -885,28 +885,54 @@ public function getAllMedicalCenters()
 
 
 
- public function addShift(array $data)
- {
+//  public function addShift(array $data)
+//  {
+    
+//     $validatedData = Validator::make($data, [
+//         'shiftStart' => 'required|date',
+//         'shiftEnd' => 'required|date|after:shiftStart',
+//         'name' => 'required|string|max:255',
+        
+//     ])->validate();
+ 
+//      $user = auth('user')->user();
+//      $centerId = UserCenter::where('userID', $user->id)->first()->centerID;
+//      $shift = new Shift([
+//          'shiftStart' => $validatedData['shiftStart'],
+//          'shiftEnd' => $validatedData['shiftEnd'],
+//          'name' => $validatedData['name'],
+//          'centerID' => $centerId
+//      ]);
+//      $shift->save();
+//      return $shift;
+//  }
+
+
+
+public function addShift(array $data)
+{
     
     $validatedData = Validator::make($data, [
-        'shiftStart' => 'required|date',
-        'shiftEnd' => 'required|date|after:shiftStart',
+        'shiftStart' => 'required|date_format:H:i', // تحديد تنسيق الوقت
+        'shiftEnd' => 'required|date_format:H:i|after:shiftStart', // تحديد تنسيق الوقت والتحقق من أن shiftEnd بعد shiftStart
         'name' => 'required|string|max:255',
         
     ])->validate();
- 
-     $user = auth('user')->user();
-     $centerId = UserCenter::where('userID', $user->id)->first()->centerID;
-     $shift = new Shift([
-         'shiftStart' => $validatedData['shiftStart'],
-         'shiftEnd' => $validatedData['shiftEnd'],
-         'name' => $validatedData['name'],
-         'centerID' => $centerId
-     ]);
-     $shift->save();
-     return $shift;
- }
 
+    $user = auth('user')->user();
+    $centerId = UserCenter::where('userID', $user->id)->first()->centerID;
+    
+    // تحويل الوقت إلى نوع البيانات time قبل حفظه في الداتابيس
+    $shift = new Shift([
+        'shiftStart' => Carbon::createFromFormat('H:i', $validatedData['shiftStart']),
+        'shiftEnd' => Carbon::createFromFormat('H:i', $validatedData['shiftEnd']),
+        'name' => $validatedData['name'],
+        'centerID' => $centerId
+    ]);
+    
+    $shift->save();
+    return $shift;
+}
 
 
 
@@ -1242,6 +1268,7 @@ public function getNotesByreceiverID($receiverID)
         ];
     });
 }
+
 
 
 

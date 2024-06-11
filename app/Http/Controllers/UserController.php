@@ -518,7 +518,7 @@ public function getNotesByreceiverID($receiverID)
     $notes = $this->userService->getNotesByreceiverID($receiverID);
     return response()->json(['notes' =>$notes], 200);
 } catch (\Exception $e) {
-           
+         
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
