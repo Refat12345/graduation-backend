@@ -158,6 +158,8 @@ class UserService implements UserServiceInterface
              }
          });
      }
+
+
      
      public function addPatientTransferRequest(array $data)
      {
@@ -166,7 +168,7 @@ class UserService implements UserServiceInterface
              'patientID' => 'required|exists:users,id',
              'centerPatientID' => 'required|exists:medical_centers,id',
              'destinationCenterID' => 'required|exists:medical_centers,id',
-             'requestStatus' => 'required|in:pending,approved,rejected',
+            // 'requestStatus' => 'required|in:pending,approved,rejected',
              'cause' => 'sometimes|required|string'
          ]);
      
@@ -174,7 +176,7 @@ class UserService implements UserServiceInterface
              return $validator->errors();
          }
          $request = new Requests();
-         $request->requestStatus = $data['requestStatus'];
+         $request->requestStatus = 'pending';
          $request->cause = $data['cause'] ?? null;
          $request->save();
      
@@ -293,37 +295,36 @@ class UserService implements UserServiceInterface
 
 
 
-
      public function mapRequests($requests)
-{
-    return $requests->map(function ($request) {
-        $processedRequest = [
-            'id' => $request->id,
-            'requestStatus' => $request->requestStatus,
-            'cause' => $request->cause,
-        ];
-
-        if ($request->globalRequest) {
-            $processedRequest['type'] = 'Global';
-            $processedRequest['content'] = $request->globalRequest->content;
-          //  $processedRequest['direction'] = $request->globalRequest->direction;
-           $processedRequest['sender'] = $request->globalRequest->requester;
-           // $processedRequest['reciver'] = $request->globalRequest->reciver;
-        } elseif ($request->patientTransferRequest) {
-            $processedRequest['type'] = 'Patient Transfer';
-            $processedRequest['patientName'] = $request->patientTransferRequest->user->fullName;
-          //  $processedRequest['centerPatientName'] = $request->patientTransferRequest->centerPatient->centerName;
-            $processedRequest['destinationCenterName'] = $request->patientTransferRequest->destinationCenter->centerName;
-        } elseif ($request->requestModifyAppointment) {
-            $processedRequest['type'] = 'Modify Appointment';
-            $processedRequest['newTime'] = $request->requestModifyAppointment->newTime;
-        }
-        
-
-
-        return $processedRequest;
-    });
-}
+     {
+         $user = auth('user')->user(); 
+     
+         return $requests->map(function ($request) use ($user) { 
+             $processedRequest = [
+                 'id' => $request->id,
+                 'requestStatus' => $request->requestStatus,
+               //  'cause' => $request->cause,
+             ];
+     
+             if ($request->globalRequest) {
+                 $processedRequest['type'] = 'Global';
+                 $processedRequest['content'] = $request->globalRequest->content;
+                 $processedRequest['sender'] = $request->globalRequest->requester;
+             } elseif ($request->patientTransferRequest) {
+                 $patientName = $request->patientTransferRequest->user->fullName;
+                 $centerPatientName = $request->patientTransferRequest->centerPatient->centerName;
+                 $destinationCenterName = $request->patientTransferRequest->destinationCenter->centerName;
+                 $processedRequest['type'] = 'Patient Transfer';
+                 $processedRequest['senderName'] = $user->fullName;
+                 $processedRequest['content'] = "نريد نقل المريض " . $patientName . " من مركز " . $centerPatientName . " الى مركز " . $destinationCenterName . " بسبب " . $request->cause;
+             } elseif ($request->requestModifyAppointment) {
+                 $processedRequest['type'] = 'Modify Appointment';
+                 $processedRequest['newTime'] = $request->requestModifyAppointment->newTime;
+             }
+     
+             return $processedRequest;
+         });
+     }
 
 
      
