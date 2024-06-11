@@ -5,7 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckPermission;
-use App\Http\Middleware\Cors;
+use App\Http\Middleware\CorsMiddleware;
+
 
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
@@ -21,7 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(EnsureFrontendRequestsAreStateful::class);
       // $middleware->append(CheckRole::class);
         $middleware->append(CheckPermission::class);
-        $middleware->append(Cors::class);
+     $middleware->append(CorsMiddleware::class);
+      // App\Http\Middleware\CorsMiddleware::class,
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
