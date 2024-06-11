@@ -1202,9 +1202,32 @@ return  $details;
 
 
 
-public function getNotesByMedicalCenter($centerId)
+
+// public function getNotesByMedicalCenter($centerId)
+// {
+//     $notes = Note::where('centerID', $centerId)->get();
+//     return $notes->map(function ($note) {
+//         return [
+//             'senderID' => $note->senderID,
+//             'receiverID' => $note->receiverID ? $note->receiverID : null, 
+//             'noteContent' => $note->noteContent,
+//             'category' => $note->category,
+//             'type' => $note->type,
+//             'date' => $note->date,
+//             'sessionID' => $note->sessionID,
+//             'senderName' => $note->sender->fullName, 
+         
+
+//             'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
+//         ];
+//     });
+// }
+
+
+
+public function getNotesByreceiverID($receiverID)
 {
-    $notes = Note::where('centerID', $centerId)->get();
+    $notes = Note::where('receiverID', $receiverID)->get();
     return $notes->map(function ($note) {
         return [
             'senderID' => $note->senderID,
@@ -1215,8 +1238,6 @@ public function getNotesByMedicalCenter($centerId)
             'date' => $note->date,
             'sessionID' => $note->sessionID,
             'senderName' => $note->sender->fullName, 
-         
-
             'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
         ];
     });

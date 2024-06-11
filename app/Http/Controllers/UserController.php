@@ -512,6 +512,20 @@ try {
 
 
 
+public function getNotesByreceiverID($receiverID)
+{
+    try {
+    $notes = $this->userService->getNotesByreceiverID($receiverID);
+    return response()->json(['notes' =>$notes], 200);
+} catch (\Exception $e) {
+           
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+}
+
+
+
+
 public function getNotesByMedicalCenter($centerId)
 {
     try {

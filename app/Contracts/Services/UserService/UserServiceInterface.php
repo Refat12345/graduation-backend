@@ -119,7 +119,9 @@ interface UserServiceInterface
 
 
     public function createNote(array $userData);
-    public function getNotesByMedicalCenter($centerId);
+   // public function getNotesByMedicalCenter($centerId);
+    
+    public function getNotesByreceiverID($receiverID);
     public function getlogs($centerId);
 
 
