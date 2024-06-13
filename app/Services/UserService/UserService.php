@@ -195,8 +195,8 @@ class UserService implements UserServiceInterface
      {
          
          $validator = Validator::make($data, [
-             'content' => 'required|string',
-             'direction' => 'required|string',
+             'operation' => 'required|string',
+           //  'direction' => 'required|string',
             // 'requesterID' => 'required|exists:users,id',
              'reciverID' => 'required|exists:users,id',
              'requestStatus' => 'required|in:pending,approved,rejected',
@@ -216,7 +216,7 @@ class UserService implements UserServiceInterface
          $user=  auth('user')->user();
        
          $globalRequest = new GlobalRequest();
-         $globalRequest->content = $data['content'];
+         $globalRequest->content = $data['operation'];
          $globalRequest->direction = $data['direction'];
          $globalRequest->requestID = $request->id; 
          $globalRequest->requesterID = $user->id;
@@ -308,9 +308,14 @@ class UserService implements UserServiceInterface
      
              if ($request->globalRequest) {
                  $processedRequest['type'] = 'Global';
-                 $processedRequest['content'] = $request->globalRequest->content;
-                 $processedRequest['sender'] = $request->globalRequest->requester;
-             } elseif ($request->patientTransferRequest) {
+                // $processedRequest['content'] = $request->globalRequest->content;
+                 $processedRequest['senderName'] = $request->globalRequest->requester;
+             }
+             
+             
+             
+             
+             elseif ($request->patientTransferRequest) {
                  $patientName = $request->patientTransferRequest->user->fullName;
                  $centerPatientName = $request->patientTransferRequest->centerPatient->centerName;
                  $destinationCenterName = $request->patientTransferRequest->destinationCenter->centerName;

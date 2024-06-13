@@ -56,52 +56,50 @@ class PrescriptionService implements PrescriptionServiceInterface
 {
 
 
-    
-public function addPrescription(array $data)
-{
-    $validator = Validator::make($data, [
-        'patientID' => 'required|exists:users,id',
-        'medicines' => 'required|array',
-        'medicines.*.id' => 'required|exists:medicines,id',
-        'medicines.*.dateOfStart' => 'required|date',
-        'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
-        'medicines.*.amount' => 'required|numeric|min:0',
-        'medicines.*.details' => 'required|string|max:255',
-        'medicines.*.status' => 'required|string|max:255',
-    ]);
-
-    if ($validator->fails()) {
-        throw new InvalidArgumentException($validator->errors()->first());
-    }
-    
-    $validatedData = $validator->validated();
-    $doctor = auth('user')->user();
-
-    \DB::beginTransaction();
-    try {
-        $prescription = Prescription::create([
-            'patientID' => $validatedData['patientID'],
-            'doctorID' => $doctor->id,
+    public function addPrescription(array $data)
+    {
+        $validator = Validator::make($data, [
+            'patientID' => 'required|exists:users,id',
+            'medicines' => 'required|array',
+            'medicines.*.name' => 'required|exists:medicines,name', // تغيير هنا
+            'medicines.*.dateOfStart' => 'required|date',
+            'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
+            'medicines.*.amount' => 'required|numeric|min:0',
+            'medicines.*.details' => 'required|string|max:255',
         ]);
-
-        foreach ($validatedData['medicines'] as $medicine) {
-            $prescription->medicines()->attach($medicine['id'], [
-                'dateOfStart' => $medicine['dateOfStart'],
-                'dateOfEnd' => $medicine['dateOfEnd'],
-                'amount' => $medicine['amount'],
-                'details' => $medicine['details'],
-                'status' => $medicine['status'],
-            ]);
+    
+        if ($validator->fails()) {
+            throw new InvalidArgumentException($validator->errors()->first());
         }
-
-        \DB::commit();
-        return $prescription;
-    } catch (\Exception $e) {
-        \DB::rollback();
-        throw $e;
+        
+        $validatedData = $validator->validated();
+        $doctor = auth('user')->user();
+    
+        \DB::beginTransaction();
+        try {
+            $prescription = Prescription::create([
+                'patientID' => $validatedData['patientID'],
+                'doctorID' => $doctor->id,
+            ]);
+    
+            foreach ($validatedData['medicines'] as $medicineData) {
+                $medicine = Medicine::where('name', $medicineData['name'])->firstOrFail(); // تغيير هنا
+                $prescription->medicines()->attach($medicine->id, [
+                    'dateOfStart' => $medicineData['dateOfStart'],
+                    'dateOfEnd' => $medicineData['dateOfEnd'],
+                    'amount' => $medicineData['amount'],
+                    'details' => $medicineData['details'],
+                    'status' => 'nonActive',
+                ]);
+            }
+    
+            \DB::commit();
+            return $prescription;
+        } catch (\Exception $e) {
+            \DB::rollback();
+            throw $e;
+        }
     }
-}
-
 
 public function getPrescriptionsByPatient(User $patient): Collection
 {
