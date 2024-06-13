@@ -17,6 +17,7 @@ interface MedicalSessionServiceInterface
 
     public function createDialysisSession(array $data);
     public function getDialysisSessionsWithChairInfo($centerId, $month, $year);
+    public function getPatientDialysisSessions($patientId, $month, $year);
     public function getDialysisSessions($centerId);
     public function getCompleteDialysisSessionDetails($sessionId);
     

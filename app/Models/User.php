@@ -224,13 +224,10 @@ public function medicalCenters()
 }
 
 
-
 public function prescriptions()
 {
-    return $this->belongsToMany(Prescription::class, 'prescription_medicines', 'medicineID', 'prescriptionID')
-                ->withPivot('amount', 'details', 'status');
+    return $this->hasMany(Prescription::class, 'patientID', 'id');
 }
-
 
 
 

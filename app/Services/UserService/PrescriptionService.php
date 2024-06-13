@@ -102,8 +102,10 @@ class PrescriptionService implements PrescriptionServiceInterface
     }
 
 public function getPrescriptionsByPatient(User $patient): Collection
-{
+{ 
+
     $prescriptions = $patient->prescriptions()->with(['medicines.prescriptionMedicine', 'doctor'])->get()->map(function ($prescription) {
+    
         return [
             'doctor' => $prescription->doctor->fullName,
             'medicines' => $prescription->medicines->map(function ($medicine) {
