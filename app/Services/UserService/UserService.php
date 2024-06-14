@@ -1331,6 +1331,15 @@ public function getlogs($centerId)
 
 
 
+public function getMedicineNames()
+{
+    return Medicine::pluck('name');
+}
+
+
+
+
+
 
 }
 

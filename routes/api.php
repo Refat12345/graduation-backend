@@ -131,6 +131,10 @@ Route::get('/getDialysisSessions/{centerId}/{month}/{year}', [MedicalSessionCont
 Route::get('getAllMedicalCenters', [UserController::class, 'getAllMedicalCenters']);
 Route::get('getPieCharts/{month?}/{year?}', [StatisticsController::class, 'getPieCharts']);
 
+
+Route::get('getMedicineNames', [UserController::class, 'getMedicineNames']);
+
+
 Route::get('causeRenalFailure', [StatisticsController::class, 'causeRenalFailure']);
 Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatistics']);
 

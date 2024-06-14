@@ -638,7 +638,11 @@ public function getAllMedicalCenters()
 
 
 
-
+public function getMedicineNames()
+{
+    $medicineNames = $this->userService->getMedicineNames();
+    return response()->json(['medicine_names' => $medicineNames]);
+}
 
 
 
