@@ -9,7 +9,7 @@ class MedicalAnalysis extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['averageMin', 'averageMax', 'value', 'analysisDate', 'notes', 'quarter', 'analysisTypeID', 'userID'];
+    protected $fillable = ['averageMin', 'averageMax', 'value', 'analysisDate', 'notes', 'quarter', 'analysisTypeID', 'userID','valid'];
     
 
 

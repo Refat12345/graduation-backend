@@ -9,7 +9,7 @@ class Chair extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['chairNumber', 'roomName', 'centerID'];
+    protected $fillable = ['chairNumber', 'roomName', 'centerID','valid'];
     
     public function medicalCenter(): BelongsTo
     {

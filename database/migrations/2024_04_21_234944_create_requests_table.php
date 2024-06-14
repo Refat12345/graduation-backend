@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id(); 
             $table->string('requestStatus');
             $table->text('cause');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
 
             $table->index('requestStatus');

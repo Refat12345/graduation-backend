@@ -9,7 +9,7 @@ class PathologicalHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['illnessName', 'medicalDiagnosisDate', 'generalDetails', 'medicalRecordID'];
+    protected $fillable = ['illnessName', 'medicalDiagnosisDate', 'generalDetails', 'medicalRecordID','valid'];
     
     public function medicalRecord(): BelongsTo
     {

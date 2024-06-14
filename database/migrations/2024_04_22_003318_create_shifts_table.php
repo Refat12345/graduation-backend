@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->unsignedBigInteger('centerID');
             $table->foreign('centerID')->references('id')->on('medical_centers');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
 
            $table->index('centerID');

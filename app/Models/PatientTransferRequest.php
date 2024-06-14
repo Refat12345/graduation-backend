@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PatientTransferRequest extends Model
 {
-    protected $fillable = ['patientID', 'centerPatientID', 'destinationCenterID', 'requestID'];
+    protected $fillable = ['patientID', 'centerPatientID', 'destinationCenterID', 'requestID','valid'];
     
     public function user()
     {

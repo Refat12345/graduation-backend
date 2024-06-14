@@ -21,6 +21,8 @@ return new class extends Migration
             $table->text('causeRenalFailure');
             $table->unsignedBigInteger('userID')->nullable();
             $table->foreign('userID')->references('id')->on('users');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
 
             $table->index('userID');

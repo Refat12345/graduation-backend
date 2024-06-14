@@ -22,6 +22,8 @@ return new class extends Migration
             $table->foreign('requesterID')->references('id')->on('users');
             $table->foreign('reciverID')->references('id')->on('users');
             $table->timestamps();
+            $table->unsignedBigInteger('valid')->default(0);
+
             
            $table->index(['requesterID', 'reciverID']);
         });

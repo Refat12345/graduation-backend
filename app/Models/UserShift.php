@@ -9,7 +9,7 @@ class UserShift extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['shiftID', 'userID'];
+    protected $fillable = ['shiftID', 'userID','valid'];
     
     public function shift(): BelongsTo
     {

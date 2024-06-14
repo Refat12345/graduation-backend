@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('countries', function (Blueprint $table) {
             $table->id(); 
             $table->string('countryName');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
 
            $table->index('countryName');

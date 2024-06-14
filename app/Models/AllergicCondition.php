@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AllergicCondition extends Model
 {
     use HasFactory;
-    protected $fillable = ['allergy', 'dateOfSymptomOnset', 'generalDetails', 'medicalRecordID'];
+    protected $fillable = ['allergy', 'dateOfSymptomOnset', 'generalDetails', 'medicalRecordID','valid'];
     
     public function medicalRecord(): BelongsTo
     {

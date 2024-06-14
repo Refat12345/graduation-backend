@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreign('centerPatientID')->references('id')->on('medical_centers');
             $table->foreign('destinationCenterID')->references('id')->on('medical_centers');
             $table->foreign('requestID')->references('id')->on('requests');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
 
            $table->index(['patientID', 'centerPatientID', 'destinationCenterID'], 'patientTransfer');

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('medicineID');
             $table->foreign('prescriptionID')->references('id')->on('prescriptions');
             $table->foreign('medicineID')->references('id')->on('medicines');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
         });
     }

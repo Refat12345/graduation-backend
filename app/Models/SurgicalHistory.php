@@ -9,7 +9,7 @@ class SurgicalHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['surgeryName', 'surgeryDate', 'generalDetails', 'medicalRecordID'];
+    protected $fillable = ['surgeryName', 'surgeryDate', 'generalDetails', 'medicalRecordID','valid'];
     
     public function medicalRecord(): BelongsTo
     {

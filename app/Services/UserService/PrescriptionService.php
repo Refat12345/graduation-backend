@@ -101,28 +101,48 @@ class PrescriptionService implements PrescriptionServiceInterface
         }
     }
 
-public function getPrescriptionsByPatient(User $patient): Collection
-{ 
+// public function getPrescriptionsByPatient(User $patient): Collection
+// { 
 
-    $prescriptions = $patient->prescriptions()->with(['medicines.prescriptionMedicine', 'doctor'])->get()->map(function ($prescription) {
+//     $prescriptions = $patient->prescriptions()->with(['medicines.prescriptionMedicine', 'doctor'])->get()->map(function ($prescription) {
     
-        return [
-            'doctor' => $prescription->doctor->fullName,
-            'medicines' => $prescription->medicines->map(function ($medicine) {
-                $prescriptionMedicine = $medicine->prescriptionMedicine; 
-                return [
-                    'status' => $prescriptionMedicine->status, 
-                    'name' => $medicine->name,
-                    'dateOfStart' =>  $dateOfStart = $prescriptionMedicine->dateOfStart instanceof Carbon ? $prescriptionMedicine->dateOfStart : Carbon::parse($prescriptionMedicine->dateOfStart)->format('Y-m-d'),
-                    'dateOfEnd' =>  $dateOfEnd = $prescriptionMedicine->dateOfEnd instanceof Carbon ? $prescriptionMedicine->dateOfEnd : Carbon::parse($prescriptionMedicine->dateOfEnd)->format('Y-m-d'),
+//         return [
+//             'doctor' => $prescription->doctor->fullName,
+//             'medicines' => $prescription->medicines->map(function ($medicine) {
+//                 $prescriptionMedicine = $medicine->prescriptionMedicine; 
+//                 return [
+//                     'status' => $prescriptionMedicine->status, 
+//                     'name' => $medicine->name,
+//                     'dateOfStart' =>  $dateOfStart = $prescriptionMedicine->dateOfStart instanceof Carbon ? $prescriptionMedicine->dateOfStart : Carbon::parse($prescriptionMedicine->dateOfStart)->format('Y-m-d'),
+//                     'dateOfEnd' =>  $dateOfEnd = $prescriptionMedicine->dateOfEnd instanceof Carbon ? $prescriptionMedicine->dateOfEnd : Carbon::parse($prescriptionMedicine->dateOfEnd)->format('Y-m-d'),
                     
-                    'details' => $prescriptionMedicine->details
+//                     'details' => $prescriptionMedicine->details
+//                 ];
+//             })
+//         ];
+//     });
+
+//     return  $prescriptions;
+// }
+
+
+public function getAllPrescriptionsForUser($userId) {
+    $prescriptions = Prescription::where('patientID', $userId)->with(['medicines', 'doctor'])->get();
+
+    return $prescriptions->map(function ($prescription) {
+        return [
+            'doctor' => $prescription->doctor->fullName ,
+            'medicines' => $prescription->medicines->map(function ($medicine) {
+                return [
+                    'status' => $medicine->pivot->status,
+                    'name' => $medicine->name,
+                    'dateOfStart' => $medicine->pivot->dateOfStart,
+                    'dateOfEnd' => $medicine->pivot->dateOfEnd,
+                    'details' => $medicine->pivot->details
                 ];
             })
         ];
     });
-
-    return  $prescriptions;
 }
 
 

@@ -13,7 +13,7 @@ class GeneralPatientInformation extends Model
     protected $fillable = [
         'maritalStatus', 'nationality', 'status', 'reasonOfStatus',
         'educationalLevel', 'generalIncome', 'incomeType', 'sourceOfIncome',
-        'workDetails', 'residenceType', 'patientID'
+        'workDetails', 'residenceType', 'patientID','valid'
     ];
     
     public function user()

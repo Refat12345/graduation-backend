@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreign('chairID')->references('id')->on('chairs');
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->foreign('sessionID')->references('id')->on('dialysis_sessions');
+            $table->unsignedBigInteger('valid')->default(0);
 
             $table->timestamps();
 

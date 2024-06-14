@@ -16,7 +16,7 @@ class User extends Authenticatable
 
         protected $fillable = [
             'fullName', 'password', 'nationalNumber', 'dateOfBirth', 
-            'gender', 'accountStatus', 'role', 'verificationCode'
+            'gender', 'accountStatus', 'role', 'verificationCode','valid'
         ];
     
         protected $hidden = [
@@ -224,7 +224,7 @@ public function medicalCenters()
 }
 
 
-public function prescriptions()
+public function prescriptions()  : HasMany
 {
     return $this->hasMany(Prescription::class, 'patientID', 'id');
 }

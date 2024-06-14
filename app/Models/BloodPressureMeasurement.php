@@ -9,7 +9,7 @@ class BloodPressureMeasurement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pressureValue', 'pulseValue', 'time', 'sessionID'];
+    protected $fillable = ['pressureValue', 'pulseValue', 'time', 'sessionID','valid'];
 
     public function dialysisSession(): BelongsTo
     {

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('residenceType');
             $table->unsignedBigInteger('patientID');
             $table->foreign('patientID')->references('id')->on('users');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
             
            $table->index('patientID');

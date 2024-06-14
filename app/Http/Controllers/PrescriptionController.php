@@ -36,12 +36,13 @@ public function addPrescription(Request $request)
 }
 
 
-public function getPrescriptionsByPatient($patientID = null)
+
+public function getPrescriptionsByPatient($patientID )
 {
     try {
-        $patientID = $patientID ?? auth('user')->user()->id;
-        $patient = User::findOrFail($patientID);
-        $prescriptions = $this->prescriptionService->getPrescriptionsByPatient($patient);
+      ///  $patientID = $patientID ?? auth('user')->user()->id;
+       // $patient = User::findOrFail($patientID);
+       $prescriptions = $this->prescriptionService->getAllPrescriptionsForUser($patientID);
         return response()->json(["prescriptions" =>$prescriptions], 200);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 400);

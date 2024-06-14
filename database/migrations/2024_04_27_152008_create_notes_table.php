@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreign('senderID')->references('id')->on('users');
             $table->foreign('receiverID')->references('id')->on('users');
             $table->foreign('centerID')->references('id')->on('medical_centers');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
 
             $table->index('centerID');

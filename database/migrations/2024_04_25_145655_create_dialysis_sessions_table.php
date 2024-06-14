@@ -35,7 +35,10 @@ return new class extends Migration
             $table->foreign('nurseID')->references('id')->on('users');
             $table->foreign('doctorID')->references('id')->on('users');
             $table->foreign('centerID')->references('id')->on('medical_centers');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
+            
 
            $table->index(['centerID', 'patientID', 'doctorID', 'nurseID']);
         });

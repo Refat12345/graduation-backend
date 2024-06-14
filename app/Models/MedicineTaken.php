@@ -9,7 +9,7 @@ class MedicineTaken extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['value', 'sessionID', 'medicineID'];
+    protected $fillable = ['value', 'sessionID', 'medicineID','valid'];
 
 
     public function dialysisSession()

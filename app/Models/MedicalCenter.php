@@ -10,7 +10,7 @@ class MedicalCenter extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['centerName', 'description', 'charityName'];
+    protected $fillable = ['centerName', 'description', 'charityName','valid'];
 
 
 

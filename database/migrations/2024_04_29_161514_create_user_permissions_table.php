@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('userID')->constrained('users');
             $table->foreignId('permissionID')->constrained('permissions');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
 
            $table->index('userID');

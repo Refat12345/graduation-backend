@@ -17,6 +17,8 @@ return new class extends Migration
             $table->integer('recurrenceInterval');
             $table->string('unitOfMeasurement')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('valid')->default(0);
+
 
            $table->index('analysisName');
         });

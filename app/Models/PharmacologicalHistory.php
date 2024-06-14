@@ -9,7 +9,7 @@ class PharmacologicalHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['medicineName', 'dateStart', 'dateEnd', 'generalDetails', 'medicalRecordID'];
+    protected $fillable = ['medicineName', 'dateStart', 'dateEnd', 'generalDetails', 'medicalRecordID','valid'];
     
     public function medicalRecord(): BelongsTo
     {

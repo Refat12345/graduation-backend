@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AnalysisType extends Model
 {
     use HasFactory;
-    protected $fillable = ['analysisName', 'recurrenceInterval', 'unitOfMeasurement'];
+    protected $fillable = ['analysisName', 'recurrenceInterval', 'unitOfMeasurement','valid'];
 
 
 

@@ -23,6 +23,11 @@ return new class extends Migration
             $table->string('role');
             $table->string('verificationCode')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('valid')->default(0);
+
+
+
+
             $table->index('nationalNumber');
             $table->index('fullName');
             $table->index('accountStatus');

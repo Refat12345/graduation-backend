@@ -19,6 +19,8 @@ return new class extends Migration
             $table->text('generalDetails');
             $table->unsignedBigInteger('medicalRecordID');
             $table->foreign('medicalRecordID')->references('id')->on('medical_records');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
 
            $table->index('medicalRecordID');

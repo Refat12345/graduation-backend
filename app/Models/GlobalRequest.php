@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GlobalRequest extends Model
 {
-    protected $fillable = ['content', 'direction', 'requestID', 'requesterID', 'reciverID'];
+    protected $fillable = ['content', 'direction', 'requestID', 'requesterID', 'reciverID','valid'];
     
     public function request()
     {

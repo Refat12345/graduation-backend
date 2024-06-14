@@ -9,7 +9,7 @@ class PrescriptionMedicine extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['dateOfEnd', 'dateOfStart','amount', 'details', 'status', 'prescriptionID', 'medicineID'];
+    protected $fillable = ['dateOfEnd', 'dateOfStart','amount', 'details', 'status', 'prescriptionID', 'medicineID','valid'];
 
   
     public function prescription(): BelongsTo

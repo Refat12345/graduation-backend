@@ -12,7 +12,7 @@ class PatientCompanion extends Model
     protected $fillable = [
         'fullName',
         'degreeOfKinship',
-        'userID',
+        'userID','valid'
     ];
 
     public function user()

@@ -10,7 +10,7 @@ class UserPermission extends Model
     use HasFactory;
 
 
-    protected $fillable = ['userID', 'permissionID'];
+    protected $fillable = ['userID', 'permissionID','valid'];
 
     public function user()
     {

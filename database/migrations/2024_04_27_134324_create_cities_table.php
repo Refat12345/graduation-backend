@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('cityName');
             $table->unsignedBigInteger('countryID')->nullable();
             $table->foreign('countryID')->references('id')->on('countries');
+            $table->unsignedBigInteger('valid')->default(0);
+
             $table->timestamps();
         });
     }

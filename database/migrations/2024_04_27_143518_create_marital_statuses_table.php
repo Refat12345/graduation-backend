@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('healthStateChildren');
             $table->unsignedBigInteger('generalPatientInformationID');
             $table->foreign('generalPatientInformationID')->references('id')->on('general_patient_informations');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
            $table->index('generalPatientInformationID');
         });

@@ -11,7 +11,7 @@ class MedicalRecord extends Model
 
     protected $fillable = [
         'dialysisStartDate', 'dryWeight', 'bloodType', 'vascularEntrance',
-        'kidneyTransplant', 'causeRenalFailure', 'userID'
+        'kidneyTransplant', 'causeRenalFailure', 'userID','valid'
     ];
     
     public function user()

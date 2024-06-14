@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('titer');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
 
            $table->index('name');

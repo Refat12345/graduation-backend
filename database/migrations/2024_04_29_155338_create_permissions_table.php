@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
             $table->string('permissionName');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
             
            $table->index('permissionName');

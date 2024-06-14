@@ -9,7 +9,7 @@ class Address extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['use', 'line', 'userID', 'centerID', 'cityID' , 'PatientCompanionID'];
+    protected $fillable = ['use', 'line', 'userID', 'centerID', 'cityID' , 'PatientCompanionID','valid'];
     
     public function user(): BelongsTo
     {

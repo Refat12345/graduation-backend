@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserCenter extends Model
 {
     use HasFactory;
-    protected $fillable = ['userID', 'centerID'];
+    protected $fillable = ['userID', 'centerID','valid'];
     
     public function user(): BelongsTo
     {

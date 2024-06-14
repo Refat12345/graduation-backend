@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreign('patientCompanionID')->references('id')->on('patient_companions');
             $table->foreign('userID')->references('id')->on('users');
             $table->foreign('centerID')->references('id')->on('medical_centers');
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
 
            $table->index('value');

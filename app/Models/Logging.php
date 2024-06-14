@@ -19,7 +19,7 @@ class Logging extends Model
     
         'affectedUserID',
         'affectorUserID',
-        'sessionID',
+        'sessionID','valid'
     ];
 
 

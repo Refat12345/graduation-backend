@@ -15,7 +15,7 @@ interface PrescriptionServiceInterface
 {
 
     public function addPrescription(array $data);
-    public function getPrescriptionsByPatient(User $patient): Collection;
-
+  //  public function getPrescriptionsByPatient(User $patient): Collection;
+    public function getAllPrescriptionsForUser($userId);
     
 }

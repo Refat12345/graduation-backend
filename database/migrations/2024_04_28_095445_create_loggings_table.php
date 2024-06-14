@@ -29,7 +29,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('centerID');
             $table->foreign('centerID')->references('id')->on('medical_centers');
-
+            $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
         });
     }

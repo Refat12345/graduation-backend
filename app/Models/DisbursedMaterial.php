@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class DisbursedMaterial extends Model
 {
     use HasFactory;
-    protected $fillable = ['materialName', 'date'];
+    protected $fillable = ['materialName', 'date','valid'];
 }

@@ -9,7 +9,7 @@ class Telecom extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['system', 'value', 'use', 'userID', 'centerID','patientCompanionID'];
+    protected $fillable = ['system', 'value', 'use', 'userID', 'centerID','patientCompanionID','valid'];
     
     
     public function user(): BelongsTo

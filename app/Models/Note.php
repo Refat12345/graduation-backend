@@ -10,7 +10,7 @@ class Note extends Model
     use HasFactory;
 
     protected $fillable = ['noteContent', 'category', 'type', 'date', 
-    'sessionID', 'senderID', 'receiverID', 'centerID'];
+    'sessionID', 'senderID', 'receiverID', 'centerID','valid'];
 
   
     public function dialysisSession()

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RequestModifyAppointment extends Model
 {
-    protected $fillable = ['newTime', 'requestID', 'requesterID', 'appointmentID'];
+    protected $fillable = ['newTime', 'requestID', 'requesterID', 'appointmentID','valid'];
     
     public function request()
     {

@@ -17,7 +17,7 @@ class DialysisSession extends Model
         'sessionStartTime', 'sessionEndTime', 'weightBeforeSession',
         'weightAfterSession', 'totalWithdrawalRate', 'withdrawalRateHourly', 'pumpSpeed',
         'filterColor', 'filterType', 'vascularConnection', 'naConcentration',
-        'venousPressure', 'status', 'sessionDate', 'patientID', 'nurseID', 'doctorID', 'centerID'
+        'venousPressure', 'status', 'sessionDate', 'patientID', 'nurseID', 'doctorID', 'centerID','valid'
     ];
     
     public function patient()

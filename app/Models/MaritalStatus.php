@@ -9,7 +9,7 @@ class MaritalStatus extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['childrenNumber', 'healthStateChildren', 'generalPatientInformationID'];
+    protected $fillable = ['childrenNumber', 'healthStateChildren', 'generalPatientInformationID','valid'];
     
     public function generalPatientInformation(): BelongsTo
     {
