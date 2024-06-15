@@ -146,7 +146,6 @@ class UserService implements UserServiceInterface
      }
  }
  
-
      public function addPermissionsToUser($userId, array $permissionNames)
      {
          DB::transaction(function () use ($userId, $permissionNames) {
@@ -158,6 +157,136 @@ class UserService implements UserServiceInterface
              }
          });
      }
+
+     public function createUserAddress(User $user, array $addressData)
+     {
+    
+         $city = City::firstOrCreate(['cityName' => $addressData['cityName']]);
+         $country = Country::firstOrCreate(['countryName' => $addressData['countryName']]);
+    
+         $city->country()->associate($country);
+    
+         $city->save();
+     
+         $address = new Address([
+             'line' => $addressData['line'],
+             'use' => $addressData['use'],
+             'cityID' => $city->id,
+             'userID' => $user->id, 
+         ]);
+    
+         $user->address()->save($address);
+     }
+     
+         public function createUserTelecoms(User $user, array $telecomData)
+         {
+            try{
+             foreach ($telecomData as $data) {
+              
+                 $data['userID'] = $user->id;
+                 $telecom = new Telecom($data);
+                 $user->telecom()->save($telecom);
+             }
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw new LogicException('Error creating user: ' . $e->getMessage());
+            }
+         }
+
+
+
+
+
+         ////////////////////////// update user ////////////////////////////
+
+
+
+
+         public function updateUser(array $userData, $userId)
+         {
+             DB::beginTransaction();
+             try {
+                 $originalUser = User::findOrFail($userId);
+         
+                 // إنشاء نسخة من السجل الأصلي للتعديل
+                 $editUser = $originalUser->replicate();
+                 $editUser->fill($userData);
+         
+                 // إزالة القيم الفريدة وإضافة بادئة مؤقتة
+                 $editUser->nationalNumber = 'temp_' . $editUser->nationalNumber;
+                 foreach ($editUser->telecom as $telecom) {
+                     $telecom->value = 'temp_' . $telecom->value;
+                 }
+         
+                 $editUser->valid = $originalUser->id;
+                 $editUser->save();
+         
+                 // إضافة أو تعديل بيانات الاتصال والعنوان
+                 $this->createOrUpdateUserTelecoms($editUser, $userData['telecom']);
+                 foreach ($userData['address'] as $addressData) {
+                     $this->createOrUpdateUserAddress($editUser, $addressData);
+                 }
+         
+                 // إضافة الصلاحيات إذا كانت موجودة
+                 if (isset($userData['permissionNames'])) {
+                     $this->addPermissionsToUser($editUser->id, $userData['permissionNames']);
+                 }
+         
+                 DB::commit();
+                 return $editUser;
+             } catch (\Exception $e) {
+                 DB::rollBack();
+                 throw new LogicException('Error updating user: ' . $e->getMessage());
+             }
+         }
+         
+         
+         
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
 
 
      
@@ -392,45 +521,6 @@ class UserService implements UserServiceInterface
 
 
 
- public function createUserAddress(User $user, array $addressData)
- {
-
-     $city = City::firstOrCreate(['cityName' => $addressData['cityName']]);
-     $country = Country::firstOrCreate(['countryName' => $addressData['countryName']]);
-
-     $city->country()->associate($country);
-
-     $city->save();
- 
-     $address = new Address([
-         'line' => $addressData['line'],
-         'use' => $addressData['use'],
-         'cityID' => $city->id,
-         'userID' => $user->id, 
-     ]);
-
-     $user->address()->save($address);
- }
- 
-
-
- 
-
-     
-     public function createUserTelecoms(User $user, array $telecomData)
-     {
-        try{
-         foreach ($telecomData as $data) {
-          
-             $data['userID'] = $user->id;
-             $telecom = new Telecom($data);
-             $user->telecom()->save($telecom);
-         }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw new LogicException('Error creating user: ' . $e->getMessage());
-        }
-     }
 
  
      

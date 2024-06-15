@@ -105,25 +105,62 @@ public function createDisbursedMaterial(array $materialData)
 
 
 
+// public function assignMaterialToUserCenter(array $assignmentData)
+// {
+//     if (!isset($assignmentData['materialName'])) {
+//         throw new InvalidArgumentException('اسم المادة مطلوب.');
+//     }
+
+//     $disbursedMaterial = DisbursedMaterial::where('materialName', $assignmentData['materialName'])->first();
+//     if (!$disbursedMaterial) {
+//         throw new InvalidArgumentException('المادة المحددة غير موجودة.');
+//     }
+
+//     $assignmentData['disbursedMaterialID'] = $disbursedMaterial->id;
+
+//     $validator = Validator::make($assignmentData, [
+//         'userID' => 'required|exists:users,id',
+//         'centerID' => 'required|exists:medical_centers,id',
+//         'disbursedMaterialID' => 'required|exists:disbursed_materials,id',
+//         'quantity' => 'required|numeric|min:0',
+        
+//     ]);
+
+//     if ($validator->fails()) {
+//         throw new InvalidArgumentException($validator->errors()->first());
+//     }
+
+//     $validatedAssignmentData = $validator->validated();
+
+//     DB::beginTransaction();
+//     try {
+//         $disbursedMaterialsUser = new DisbursedMaterialsUser([
+//             'userID' => $validatedAssignmentData['userID'],
+//             'centerID' => $validatedAssignmentData['centerID'],
+//             'disbursedMaterialID' => $validatedAssignmentData['disbursedMaterialID'],
+//             'quantity' => $validatedAssignmentData['quantity'],
+//             'status' => 'pending',
+//         ]);
+//         $disbursedMaterialsUser->save();
+
+//         DB::commit();
+//         return $disbursedMaterialsUser;
+//     } catch (\Exception $e) {
+//         DB::rollback();
+//         throw $e;
+//     }
+// }
+
+
 public function assignMaterialToUserCenter(array $assignmentData)
 {
-    if (!isset($assignmentData['materialName'])) {
-        throw new InvalidArgumentException('اسم المادة مطلوب.');
-    }
-
-    $disbursedMaterial = DisbursedMaterial::where('materialName', $assignmentData['materialName'])->first();
-    if (!$disbursedMaterial) {
-        throw new InvalidArgumentException('المادة المحددة غير موجودة.');
-    }
-
-    $assignmentData['disbursedMaterialID'] = $disbursedMaterial->id;
-
+   
     $validator = Validator::make($assignmentData, [
         'userID' => 'required|exists:users,id',
         'centerID' => 'required|exists:medical_centers,id',
-        'disbursedMaterialID' => 'required|exists:disbursed_materials,id',
-        'quantity' => 'required|numeric|min:0',
-        
+        'materials' => 'required|array',
+        'materials.*.materialName' => 'required|string|exists:disbursed_materials,materialName',
+        'materials.*.quantity' => 'required|numeric|min:0',
     ]);
 
     if ($validator->fails()) {
@@ -134,22 +171,35 @@ public function assignMaterialToUserCenter(array $assignmentData)
 
     DB::beginTransaction();
     try {
-        $disbursedMaterialsUser = new DisbursedMaterialsUser([
-            'userID' => $validatedAssignmentData['userID'],
-            'centerID' => $validatedAssignmentData['centerID'],
-            'disbursedMaterialID' => $validatedAssignmentData['disbursedMaterialID'],
-            'quantity' => $validatedAssignmentData['quantity'],
-            'status' => 'pending',
-        ]);
-        $disbursedMaterialsUser->save();
+        $assignedMaterials = [];
+        foreach ($validatedAssignmentData['materials'] as $materialData) {
+           
+            $disbursedMaterial = DisbursedMaterial::where('materialName', $materialData['materialName'])->firstOrFail();
+
+         
+            $disbursedMaterialsUser = DisbursedMaterialsUser::create([
+                'userID' => $validatedAssignmentData['userID'],
+                'centerID' => $validatedAssignmentData['centerID'],
+                'disbursedMaterialID' => $disbursedMaterial->id,
+                'quantity' => $materialData['quantity'],
+                'status' => 'pending',
+            ]);
+
+            array_push($assignedMaterials, $disbursedMaterialsUser);
+        }
 
         DB::commit();
-        return $disbursedMaterialsUser;
+        return $assignedMaterials;
     } catch (\Exception $e) {
         DB::rollback();
         throw $e;
     }
 }
+
+
+
+
+
 
 
 
