@@ -10,7 +10,7 @@ class Appointment extends Model
     use HasFactory;
 
  
-    protected $fillable = ['appointmentTimeStamp', 'userID', 'shiftID', 'chairID','centerID', 'sessionID','valid'];
+    protected $fillable = ['appointmentTimeStamp', 'userID', 'shiftID', 'chairID','centerID', 'sessionID','valid','nurseID'];
     
 
     public function updateappointmentTime($new)

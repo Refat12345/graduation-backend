@@ -109,6 +109,7 @@ class MedicalSessionService implements MedicalSessionServiceInterface
                 $appointment = Appointment::find($data['appointmentID']);
                 if ($appointment) {
                     $appointment->sessionID = $dialysisSession->id;
+                    $appointment->valid = 'finished';
                     $appointment->save();
                 }}
     
@@ -335,5 +336,80 @@ public function getDialysisSessions($centerId)
                                });
 
     return response()->json(['dialysisSessions' => $dialysisSessions]);
-}   
+}  
+
+
+
+
+
+
+public function getNurseDialysisSessions($sessionStatus, $day = null, $month = null, $year = null)
+{
+    $nurse = auth('user')->user();
+    $centerId = $nurse->medicalCenters()->first()->id;
+
+    $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair']);
+
+    
+    if ($sessionStatus === 'coming') {
+        $query->where('centerID', $centerId);
+    } else {
+        $query->where('nurseID', $nurse->id);
+    }
+
+    $query->where('valid', $sessionStatus);
+
+    if ($day && $month && $year) {
+        $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+        $query->whereRaw('DATE_FORMAT(appointmentTimeStamp, "%Y-%m-%d") = ?', [$dateString]);
+    }
+
+    $dialysisSessions = $query->get()
+        ->map(function ($appointment) {
+            return [
+                'id' => $appointment->session->id,
+                'patientName' => $appointment->session->patient->fullName,
+                'nurseName' => $appointment->session->nurse->fullName,
+                'sessionStartTime' => $appointment->session->sessionStartTime,
+                'sessionEndTime' => $appointment->session->sessionEndTime,
+                'chair' => $appointment->chair->chairNumber,
+                'roomName' => $appointment->chair->roomName,
+                'sessionStatus' => $appointment->valid 
+            ];
+        });
+
+    return $dialysisSessions;
+}
+
+
+
+public function startAppointment($appointmentId)
+{
+    $nurse = auth('user')->user();
+    try {
+        $appointment = Appointment::findOrFail($appointmentId);
+        $appointment->valid = 'active';
+        $appointment->nurseID = $nurse->id;
+        $appointment->save();
+
+        return 'تم حجز الموعد';
+    } catch (ModelNotFoundException $e) {
+        return 'الموعد غير موجود';
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

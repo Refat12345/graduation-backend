@@ -20,12 +20,14 @@ return new class extends Migration
             $table->unsignedBigInteger('chairID');
             $table->unsignedBigInteger('centerID');
             $table->unsignedBigInteger('sessionID')->nullable();
+            $table->unsignedBigInteger('nurseID')->nullable();
             $table->foreign('userID')->references('id')->on('users');
+            $table->foreign('nurseID')->references('id')->on('users');
             $table->foreign('shiftID')->references('id')->on('shifts');
             $table->foreign('chairID')->references('id')->on('chairs');
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->foreign('sessionID')->references('id')->on('dialysis_sessions');
-            $table->unsignedBigInteger('valid')->default(0);
+            $table->string('valid')->default('coming');
 
             $table->timestamps();
 

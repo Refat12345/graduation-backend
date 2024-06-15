@@ -205,43 +205,176 @@ class UserService implements UserServiceInterface
          public function updateUser(array $userData, $userId)
          {
              DB::beginTransaction();
+
+             $validator = Validator::make($userData, [
+                'fullName' => 'required|string|max:255',
+                'nationalNumber' => 'required|string|max:11|unique:users',
+                'dateOfBirth' => 'required|date',
+                'gender' => 'required|in:male,female,other',
+                'role' => 'required|string|max:255',
+                'telecom' => 'required|array',
+                'telecom.*.system' => 'required|string|max:255',
+                'telecom.*.value' => 'required|string|max:255',
+                'telecom.*.use' => 'required|string|max:255',
+                'address' => 'required|array',
+                'address.*.line' => 'required|string|max:255',
+                'address.*.use' => 'required|string|max:255',
+                'address.*.cityName' => 'required|string|max:255',
+                'address.*.countryName' => 'required|string|max:255',
+                'centerName' => 'required|string|max:255',
+                 'permissionNames' => 'array'
+            ]);
+
+            if ($validator->fails()) {
+                throw new LogicException($validator->errors()->first());
+            }
+            
              try {
                  $originalUser = User::findOrFail($userId);
          
-                 // إنشاء نسخة من السجل الأصلي للتعديل
                  $editUser = $originalUser->replicate();
                  $editUser->fill($userData);
          
-                 // إزالة القيم الفريدة وإضافة بادئة مؤقتة
                  $editUser->nationalNumber = 'temp_' . $editUser->nationalNumber;
-                 foreach ($editUser->telecom as $telecom) {
-                     $telecom->value = 'temp_' . $telecom->value;
-                 }
+
+
+    $this->updateUserTelecom($originalUser, $userData['telecom']);
+        
+    $editUser->valid = $originalUser->id;
+    $editUser->save();
+
+    if (isset($userData['address'])) {
+        foreach ($userData['address'] as $addressData) {
+            $this->updateUserLocation($originalUser, $addressData);
+        }
+    }
+
+    if (isset($userData['permissionNames'])) {
+        $this->updatePermissionsToUser($editUser->id, $userData['permissionNames']);
+    }
+
+    DB::commit();
+    return $editUser;
+} catch (\Exception $e) {
+    DB::rollBack();
+    throw new LogicException('Error updating user: ' . $e->getMessage());
+}
+}
+
          
-                 $editUser->valid = $originalUser->id;
-                 $editUser->save();
          
-                 // إضافة أو تعديل بيانات الاتصال والعنوان
-                 $this->createOrUpdateUserTelecoms($editUser, $userData['telecom']);
-                 foreach ($userData['address'] as $addressData) {
-                     $this->createOrUpdateUserAddress($editUser, $addressData);
-                 }
+         public function updateUserLocation(User $user, array $locationData)
+         {
+             DB::beginTransaction();
+             try {
+                 $originalAddress = Address::where('userID', $user->id)->firstOrFail();
+                 $originalCity = City::findOrFail($originalAddress->cityID);
+                 $originalCountry = Country::findOrFail($originalCity->country_id);
          
-                 // إضافة الصلاحيات إذا كانت موجودة
-                 if (isset($userData['permissionNames'])) {
-                     $this->addPermissionsToUser($editUser->id, $userData['permissionNames']);
-                 }
+                 $editCity = $originalCity->replicate();
+                 $editCountry = $originalCountry->replicate();
+         
+                 $editCity->fill(['cityName' => $locationData['cityName']]);
+                 $editCountry->fill(['countryName' => $locationData['countryName']]);
+         
+                 $editCity->valid = $originalCity->id;
+                 $editCountry->valid = $originalCountry->id;
+         
+                 $editCity->save();
+                 $editCountry->save();
+         
+                 $editAddress = $originalAddress->replicate();
+                 $editAddress->cityID = $editCity->id;
+                 $editAddress->valid = $originalAddress->id;
+                 $editAddress->fill($locationData);
+                 $editAddress->save();
          
                  DB::commit();
-                 return $editUser;
+                 return ['city' => $editCity, 'country' => $editCountry, 'address' => $editAddress];
              } catch (\Exception $e) {
                  DB::rollBack();
-                 throw new LogicException('Error updating user: ' . $e->getMessage());
+                 throw new LogicException('Error updating location: ' . $e->getMessage());
              }
          }
          
+         public function updateUserTelecom(User $user, array $telecomData)
+         {
+             DB::beginTransaction();
+             try {
+                 $originalTelecoms = Telecom::where('userID', $user->id)->get();
          
+                 $editTelecoms = [];
+                 foreach ($originalTelecoms as $originalTelecom) {
+                     $editTelecom = $originalTelecom->replicate();
+                     $editTelecom->fill($telecomData);
+                     $editTelecom->valid = $originalTelecom->id;
+                     $editTelecom->value = 'temp_' . $originalTelecom->value;
+                     $editTelecom->save();
+                     $editTelecoms[] = $editTelecom;
+                 }
          
+                 DB::commit();
+                 return $editTelecoms;
+             } catch (\Exception $e) {
+                 DB::rollBack();
+                 throw new LogicException('Error updating telecom: ' . $e->getMessage());
+             }
+         }
+         
+
+
+         public function approveUserEdits($originalUserId)
+{
+    DB::beginTransaction();
+    try {
+        $editUsers = User::where('valid', $originalUserId)->get();
+
+        foreach ($editUsers as $editUser) {
+            $originalUser = User::findOrFail($originalUserId);
+
+            $originalUser->fill($editUser->getAttributes());
+            $originalUser->save();
+
+            $this->approveLocationEdits($editUser);
+            $this->approveTelecomEdits($editUser);
+
+            $editUser->delete();
+        }
+
+        DB::commit();
+        return $originalUser;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw new LogicException('Error approving user edits: ' . $e->getMessage());
+    }
+}
+
+public function approveLocationEdits(User $editUser)
+{
+    $editAddresses = Address::where('valid', $editUser->id)->get();
+    foreach ($editAddresses as $editAddress) {
+        $originalAddress = Address::findOrFail($editAddress->valid);
+        $originalAddress->fill($editAddress->getAttributes());
+        $originalAddress->save();
+        $editAddress->delete();
+    }
+}
+
+public function approveTelecomEdits(User $editUser)
+{
+    $editTelecoms = Telecom::where('valid', $editUser->id)->get();
+    foreach ($editTelecoms as $editTelecom) {
+        $originalTelecom = Telecom::findOrFail($editTelecom->valid);
+        $originalTelecom->fill($editTelecom->getAttributes());
+        $originalTelecom->save();
+        $editTelecom->delete();
+    }
+}
+
+
+
+
+
 
 
 

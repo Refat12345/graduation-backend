@@ -72,4 +72,35 @@ class MedicalSessionController extends Controller
 
 
 
+
+public function getNurseDialysisSessions($sessionStatus, $day = null, $month = null, $year = null)
+{
+
+    $result = $this->medicalSessionService->getNurseDialysisSessions($sessionStatus, $day, $month, $year);
+
+    return response()->json(['message' => $result]);
+}
+
+
+
+
+public function startAppointment($appointmentId)
+{
+    $result = $this->medicalSessionService->startAppointment($appointmentId);
+
+    return response()->json(['message' => $result]);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

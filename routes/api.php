@@ -80,6 +80,9 @@ Route::get('/getNotesByreceiverID/{receiverID}', [UserController::class, 'getNot
 Route::get('/getDialysisSessionDetails/{sessionId}', [MedicalSessionController::class, 'getDialysisSessionDetails']);
 Route::post('/createDialysisSession', [MedicalSessionController::class, 'createDialysisSession']);
 
+Route::get('/getNurseDialysisSessions/{sessionStatus}/{day?}/{month?}/{year?}', [MedicalSessionController::class, 'getNurseDialysisSessions']);
+Route::post('/startAppointment/{appointmentId}', [MedicalSessionController::class, 'startAppointment']);
+
 
 
 Route::post('/addMedicine', [DisbursedMaterialController::class, 'addMedicine']);
