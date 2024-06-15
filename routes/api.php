@@ -84,7 +84,7 @@ Route::post('/createDialysisSession', [MedicalSessionController::class, 'createD
 
 Route::post('/addMedicine', [DisbursedMaterialController::class, 'addMedicine']);
 Route::get('/getMedicines', [DisbursedMaterialController::class, 'getMedicines']);
-
+Route::get('/getMaterialNames', [DisbursedMaterialController::class, 'getMaterialNames']);
 
 Route::post('/addPrescription', [PrescriptionController::class, 'addPrescription']);
 Route::get('/getPrescriptionsByPatient/{patientID?}', [PrescriptionController::class, 'getPrescriptionsByPatient']);
@@ -139,7 +139,7 @@ Route::get('causeRenalFailure', [StatisticsController::class, 'causeRenalFailure
 Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatistics']);
 
 
-
+Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
 
 
 $roles = [ 'admin'];
@@ -149,7 +149,7 @@ $permissions = ['view-dashboard', 'edit-dashboard', 'view-reports'];
 
 Route::middleware(CheckRole::class . ':' . implode(',', $roles))->group(function () {
    
-    Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
+ 
 });
 
 

@@ -54,45 +54,50 @@ use Illuminate\Support\Collection;
 class MedicalAnalysisService implements MedicalAnalysisServiceInterface
 {
   
-public function createMedicalAnalysis(array $MedicalAnalysisData )
-{
-   $validator = Validator::make($MedicalAnalysisData, [
-    'averageMin' => 'required|numeric',
-    'averageMax' => 'required|numeric',
-    'value' => 'required|numeric',
-    'analysisDate' => 'required|date',
-    'notes' => 'required|string|max:255',
-    'quarter' => 'required|string|max:255',
-    'analysisTypeID' => [
-        'required',
-        'integer',
-        Rule::exists('analysis_types', 'id'),
-    ],
-     'userID' => [
-        'required',
-        'integer',
-        Rule::exists('users', 'id')->where(function ($query) {
-            $query->where('role', 'patient');
-        }),
-
-    ],   ]);
-
-if ($validator->fails()) {
-    throw new LogicException($validator->errors()->first());
-}
-
-DB::beginTransaction();
-try {
-     $MedicalAnalysis = MedicalAnalysis::create($MedicalAnalysisData);
-    DB::commit();
-    return $MedicalAnalysis;
-} catch (\Exception $e) {
-    DB::rollBack();
-    throw new LogicException('Error creating MedicalAnalysis: ' . $e->getMessage());
-}
-}
-
-
+    public function createMedicalAnalysis(array $MedicalAnalysisData)
+    {
+      
+        if (!isset($MedicalAnalysisData['analysisName'])) {
+            throw new LogicException('اسم نوع التحليل مطلوب.');
+        }
+    
+        $analysisType = AnalysisType::where('analysisName', $MedicalAnalysisData['analysisName'])->first();
+        if (!$analysisType) {
+            throw new LogicException('نوع التحليل غير موجود.');
+        }
+    
+        $MedicalAnalysisData['analysisTypeID'] = $analysisType->id;
+    
+        $validator = Validator::make($MedicalAnalysisData, [
+            'averageMin' => 'required|numeric',
+            'averageMax' => 'required|numeric',
+            'value' => 'required|numeric',
+            'analysisDate' => 'required|date',
+            'notes' => 'required|string|max:255',
+            'analysisTypeID' => 'required|integer|exists:analysis_types,id',
+            'userID' => [
+                'required',
+                'integer',
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role', 'patient');
+                }),
+            ],
+        ]);
+    
+        if ($validator->fails()) {
+            throw new LogicException($validator->errors()->first());
+        }
+    
+        DB::beginTransaction();
+        try {
+            $MedicalAnalysis = MedicalAnalysis::create($MedicalAnalysisData);
+            DB::commit();
+            return $MedicalAnalysis;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new LogicException('Error creating MedicalAnalysis: ' . $e->getMessage());
+        }
+    }
 
 
 

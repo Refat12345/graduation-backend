@@ -64,7 +64,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
             'dryWeight' => 'required|numeric',
             'bloodType' => 'required|string|max:255',
             'vascularEntrance' => 'required|string|max:255',
-            'kidneyTransplant' => 'required|boolean|max:255',
+            'kidneyTransplant' => 'required|boolean',
             'causeRenalFailure' => 'required|string|max:255',
             'userID' => [
                 'required',
@@ -72,9 +72,14 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
                 Rule::exists('users', 'id')->where(function ($query) {
                     $query->where('role', 'patient');
                 }),
-    
+                Rule::unique('medical_records', 'userID')
             ],
         ]);
+        $validator->after(function ($validator) use ($MedicalRecordData) {
+            if (MedicalRecord::where('userID', $MedicalRecordData['userID'])->exists()) {
+                $validator->errors()->add('userID', 'يوجد سجل طبي لهذا المريض');
+            }
+        });
     
         if ($validator->fails()) {
             throw new LogicException($validator->errors()->first());

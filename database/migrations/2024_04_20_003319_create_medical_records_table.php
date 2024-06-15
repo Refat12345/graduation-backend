@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('kidneyTransplant');
             $table->text('causeRenalFailure');
             $table->unsignedBigInteger('userID')->nullable();
-            $table->foreign('userID')->references('id')->on('users');
+            $table->foreign('userID')->references('id')->on('users')->unique();
             $table->unsignedBigInteger('valid')->default(0);
 
             $table->timestamps();

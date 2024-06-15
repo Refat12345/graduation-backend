@@ -18,7 +18,7 @@ return new class extends Migration
             $table->float('value');
             $table->date('analysisDate');
             $table->text('notes')->nullable();
-            $table->string('quarter');
+           // $table->string('quarter');
             $table->unsignedBigInteger('analysisTypeID');
             $table->unsignedBigInteger('userID');
             $table->foreign('analysisTypeID')->references('id')->on('analysis_types');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\Services\UserService\MaterialServiceInterface;      
 
 use App\Models\MedicalAnalysis;
+use App\Models\DisbursedMaterial;
 use Illuminate\Http\Request;
 
 class DisbursedMaterialController extends Controller
@@ -90,6 +91,13 @@ public function getDisbursedMaterialsDetailsForUser(Request $request)
     return response()->json(['error' => $e->getMessage()], 400);
 }
     
+}
+
+
+public function getMaterialNames()
+{
+    $materials = DisbursedMaterial::all();
+    return $materials;
 }
 
 

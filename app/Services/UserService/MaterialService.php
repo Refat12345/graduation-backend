@@ -80,6 +80,8 @@ public function getAllMedicines()
 
 
 
+
+
 public function createDisbursedMaterial(array $materialData)
 {
     $validator = Validator::make($materialData, [
@@ -103,15 +105,25 @@ public function createDisbursedMaterial(array $materialData)
 
 
 
-
 public function assignMaterialToUserCenter(array $assignmentData)
 {
+    if (!isset($assignmentData['materialName'])) {
+        throw new InvalidArgumentException('اسم المادة مطلوب.');
+    }
+
+    $disbursedMaterial = DisbursedMaterial::where('materialName', $assignmentData['materialName'])->first();
+    if (!$disbursedMaterial) {
+        throw new InvalidArgumentException('المادة المحددة غير موجودة.');
+    }
+
+    $assignmentData['disbursedMaterialID'] = $disbursedMaterial->id;
+
     $validator = Validator::make($assignmentData, [
         'userID' => 'required|exists:users,id',
         'centerID' => 'required|exists:medical_centers,id',
         'disbursedMaterialID' => 'required|exists:disbursed_materials,id',
         'quantity' => 'required|numeric|min:0',
-        'status' => 'required|string|max:255',
+        
     ]);
 
     if ($validator->fails()) {
@@ -120,25 +132,24 @@ public function assignMaterialToUserCenter(array $assignmentData)
 
     $validatedAssignmentData = $validator->validated();
 
-    \DB::beginTransaction();
+    DB::beginTransaction();
     try {
         $disbursedMaterialsUser = new DisbursedMaterialsUser([
             'userID' => $validatedAssignmentData['userID'],
             'centerID' => $validatedAssignmentData['centerID'],
             'disbursedMaterialID' => $validatedAssignmentData['disbursedMaterialID'],
             'quantity' => $validatedAssignmentData['quantity'],
-            'status' => $validatedAssignmentData['status'],
+            'status' => 'pending',
         ]);
         $disbursedMaterialsUser->save();
 
-        \DB::commit();
+        DB::commit();
         return $disbursedMaterialsUser;
     } catch (\Exception $e) {
-        \DB::rollback();
+        DB::rollback();
         throw $e;
     }
 }
-
 
 
 
