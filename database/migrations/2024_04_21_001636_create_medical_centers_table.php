@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('charityName')->nullable();
             $table->timestamps();
-            $table->unsignedBigInteger('valid')->default(0);
+            $table->unsignedBigInteger('valid')->default(-1);
 
             $table->index('centerName');
         });

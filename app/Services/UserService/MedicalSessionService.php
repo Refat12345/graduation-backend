@@ -141,7 +141,8 @@ class MedicalSessionService implements MedicalSessionServiceInterface
                     'sessionStartTime' => $appointment->session->sessionStartTime,
                     'sessionEndTime' => $appointment->session->sessionEndTime,
                     'chair' => $appointment->chair->chairNumber,
-                    'roomName' => $appointment->chair->roomName
+                    'roomName' => $appointment->chair->roomName,
+                    'valid' => $appointment->valid
                 ];
             });
     
@@ -169,7 +170,8 @@ class MedicalSessionService implements MedicalSessionServiceInterface
                     'sessionStartTime' => $appointment->session->sessionStartTime,
                     'sessionEndTime' => $appointment->session->sessionEndTime,
                     'chair' => $appointment->chair->chairNumber,
-                    'roomName' => $appointment->chair->roomName
+                    'roomName' => $appointment->chair->roomName,
+                    'valid' => $appointment->valid
                 ];
             });
     
@@ -397,10 +399,6 @@ public function startAppointment($appointmentId)
         return 'الموعد غير موجود';
     }
 }
-
-
-
-
 
 
 

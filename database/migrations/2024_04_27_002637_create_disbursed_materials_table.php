@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('disbursed_materials', function (Blueprint $table) {
             $table->id(); 
             $table->string('materialName');
-            $table->date('date');
-            $table->unsignedBigInteger('valid')->default(0);
+         //   $table->date('date');
+           // $table->unsignedBigInteger('valid')->default(0);
 
             $table->timestamps();
 

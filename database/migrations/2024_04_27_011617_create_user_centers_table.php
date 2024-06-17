@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('userID')->references('id')->on('users');
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->timestamps();
-            $table->unsignedBigInteger('valid')->default(0);
+            $table->unsignedBigInteger('valid')->default(-1);
 
 
            $table->index('userID');

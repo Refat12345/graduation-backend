@@ -14,6 +14,12 @@ class MedicalCenter extends Model
 
 
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_centers', 'centerID', 'userID');
+    }
+
+
 
     public function centertelecoms()
     {
@@ -77,10 +83,6 @@ class MedicalCenter extends Model
 /////////////////////////// belongsToMany ///////////////////////////////
 
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'user_centers', 'centerID', 'userID');
-    }
 
  
 

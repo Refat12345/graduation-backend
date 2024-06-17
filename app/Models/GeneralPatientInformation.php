@@ -25,6 +25,7 @@ class GeneralPatientInformation extends Model
     {
         return $this->hasOne(MaritalStatus::class, 'generalPatientInformationID', 'id');
     }
+    
 
 
     

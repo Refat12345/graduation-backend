@@ -262,5 +262,16 @@ public function permissions()
     {
         return $this->belongsTo(UserCenter::class, 'id', 'userID');
     }
+
+
+    
+    public function userCenters(): HasMany
+{
+    return $this->hasMany(UserCenter::class, 'userID', 'id');
+}
+
+
+
+
 }
 

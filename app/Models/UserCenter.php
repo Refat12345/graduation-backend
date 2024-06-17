@@ -15,7 +15,7 @@ class UserCenter extends Model
         return $this->belongsTo(User::class, 'userID', 'id');
     }
     
-    public function medicalCenter(): BelongsTo
+    public function medicalCenter()
     {
         return $this->belongsTo(MedicalCenter::class, 'centerID', 'id');
     }

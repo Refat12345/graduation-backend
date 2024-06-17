@@ -129,4 +129,24 @@ interface UserServiceInterface
 
     public function getMedicineNames();
     
+
+
+
+
+
+
+
+
+
+
+public function acceptaddShift($shiftId, $status);
+public function acceptAddChair($chairID, $status);
+public function acceptAddMedicalRecord($medicalRecordID, $status);
+public function acceptAddDisbursedMaterialsUser($disbursedMaterialdID, $status);
+public function acceptPatientInformation($userId, $status);
+public function getAddShiftsRequests($centerId);
+public function getMedicalRecordRequests($centerId);
+public function getChairsInCenter($centerId);
+public function getAllPatientInfoRequests($centerId);
+
 }

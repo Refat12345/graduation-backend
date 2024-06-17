@@ -86,7 +86,7 @@ public function createDisbursedMaterial(array $materialData)
 {
     $validator = Validator::make($materialData, [
         'materialName' => 'required|string|max:255',
-        'date' => 'required|date',
+       // 'date' => 'required|date',
     ]);
 
     if ($validator->fails()) {
@@ -97,7 +97,7 @@ public function createDisbursedMaterial(array $materialData)
 
     $disbursedMaterial = DisbursedMaterial::create([
         'materialName' => $validatedMaterialData['materialName'],
-        'date' => $validatedMaterialData['date'],
+       // 'date' => $validatedMaterialData['date'],
     ]);
 
     return $disbursedMaterial;
@@ -214,14 +214,19 @@ public function getDisbursedMaterialsDetailsForUser($userID) {
 
 
 
-public function getDisbursedMaterialsForCenterInTimeRange($centerID, $startDate, $endDate) {
-    $disbursedMaterials = DisbursedMaterialsUser::with(['disbursedMaterial', 'user'])
-                                ->where('centerID', $centerID)
-                                ->whereBetween('created_at', [$startDate, $endDate])
-                                ->get();
+public function getDisbursedMaterialsForCenterInTimeRange($centerID, $startDate = null, $endDate = null) {
+    $query = DisbursedMaterialsUser::with(['disbursedMaterial', 'user'])
+                                    ->where('centerID', $centerID);
+
+    if ($startDate && $endDate) {
+        $query->whereBetween('created_at', [$startDate, $endDate]);
+    }
+
+    $disbursedMaterials = $query->get();
 
     return $disbursedMaterials;
 }
+
 
 
 

@@ -305,7 +305,10 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
     
         return $formattedRecord;
     }
-    
+
+
+
+
 
 
 }

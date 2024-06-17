@@ -145,6 +145,34 @@ Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatis
 Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
 
 
+
+
+Route::post('acceptaddShift', [UserController::class, 'acceptaddShift']);
+Route::post('acceptAddChair', [UserController::class, 'acceptAddChair']);
+Route::post('acceptAddMedicalRecord', [UserController::class, 'acceptAddMedicalRecord']);
+Route::post('acceptAddDisbursedMaterialsUser', [UserController::class, 'acceptAddDisbursedMaterialsUser']);
+Route::post('acceptPatientInformation', [UserController::class, 'acceptPatientInformation']);
+
+Route::get('getAddShiftsRequests/{centerId}', [UserController::class, 'getAddShiftsRequests']);
+Route::get('getMedicalRecordRequests/{centerId}', [UserController::class, 'getMedicalRecordRequests']);
+Route::get('getChairsInCenter/{centerId}', [UserController::class, 'getChairsInCenter']);
+Route::get('getAllPatientInfoRequests/{centerId}', [UserController::class, 'getAllPatientInfoRequests']);
+
+
+//Route::post('/acceptaddShift', 'UserController@acceptaddShift');
+//Route::post('/acceptAddChair', 'UserController@acceptAddChair');
+//Route::post('/acceptAddMedicalRecord', 'UserController@acceptAddMedicalRecord');
+//Route::post('/acceptAddDisbursedMaterialsUser', 'UserController@acceptAddDisbursedMaterialsUser');
+//Route::post('/acceptPatientInformation', 'UserController@acceptPatientInformation');
+// Route::get('/getAddShiftsRequests/{centerId}', 'UserController@getAddShiftsRequests');
+// Route::get('/getMedicalRecordRequests/{centerId}', 'UserController@getMedicalRecordRequests');
+// Route::get('/getChairsInCenter/{centerId}', 'UserController@getChairsInCenter');
+// Route::get('/getAllPatientInfoRequests/{centerId}', 'UserController@getAllPatientInfoRequests');
+
+
+
+
+
 $roles = [ 'admin'];
 $permissions = ['view-dashboard', 'edit-dashboard', 'view-reports'];
 

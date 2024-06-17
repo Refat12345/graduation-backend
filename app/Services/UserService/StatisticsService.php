@@ -100,7 +100,7 @@ class StatisticsService implements StatisticsServiceInterface {
     foreach ($materials as $material) {
         $disbursedQuery = DisbursedMaterialsUser::whereHas('disbursedMaterial', function ($query) use ($material) {
             $query->where('materialName', $material);
-        })->where('centerID', $centerId);
+        })->where('centerID', $centerId)->where('valid', -1);
         
         $takenQuery = MedicineTaken::whereHas('medicine', function ($query) use ($material) {
             $query->where('name', $material);
@@ -146,6 +146,8 @@ class StatisticsService implements StatisticsServiceInterface {
     //     return $totalCounts;
     // }
 
+    
+
     public function causeRenalFailure()
 {
     $user = auth('user')->user();
@@ -158,7 +160,7 @@ class StatisticsService implements StatisticsServiceInterface {
         $count = User::whereHas('medicalRecord', function ($query) use ($centerID, $cause) {
             $query->whereHas('user.userCenter', function ($query) use ($centerID) {
                 $query->where('centerID', $centerID);
-            })->where('causeRenalFailure', $cause);
+            })->where('causeRenalFailure', $cause)->where('valid', -1);
         })->count();
 
         $totalCounts[$cause] = $count;

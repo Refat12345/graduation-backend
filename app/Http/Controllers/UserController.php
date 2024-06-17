@@ -647,4 +647,104 @@ public function getMedicineNames()
 
 
 
+
+
+/////////////////////////// accept /////////////////////////////
+
+
+
+public function acceptaddShift(Request $request)
+{
+    $status = $request->input('status');
+    $shiftId = $request->input('shiftId');
+   // return $this->userService->acceptaddShift($shiftId, $status);
+
+    return response()->json(['message' => $this->userService->acceptaddShift($shiftId, $status)]);
+    
+}
+
+
+public function acceptAddChair(Request $request)
+{
+    $status = $request->input('status');
+    $chairID = $request->input('chairID');
+   // return $this->userService->acceptAddChair($chairID, $status);
+    return response()->json(['message' =>  $this->userService->acceptAddChair($chairID, $status)]);
+}
+
+
+
+
+public function acceptAddMedicalRecord(Request $request)
+{
+    $status = $request->input('status');
+    $medicalRecordID = $request->input('medicalRecordID');
+  //  return $this->userService->acceptAddMedicalRecord($medicalRecordID, $status);
+    return response()->json(['message' => $this->userService->acceptAddMedicalRecord($medicalRecordID, $status)]);
+    
+}
+
+
+
+public function acceptAddDisbursedMaterialsUser(Request $request)
+{
+    $status = $request->input('status');
+    $disbursedMaterialdID = $request->input('disbursedMaterialdID');
+    //return $this->userService->acceptAddDisbursedMaterialsUser($disbursedMaterialdID, $status);
+    return response()->json(['message' => $this->userService->acceptAddDisbursedMaterialsUser($disbursedMaterialdID, $status)]);
+
+}
+
+
+
+public function acceptPatientInformation(Request $request)
+{
+    $status = $request->input('status');
+    $patientId = $request->input('patientId');
+  //  return $this->userService->acceptPatientInformation($patientId, $status);
+    return response()->json(['message' =>  $this->userService->acceptPatientInformation($patientId, $status)]);
+
+}
+
+
+
+
+public function getAddShiftsRequests($centerId)
+{
+   // return $this->userService->getAddShiftsRequests($centerId);
+    return response()->json(['message' =>  $this->userService->getAddShiftsRequests($centerId)]);
+
+}
+
+
+
+public function getMedicalRecordRequests($centerId)
+{
+  //  return $this->userService->getMedicalRecordRequests($centerId);
+    return response()->json(['message' =>  $this->userService->getMedicalRecordRequests($centerId)]);
+
+}
+
+
+
+public function getChairsInCenter($centerId)
+{
+  //  return $this->userService->getChairsInCenter($centerId);
+    return response()->json(['message' =>  $this->userService->getChairsInCenter($centerId)]);
+
+}
+
+
+public function getAllPatientInfoRequests($centerId)
+{
+   // return $this->userService->getAllPatientInfoRequests($centerId);
+
+    return response()->json(['message' =>  $this->userService->getAllPatientInfoRequests($centerId)]);
+
+}
+
+
+
+
+
 }
