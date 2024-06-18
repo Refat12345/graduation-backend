@@ -351,6 +351,8 @@ class UserService implements UserServiceInterface
     }
 }
 
+
+
 public function approveLocationEdits(User $editUser)
 {
     $editAddresses = Address::where('valid', $editUser->id)->get();

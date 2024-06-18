@@ -128,8 +128,8 @@ Route::post('/addMedicalAnalysis', [MedicalAnalysisController::class, 'addMedica
 Route::post('/addAnalysisType', [MedicalAnalysisController::class, 'addAnalysisType']);
 
 
-Route::get('/getPatientDialysisSessions/{patientId}/{month}/{year}', [MedicalSessionController::class, 'getPatientDialysisSessions']);
-Route::get('/getDialysisSessions/{centerId}/{month}/{year}', [MedicalSessionController::class, 'getDialysisSessions']);
+Route::get('/getPatientDialysisSessions/{patientId?}/{month?}/{year?}', [MedicalSessionController::class, 'getPatientDialysisSessions']);
+Route::get('/getDialysisSessions/{centerId}/{month?}/{year?}', [MedicalSessionController::class, 'getDialysisSessions']);
 
 Route::get('getAllMedicalCenters', [UserController::class, 'getAllMedicalCenters']);
 Route::get('getPieCharts/{month?}/{year?}', [StatisticsController::class, 'getPieCharts']);

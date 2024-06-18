@@ -23,7 +23,7 @@ class MedicalSessionController extends Controller
 
 
 
-    public function getDialysisSessions($centerId, $month, $year)
+    public function getDialysisSessions($centerId, $month= null, $year= null)
     {
         try {
             $sessions = $this->medicalSessionService->getDialysisSessionsWithChairInfo($centerId, $month, $year);
@@ -34,7 +34,7 @@ class MedicalSessionController extends Controller
     }
 
 
-    public function getPatientDialysisSessions($patientId, $month, $year)
+    public function getPatientDialysisSessions($patientId, $month= null, $year= null)
     {
         try {
             $sessions = $this->medicalSessionService->getPatientDialysisSessions($patientId, $month, $year);

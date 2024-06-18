@@ -121,44 +121,101 @@ class MedicalSessionService implements MedicalSessionServiceInterface
         }
     }
     
-    public function getDialysisSessionsWithChairInfo($centerId, $month, $year)
-    {
-        $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-        $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair'])
-            ->whereHas('session', function ($sessionQuery) use ($centerId, $dateString) {
-                if ($centerId > 0) {
-                    $sessionQuery->where('centerID', $centerId);
-                }
+    // public function getDialysisSessionsWithChairInfo($centerId, $month, $year)
+    // {
+    //     $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair'])
+    //         ->whereHas('session', function ($sessionQuery) use ($centerId, $dateString) {
+    //             if ($centerId > 0) {
+    //                 $sessionQuery->where('centerID', $centerId);
+    //             }
+    //             $sessionQuery->whereRaw('DATE_FORMAT(sessionEndTime, "%Y-%m") = ?', [$dateString]);
+    //         });
+    
+    //     $dialysisSessions = $query->get()
+    //         ->map(function ($appointment) {
+    //             return [
+    //                 'id' => $appointment->session->id,
+    //                 'patientName' => $appointment->session->patient->fullName,
+    //                 'nurseName' => $appointment->session->nurse->fullName,
+    //                 'sessionStartTime' => $appointment->session->sessionStartTime,
+    //                 'sessionEndTime' => $appointment->session->sessionEndTime,
+    //                 'chair' => $appointment->chair->chairNumber,
+    //                 'roomName' => $appointment->chair->roomName,
+    //                 'valid' => $appointment->valid
+    //             ];
+    //         });
+    
+    //     return $dialysisSessions;
+    // }
+    public function getDialysisSessionsWithChairInfo($centerId, $month = null, $year = null)
+{
+    $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair'])
+        ->whereHas('session', function ($sessionQuery) use ($centerId, $month, $year) {
+            if ($centerId > 0) {
+                $sessionQuery->where('centerID', $centerId);
+            }
+            if ($month && $year) {
+                $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
                 $sessionQuery->whereRaw('DATE_FORMAT(sessionEndTime, "%Y-%m") = ?', [$dateString]);
-            });
-    
-        $dialysisSessions = $query->get()
-            ->map(function ($appointment) {
-                return [
-                    'id' => $appointment->session->id,
-                    'patientName' => $appointment->session->patient->fullName,
-                    'nurseName' => $appointment->session->nurse->fullName,
-                    'sessionStartTime' => $appointment->session->sessionStartTime,
-                    'sessionEndTime' => $appointment->session->sessionEndTime,
-                    'chair' => $appointment->chair->chairNumber,
-                    'roomName' => $appointment->chair->roomName,
-                    'valid' => $appointment->valid
-                ];
-            });
-    
-        return $dialysisSessions;
-    }
-    
+            }
+        });
 
-    public function getPatientDialysisSessions($patientId, $month, $year)
-    {
-        $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
-        $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair'])
-            ->whereHas('session', function ($sessionQuery) use ($patientId, $dateString) {
+    $dialysisSessions = $query->get()
+        ->map(function ($appointment) {
+            return [
+                'id' => $appointment->session->id,
+                'patientName' => $appointment->session->patient->fullName,
+                'nurseName' => $appointment->session->nurse->fullName,
+                'sessionStartTime' => $appointment->session->sessionStartTime,
+                'sessionEndTime' => $appointment->session->sessionEndTime,
+                'chair' => $appointment->chair->chairNumber,
+                'roomName' => $appointment->chair->roomName,
+                'valid' => $appointment->valid
+            ];
+        });
+
+    return $dialysisSessions;
+}
+
+    // public function getPatientDialysisSessions($patientId, $month, $year)
+    // {
+    //     $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair'])
+    //         ->whereHas('session', function ($sessionQuery) use ($patientId, $dateString) {
             
-                    $sessionQuery->where('userID', $patientId);
+    //                 $sessionQuery->where('userID', $patientId);
              
-                $sessionQuery->whereRaw('DATE_FORMAT(sessionEndTime, "%Y-%m") = ?', [$dateString]);
+    //             $sessionQuery->whereRaw('DATE_FORMAT(sessionEndTime, "%Y-%m") = ?', [$dateString]);
+    //         });
+    
+    //     $dialysisSessions = $query->get()
+    //         ->map(function ($appointment) {
+    //             return [
+    //                 'id' => $appointment->session->id,
+    //                 'patientName' => $appointment->session->patient->fullName,
+    //                 'nurseName' => $appointment->session->nurse->fullName,
+    //                 'sessionStartTime' => $appointment->session->sessionStartTime,
+    //                 'sessionEndTime' => $appointment->session->sessionEndTime,
+    //                 'chair' => $appointment->chair->chairNumber,
+    //                 'roomName' => $appointment->chair->roomName,
+    //                 'valid' => $appointment->valid
+    //             ];
+    //         });
+    
+    //     return $dialysisSessions;
+    // }
+    
+    public function getPatientDialysisSessions($patientId, $month = null, $year = null)
+    {
+        $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair'])
+            ->whereHas('session', function ($sessionQuery) use ($patientId, $month, $year) {
+                $sessionQuery->where('userID', $patientId);
+    
+                if ($month && $year) {
+                    $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+                    $sessionQuery->whereRaw('DATE_FORMAT(sessionEndTime, "%Y-%m") = ?', [$dateString]);
+                }
             });
     
         $dialysisSessions = $query->get()
@@ -178,7 +235,6 @@ class MedicalSessionService implements MedicalSessionServiceInterface
         return $dialysisSessions;
     }
     
-
 
 
 
