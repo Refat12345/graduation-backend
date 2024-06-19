@@ -160,6 +160,18 @@ class UserService implements UserServiceInterface
          });
      }
 
+
+
+     public function updatePermissionsUser($userId, array $permissionNames)
+{
+    DB::transaction(function () use ($userId, $permissionNames) {
+        $user = User::findOrFail($userId);
+        $permissionsIds = Permission::whereIn('permissionName', $permissionNames)->pluck('id')->toArray();
+        $user->permissions()->sync($permissionsIds);
+    });
+}
+
+
      public function createUserAddress(User $user, array $addressData)
      {
     
@@ -204,64 +216,64 @@ class UserService implements UserServiceInterface
 
 
 
-         public function updateUser(array $userData, $userId)
-         {
-             DB::beginTransaction();
+//          public function updateUser(array $userData, $userId)
+//          {
+//              DB::beginTransaction();
 
-             $validator = Validator::make($userData, [
-                'fullName' => 'required|string|max:255',
-                'nationalNumber' => 'required|string|max:11|unique:users',
-                'dateOfBirth' => 'required|date',
-                'gender' => 'required|in:male,female,other',
-                'role' => 'required|string|max:255',
-                'telecom' => 'required|array',
-                'telecom.*.system' => 'required|string|max:255',
-                'telecom.*.value' => 'required|string|max:255',
-                'telecom.*.use' => 'required|string|max:255',
-                'address' => 'required|array',
-                'address.*.line' => 'required|string|max:255',
-                'address.*.use' => 'required|string|max:255',
-                'address.*.cityName' => 'required|string|max:255',
-                'address.*.countryName' => 'required|string|max:255',
-                'centerName' => 'required|string|max:255',
-                 'permissionNames' => 'array'
-            ]);
+//              $validator = Validator::make($userData, [
+//                 'fullName' => 'required|string|max:255',
+//                 'nationalNumber' => 'required|string|max:11|unique:users',
+//                 'dateOfBirth' => 'required|date',
+//                 'gender' => 'required|in:male,female,other',
+//                 'role' => 'required|string|max:255',
+//                 'telecom' => 'required|array',
+//                 'telecom.*.system' => 'required|string|max:255',
+//                 'telecom.*.value' => 'required|string|max:255',
+//                 'telecom.*.use' => 'required|string|max:255',
+//                 'address' => 'required|array',
+//                 'address.*.line' => 'required|string|max:255',
+//                 'address.*.use' => 'required|string|max:255',
+//                 'address.*.cityName' => 'required|string|max:255',
+//                 'address.*.countryName' => 'required|string|max:255',
+//                 'centerName' => 'required|string|max:255',
+//                  'permissionNames' => 'array'
+//             ]);
 
-            if ($validator->fails()) {
-                throw new LogicException($validator->errors()->first());
-            }
+//             if ($validator->fails()) {
+//                 throw new LogicException($validator->errors()->first());
+//             }
             
-             try {
-                 $originalUser = User::findOrFail($userId);
+//              try {
+//                  $originalUser = User::findOrFail($userId);
          
-                 $editUser = $originalUser->replicate();
-                 $editUser->fill($userData);
+//                  $editUser = $originalUser->replicate();
+//                  $editUser->fill($userData);
          
-                 $editUser->nationalNumber = 'temp_' . $editUser->nationalNumber;
+//                  $editUser->nationalNumber = 'temp_' . $editUser->nationalNumber;
 
 
-    $this->updateUserTelecom($originalUser, $userData['telecom']);
+//     $this->updateUserTelecom($originalUser, $userData['telecom']);
         
-    $editUser->valid = $originalUser->id;
-    $editUser->save();
+//     $editUser->valid = $originalUser->id;
+//     $editUser->save();
 
-    if (isset($userData['address'])) {
-        foreach ($userData['address'] as $addressData) {
-            $this->updateUserLocation($originalUser, $addressData);
-        }
-    }
+//     if (isset($userData['address'])) {
+//         foreach ($userData['address'] as $addressData) {
+//             $this->updateUserLocation($originalUser, $addressData);
+//         }
+//     }
 
-    if (isset($userData['permissionNames'])) {
-        $this->updatePermissionsToUser($editUser->id, $userData['permissionNames']);
-    }
+//     if (isset($userData['permissionNames'])) {
+//         $this->updatePermissionsToUser($editUser->id, $userData['permissionNames']);
+//     }
 
-    DB::commit();
-    return $editUser;
-} catch (\Exception $e) {
-    DB::rollBack();
-    throw new LogicException('Error updating user: ' . $e->getMessage());
-}
-}
+//     DB::commit();
+//     return $editUser;
+// } catch (\Exception $e) {
+//     DB::rollBack();
+//     throw new LogicException('Error updating user: ' . $e->getMessage());
+// }
+// }
 
          
          
@@ -766,384 +778,6 @@ public function loginUser(string $nationalNumber, string $password)
 }
 
 
-
-////////////////////////// accept ///////////////////////
-
-// public function acceptAddUser($userId)
-// {
-//     User::where('id', $userId)->update(['accountStatus' =>'active']);
-
-//     UserCenter::where('userID', $userId)->update(['valid' => -1]);
-
-//     return 'تم قبول اضافة المستخدم';
-// }
-
-
-
-
-public function changeAccountStatus(User $user, string $newStatus)
-{
-    $user->update(['accountStatus' => $newStatus]);
-}
-
-
-
-public function acceptUpdateCenter($centerId)
-{
-    MedicalCenter::where('id', $centerId)->update(['valid' => -1]);
-
-    return 'تم تحديث بيانات المركز';
-}
-
-
-
-
-// public function acceptaddShift($shiftId)
-// {
-//     Shift::where('id', $shiftId)->update(['valid' => -1]);
-
-
-//     return 'تم اضافة الوردية';
-// }
-
-
-public function acceptaddShift($shiftId, $status)
-{
-    if ($status === 'approved') {
-        Shift::where('id', $shiftId)->update(['valid' => -1]);
-        return 'تم قبول الوردية ';
-    } elseif ($status === 'rejected') {
-        Shift::where('id', $shiftId)->update(['valid' => -2]);
-        return 'تم رفض الوردية ';
-    }
-
-    return 'الحالة الممررة غير معروفة.';
-}
-
-
-
-
-
-// public function acceptAddChair($chairID)
-// {
-//     Chair::where('id', $chairID)->update(['valid' => -1]);
-
-//     return 'تم اضافة الكرسي';
-// }
-
-
-public function acceptAddChair($chairID, $status)
-{
-    if ($status === 'approved') {
-        Chair::where('id', $chairID)->update(['valid' => -1]);
-        return 'تم قبول إضافة الكرسي ';
-    } elseif ($status === 'rejected') {
-        Chair::where('id', $chairID)->update(['valid' => -2]);
-        return 'تم رفض إضافة الكرسي ';
-    }
-
-    return 'الحالة الممررة غير معروفة.';
-}
-
-
-
-public function updateStatus( $requestId, $newStatus)
-{
-    $validator = Validator::make([
-        'request_id' => $requestId, 
-        'new_status' => $newStatus
-    ], [
-        'request_id' => 'required|integer|exists:requests,id',
-        'new_status' => 'required|string|in:pending,approved,rejected', 
-    ]);
-
-    
-    if ($validator->fails()) {
-        throw new InvalidArgumentException($validator->errors()->first());
-    }
-
-  $validatedData = $validator->validated();
-
-    $requestModel = Requests::findOrFail($validatedData['request_id']);
-    $requestModel->updateRequestStatus($validatedData['new_status']);
-
-    if ($newStatus === 'approved') {
-        $requestModel->valid = -1;
-    } elseif ($newStatus === 'rejected') {
-        $requestModel->valid = -2;
-    }
-    $requestModel->save();
-
-
-    if ($requestModel->globalRequest) { 
-
-
-
-    }
-    
-elseif ($requestModel->patientTransferRequest && $newStatus === 'approved') {
-    $userCenter = UserCenter::where('userID', $requestModel->patientTransferRequest->patientID)
-                             ->where('centerID', $requestModel->patientTransferRequest->centerPatientID)
-                             ->first();
-    if ($userCenter) {
-        $userCenter->valid = 0;
-        $userCenter->save();
-    }
-
-    $newUserCenter = new UserCenter([
-        'userID' => $requestModel->patientTransferRequest->patientID,
-        'centerID' => $requestModel->patientTransferRequest->destinationCenterID,
-        'valid' => -1 
-    ]);
-    $newUserCenter->save();
-}
-
-
-
-    elseif ($requestModel->requestModifyAppointment  && $newStatus === 'approved') {
-
-     
-      $appointment= Appointment::findOrFail($requestModel->requestModifyAppointment->appointment->id);
-   
-        $appointment->updateappointmentTime($requestModel->requestModifyAppointment->newTime);
-     
-    }
-
-
-}
-
-
-
-
-
-// public function acceptAddMedicalRecord($medicalRecordID)
-// {
-//     MedicalRecord::where('id', $medicalRecordID)->update(['valid' => -1]);
-
-//     return 'تم اضافة السجل الطبي';
-// }
-
-public function acceptAddMedicalRecord($medicalRecordID, $status)
-{
-    if ($status === 'approved') {
-        MedicalRecord::where('id', $medicalRecordID)->update(['valid' => -1]);
-        return 'تم قبول إضافة السجل الطبي ';
-    } elseif ($status === 'rejected') {
-        MedicalRecord::where('id', $medicalRecordID)->update(['valid' => -2]);
-        return 'تم رفض إضافة السجل الطبي ';
-    }
-
-    return 'الحالة الممررة غير معروفة.';
-}
-
-
-
-// public function acceptAddDisbursedMaterialsUser($disbursedMaterialdID)
-// {
-//     DisbursedMaterialsUser::where('id', $disbursedMaterialdID)->update(['valid' => -1]);
-
-//     return 'تم صرف المادة للمريض ';
-// }
-
-
-
-
-// public function acceptPatientInformation($userId)
-// {
-//     GeneralPatientInformation::where('patientID', $userId)->update(['valid' => -1]);
-
-//     PatientCompanion::where('userID', $userId)->update(['valid' => -1]);
-
-//     return 'تم قبول المعلومات العامة للمريض';
-// }
-
-
-public function acceptAddDisbursedMaterialsUser($disbursedMaterialdID, $status)
-{
-    if ($status === 'approved') {
-        DisbursedMaterialsUser::where('id', $disbursedMaterialdID)->update(['valid' => -1]);
-        return 'تم قبول صرف المادة للمريض ';
-    } elseif ($status === 'rejected') {
-        DisbursedMaterialsUser::where('id', $disbursedMaterialdID)->update(['valid' => -2]);
-        return 'تم رفض صرف المادة للمريض ';
-    }
-
-    return 'الحالة الممررة غير معروفة.';
-}
-
-public function acceptPatientInformation($userId, $status)
-{
-    if ($status === 'approved') {
-        GeneralPatientInformation::where('patientID', $userId)->update(['valid' => -1]);
-        PatientCompanion::where('userID', $userId)->update(['valid' => -1]);
-        return 'تم قبول المعلومات العامة للمريض ';
-    } elseif ($status === 'rejected') {
-        GeneralPatientInformation::where('patientID', $userId)->update(['valid' => -2]);
-        PatientCompanion::where('userID', $userId)->update(['valid' => -2]);
-        return 'تم رفض المعلومات العامة للمريض ';
-    }
-
-    return 'الحالة الممررة غير معروفة.';
-}
-
-
-
-//طلبات اضافة وردية
-
-
-
-public function getAddShiftsRequests($centerId)
-{
-    $shifts = Shift::where('centerID', $centerId)->where('valid', 0)->get();
-
-    if ($shifts->isEmpty()) {
-        return 'لا توجد ورديات متاحة لهذا المركز';
-    }
-
-    return $shifts;
-}
-
-
-
-// // طلبات استهلاك المواد
-// public function getDisbursedMaterialsRequests($centerID) {
-//     $disbursedMaterials = DisbursedMaterialsUser::with(['disbursedMaterial', 'user'])
-//                                 ->where('centerID', $centerID)->where('valid', 0)
-                               
-//                                 ->get();
-
-//     return $disbursedMaterials;
-// }
-
-
-    
-
-public function getMedicalRecordRequests($centerId)
-{
-    $users = User::whereHas('userCenters', function ($query) use ($centerId) {
-        $query->where('centerID', $centerId);
-    })->where('role', 'patient')->get();
-
-    
-    $medicalRecords = [];
-    foreach ($users as $user) {
-        $medicalRecord = MedicalRecord::with(['allergicConditions', 'pathologicalHistories', 'pharmacologicalHistories', 'surgicalHistories'])
-                                      ->where('userID', $user->id)
-                                      ->where('valid', -1)
-                                      ->first();
-        if ($medicalRecord) {
-            $formattedRecord = [
-                'vascularEntrance' => $medicalRecord->vascularEntrance,
-                'dryWeight' => $medicalRecord->dryWeight,
-                'bloodType' => $medicalRecord->bloodType,
-                'causeRenalFailure' => $medicalRecord->causeRenalFailure,
-                'dialysisStartDate' => $medicalRecord->dialysisStartDate,
-                'kidneyTransplant' => $medicalRecord->kidneyTransplant ,
-                'pharmacologicalPrecedents' => $medicalRecord->pharmacologicalHistories->map(function ($history) {
-                    return [
-                        'medicineName' => $history->medicineName,
-                        'dateStart' => $history->dateStart,
-                        'dateEnd' => $history->dateEnd,
-                        'generalDetails' => $history->generalDetails
-                    ];
-                }),
-                'pathologicalPrecedents' => $medicalRecord->pathologicalHistories->map(function ($history) {
-                    return [
-                        'illnessName' => $history->illnessName,
-                        'medicalDiagnosisDate' => $history->medicalDiagnosisDate,
-                        'generalDetails' => $history->generalDetails
-                    ];
-                }),
-                'surgicalPrecedents' => $medicalRecord->surgicalHistories->map(function ($history) {
-                    return [
-                        'surgeryName' => $history->surgeryName,
-                        'surgeryDate' => $history->surgeryDate,
-                        'generalDetails' => $history->generalDetails
-                    ];
-                })
-            ];
-        
-            $medicalRecords[] = $formattedRecord;
-        }
-    }
-
-    return $medicalRecords;
-}
-
-
-public function getChairsInCenter($centerId)
-{
-    $chairs = Chair::where('centerID', $centerId)->get();
-    return $chairs;
-}
-
-
-
-
-
-
-public function getAllPatientInfoRequests($centerId)
-{
-    $patients = User::whereHas('userCenters', function ($query) use ($centerId) {
-        $query->where('centerID', $centerId);
-    })->where('role', 'patient')->get();
-
-    $allPatientInfo = [];
-    foreach ($patients as $patient) {
-        $patientInfo = GeneralPatientInformation::with([
-            'maritalStatus',
-           
-        ])->where('patientID', $patient->id)->first();
-
-        if ($patientInfo) {
-            $formattedPatientInfo = [
-                'maritalStatus' => $patientInfo->maritalStatus,
-                'nationality' => $patientInfo->nationality,
-                'status' => $patientInfo->status,
-                'reasonOfStatus' => $patientInfo->reasonOfStatus,
-                'educationalLevel' => $patientInfo->educationalLevel,
-                'generalIncome' => $patientInfo->generalIncome,
-                'incomeType' => $patientInfo->incomeType,
-                'sourceOfIncome' => $patientInfo->sourceOfIncome,
-                'workDetails' => $patientInfo->workDetails,
-                'residenceType' => $patientInfo->residenceType,
-                'childrenNumber' => $patientInfo->maritalStatus->childrenNumber,
-                'healthStateChildren' => $patientInfo->maritalStatus->healthStateChildren,
-                'valid' => $patientInfo->valid,
-
-                'companion' => [
-                    'fullName' => $patientInfo->patientCompanion->fullName,
-                    'degreeOfKinship' => $patientInfo->patientCompanion->degreeOfKinship,
-                    'telecoms' => $patientInfo->patientCompanion->telecoms,
-                    'addresses' => $patientInfo->patientCompanion->addresses,
-                    'valid' => $patientInfo->patientCompanion->valid
-                ]
-            ];
-            $allPatientInfo[] = $formattedPatientInfo;
-        }
-    }
-
-    return $allPatientInfo;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////////
 
     public function addGeneralPatientInformationWithMaritalStatus(array $data)
     {
@@ -1695,6 +1329,7 @@ public function getUserDetails($userId)
                 ->findOrFail($userId);
 
     $userDetails = [
+        'id' => $user->id,
         'fullName' => $user->fullName,
         'accountStatus' => $user->accountStatus,
         'gender' => $user->gender,
@@ -1711,6 +1346,7 @@ public function getUserDetails($userId)
 
         'telecom' => $user->telecom->map(function ($telecom) {
             return [
+                'id' => $telecom->id,
                 'system' => $telecom->system,
                 'value' => $telecom->value,
                 'use' => $telecom->use
@@ -1725,6 +1361,7 @@ public function getUserDetails($userId)
      
            
                 $userDetails['address'][] = [
+                    'id' => $address->id,
                     'line' => $address->line,
                     'use' => $address->use,
                     'cityName' => $address->city->cityName,
@@ -1934,6 +1571,561 @@ public function getMedicineNames()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////// accept ///////////////////////
+
+// public function acceptAddUser($userId)
+// {
+//     User::where('id', $userId)->update(['accountStatus' =>'active']);
+
+//     UserCenter::where('userID', $userId)->update(['valid' => -1]);
+
+//     return 'تم قبول اضافة المستخدم';
+// }
+
+
+
+
+public function changeAccountStatus(User $user, string $newStatus)
+{
+    $user->update(['accountStatus' => $newStatus]);
+}
+
+
+
+public function acceptUpdateCenter($centerId)
+{
+    MedicalCenter::where('id', $centerId)->update(['valid' => -1]);
+
+    return 'تم تحديث بيانات المركز';
+}
+
+
+
+
+// public function acceptaddShift($shiftId)
+// {
+//     Shift::where('id', $shiftId)->update(['valid' => -1]);
+
+
+//     return 'تم اضافة الوردية';
+// }
+
+
+public function acceptaddShift($shiftId, $status)
+{
+    if ($status === 'approved') {
+        Shift::where('id', $shiftId)->update(['valid' => -1]);
+        return 'تم قبول الوردية ';
+    } elseif ($status === 'rejected') {
+        Shift::where('id', $shiftId)->update(['valid' => -2]);
+        return 'تم رفض الوردية ';
+    }
+
+    return 'الحالة الممررة غير معروفة.';
+}
+
+
+
+
+
+// public function acceptAddChair($chairID)
+// {
+//     Chair::where('id', $chairID)->update(['valid' => -1]);
+
+//     return 'تم اضافة الكرسي';
+// }
+
+
+public function acceptAddChair($chairID, $status)
+{
+    if ($status === 'approved') {
+        Chair::where('id', $chairID)->update(['valid' => -1]);
+        return 'تم قبول إضافة الكرسي ';
+    } elseif ($status === 'rejected') {
+        Chair::where('id', $chairID)->update(['valid' => -2]);
+        return 'تم رفض إضافة الكرسي ';
+    }
+
+    return 'الحالة الممررة غير معروفة.';
+}
+
+
+
+public function updateStatus( $requestId, $newStatus)
+{
+    $validator = Validator::make([
+        'request_id' => $requestId, 
+        'new_status' => $newStatus
+    ], [
+        'request_id' => 'required|integer|exists:requests,id',
+        'new_status' => 'required|string|in:pending,approved,rejected', 
+    ]);
+
+    
+    if ($validator->fails()) {
+        throw new InvalidArgumentException($validator->errors()->first());
+    }
+
+  $validatedData = $validator->validated();
+
+    $requestModel = Requests::findOrFail($validatedData['request_id']);
+    $requestModel->updateRequestStatus($validatedData['new_status']);
+
+    if ($newStatus === 'approved') {
+        $requestModel->valid = -1;
+    } elseif ($newStatus === 'rejected') {
+        $requestModel->valid = -2;
+    }
+    $requestModel->save();
+
+
+    if ($requestModel->globalRequest) { 
+
+
+
+    }
+    
+elseif ($requestModel->patientTransferRequest && $newStatus === 'approved') {
+    $userCenter = UserCenter::where('userID', $requestModel->patientTransferRequest->patientID)
+                             ->where('centerID', $requestModel->patientTransferRequest->centerPatientID)
+                             ->first();
+    if ($userCenter) {
+        $userCenter->valid = 0;
+        $userCenter->save();
+    }
+
+    $newUserCenter = new UserCenter([
+        'userID' => $requestModel->patientTransferRequest->patientID,
+        'centerID' => $requestModel->patientTransferRequest->destinationCenterID,
+        'valid' => -1 
+    ]);
+    $newUserCenter->save();
+}
+
+
+
+    elseif ($requestModel->requestModifyAppointment  && $newStatus === 'approved') {
+
+     
+      $appointment= Appointment::findOrFail($requestModel->requestModifyAppointment->appointment->id);
+   
+        $appointment->updateappointmentTime($requestModel->requestModifyAppointment->newTime);
+     
+    }
+
+
+}
+
+
+
+
+
+// public function acceptAddMedicalRecord($medicalRecordID)
+// {
+//     MedicalRecord::where('id', $medicalRecordID)->update(['valid' => -1]);
+
+//     return 'تم اضافة السجل الطبي';
+// }
+
+public function acceptAddMedicalRecord($medicalRecordID, $status)
+{
+    if ($status === 'approved') {
+        MedicalRecord::where('id', $medicalRecordID)->update(['valid' => -1]);
+        return 'تم قبول إضافة السجل الطبي ';
+    } elseif ($status === 'rejected') {
+        MedicalRecord::where('id', $medicalRecordID)->update(['valid' => -2]);
+        return 'تم رفض إضافة السجل الطبي ';
+    }
+
+    return 'الحالة الممررة غير معروفة.';
+}
+
+
+
+// public function acceptAddDisbursedMaterialsUser($disbursedMaterialdID)
+// {
+//     DisbursedMaterialsUser::where('id', $disbursedMaterialdID)->update(['valid' => -1]);
+
+//     return 'تم صرف المادة للمريض ';
+// }
+
+
+
+
+// public function acceptPatientInformation($userId)
+// {
+//     GeneralPatientInformation::where('patientID', $userId)->update(['valid' => -1]);
+
+//     PatientCompanion::where('userID', $userId)->update(['valid' => -1]);
+
+//     return 'تم قبول المعلومات العامة للمريض';
+// }
+
+
+public function acceptAddDisbursedMaterialsUser($disbursedMaterialdID, $status)
+{
+    if ($status === 'approved') {
+        DisbursedMaterialsUser::where('id', $disbursedMaterialdID)->update(['valid' => -1]);
+        return 'تم قبول صرف المادة للمريض ';
+    } elseif ($status === 'rejected') {
+        DisbursedMaterialsUser::where('id', $disbursedMaterialdID)->update(['valid' => -2]);
+        return 'تم رفض صرف المادة للمريض ';
+    }
+
+    return 'الحالة الممررة غير معروفة.';
+}
+
+public function acceptPatientInformation($userId, $status)
+{
+    if ($status === 'approved') {
+        GeneralPatientInformation::where('patientID', $userId)->update(['valid' => -1]);
+        PatientCompanion::where('userID', $userId)->update(['valid' => -1]);
+        return 'تم قبول المعلومات العامة للمريض ';
+    } elseif ($status === 'rejected') {
+        GeneralPatientInformation::where('patientID', $userId)->update(['valid' => -2]);
+        PatientCompanion::where('userID', $userId)->update(['valid' => -2]);
+        return 'تم رفض المعلومات العامة للمريض ';
+    }
+
+    return 'الحالة الممررة غير معروفة.';
+}
+
+
+
+//طلبات اضافة وردية
+
+
+
+public function getAddShiftsRequests($centerId)
+{
+    $shifts = Shift::where('centerID', $centerId)->where('valid', 0)->get();
+
+    if ($shifts->isEmpty()) {
+        return 'لا توجد ورديات متاحة لهذا المركز';
+    }
+
+    return $shifts;
+}
+
+
+
+// // طلبات استهلاك المواد
+// public function getDisbursedMaterialsRequests($centerID) {
+//     $disbursedMaterials = DisbursedMaterialsUser::with(['disbursedMaterial', 'user'])
+//                                 ->where('centerID', $centerID)->where('valid', 0)
+                               
+//                                 ->get();
+
+//     return $disbursedMaterials;
+// }
+
+
+    
+
+public function getMedicalRecordRequests($centerId)
+{
+    $users = User::whereHas('userCenters', function ($query) use ($centerId) {
+        $query->where('centerID', $centerId);
+    })->where('role', 'patient')->get();
+
+    
+    $medicalRecords = [];
+    foreach ($users as $user) {
+        $medicalRecord = MedicalRecord::with(['allergicConditions', 'pathologicalHistories', 'pharmacologicalHistories', 'surgicalHistories'])
+                                      ->where('userID', $user->id)
+                                      ->where('valid', -1)
+                                      ->first();
+        if ($medicalRecord) {
+            $formattedRecord = [
+                'vascularEntrance' => $medicalRecord->vascularEntrance,
+                'dryWeight' => $medicalRecord->dryWeight,
+                'bloodType' => $medicalRecord->bloodType,
+                'causeRenalFailure' => $medicalRecord->causeRenalFailure,
+                'dialysisStartDate' => $medicalRecord->dialysisStartDate,
+                'kidneyTransplant' => $medicalRecord->kidneyTransplant ,
+                'pharmacologicalPrecedents' => $medicalRecord->pharmacologicalHistories->map(function ($history) {
+                    return [
+                        'medicineName' => $history->medicineName,
+                        'dateStart' => $history->dateStart,
+                        'dateEnd' => $history->dateEnd,
+                        'generalDetails' => $history->generalDetails
+                    ];
+                }),
+                'pathologicalPrecedents' => $medicalRecord->pathologicalHistories->map(function ($history) {
+                    return [
+                        'illnessName' => $history->illnessName,
+                        'medicalDiagnosisDate' => $history->medicalDiagnosisDate,
+                        'generalDetails' => $history->generalDetails
+                    ];
+                }),
+                'surgicalPrecedents' => $medicalRecord->surgicalHistories->map(function ($history) {
+                    return [
+                        'surgeryName' => $history->surgeryName,
+                        'surgeryDate' => $history->surgeryDate,
+                        'generalDetails' => $history->generalDetails
+                    ];
+                })
+            ];
+        
+            $medicalRecords[] = $formattedRecord;
+        }
+    }
+
+    return $medicalRecords;
+}
+
+
+public function getChairsInCenter($centerId)
+{
+    $chairs = Chair::where('centerID', $centerId)->get();
+    return $chairs;
+}
+
+
+
+
+
+
+// public function getAllPatientInfoRequests($centerId)
+// {
+//     $patients = User::whereHas('userCenters', function ($query) use ($centerId) {
+//         $query->where('centerID', $centerId);
+//     })->where('role', 'patient')->get();
+
+//     $allPatientInfo = [];
+//     foreach ($patients as $patient) {
+//         $patientInfo = GeneralPatientInformation::with([
+//             'maritalStatus',
+           
+//         ])->where('patientID', $patient->id)->first();
+
+//         if ($patientInfo) {
+//             $formattedPatientInfo = [
+//                 'maritalStatus' => $patientInfo->maritalStatus,
+//                 'nationality' => $patientInfo->nationality,
+//                 'status' => $patientInfo->status,
+//                 'reasonOfStatus' => $patientInfo->reasonOfStatus,
+//                 'educationalLevel' => $patientInfo->educationalLevel,
+//                 'generalIncome' => $patientInfo->generalIncome,
+//                 'incomeType' => $patientInfo->incomeType,
+//                 'sourceOfIncome' => $patientInfo->sourceOfIncome,
+//                 'workDetails' => $patientInfo->workDetails,
+//                 'residenceType' => $patientInfo->residenceType,
+//                 'childrenNumber' => $patientInfo->maritalStatus->childrenNumber,
+//                 'healthStateChildren' => $patientInfo->maritalStatus->healthStateChildren,
+//                 'valid' => $patientInfo->valid,
+
+//                 'companion' => [
+//                     'fullName' => $patientInfo->patientCompanion->fullName,
+//                     'degreeOfKinship' => $patientInfo->patientCompanion->degreeOfKinship,
+//                     'telecoms' => $patientInfo->patientCompanion->telecoms,
+//                     'addresses' => $patientInfo->patientCompanion->addresses,
+//                     'valid' => $patientInfo->patientCompanion->valid
+//                 ]
+//             ];
+//             $allPatientInfo[] = $formattedPatientInfo;
+//         }
+//     }
+
+//     return $allPatientInfo;
+// }
+
+
+
+
+
+public function getAllPatientInfoRequests($centerId)
+{
+    $patients = User::with(['generalPatientInformation.maritalStatus', 'patientCompanions.telecoms', 'patientCompanions.addresses'])
+        ->whereHas('userCenters', function ($query) use ($centerId) {
+            $query->where('centerID', $centerId);
+        })
+        ->where('role', 'patient')
+        ->get();
+
+    $allPatientInfo = [];
+    foreach ($patients as $patient) {
+        // تأكد من أن العلاقات محملة وأن البيانات موجودة
+        $patientInfo = $patient->generalPatientInformation;
+        $patientCompanions = $patient->patientCompanions;
+
+        // تنسيق المعلومات المطلوبة
+        $formattedPatientInfo = [
+            'patientID' => $patient->id,
+            'maritalStatus' => $patientInfo ? $patientInfo->maritalStatus : null,
+            'nationality' => $patientInfo ? $patientInfo->nationality : null,
+            'status' => $patientInfo ? $patientInfo->status : null,
+            'reasonOfStatus' => $patientInfo ? $patientInfo->reasonOfStatus : null,
+            'educationalLevel' => $patientInfo ? $patientInfo->educationalLevel : null,
+            'generalIncome' => $patientInfo ? $patientInfo->generalIncome : null,
+            'incomeType' => $patientInfo ? $patientInfo->incomeType : null,
+            'sourceOfIncome' => $patientInfo ? $patientInfo->sourceOfIncome : null,
+            'workDetails' => $patientInfo ? $patientInfo->workDetails : null,
+            'residenceType' => $patientInfo ? $patientInfo->residenceType : null,
+            'childrenNumber' => $patientInfo && $patientInfo->maritalStatus ? $patientInfo->maritalStatus->childrenNumber : null,
+            'healthStateChildren' => $patientInfo && $patientInfo->maritalStatus ? $patientInfo->maritalStatus->healthStateChildren : null,
+            'valid' => $patientInfo ? $patientInfo->valid : null,
+            'companion' => $patientCompanions->map(function ($companion) {
+                return [
+                    'fullName' => $companion->fullName,
+                    'degreeOfKinship' => $companion->degreeOfKinship,
+                    'telecoms' => $companion->telecoms,
+                    'addresses' => $companion->addresses,
+                    'valid' => $companion->valid
+                ];
+            })->toArray()
+        ];
+        $allPatientInfo[] = $formattedPatientInfo;
+    }
+
+    // إرجاع جميع المعلومات المنسقة
+    return response()->json($allPatientInfo);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////  update //////////////////////////////////
+
+
+public function updateUser($id, array $userData): User
+{
+    DB::beginTransaction();
+    try {
+        $user = User::findOrFail($id);
+
+        $validator = Validator::make($userData, [
+            'fullName' => 'sometimes|string|max:255',
+       'nationalNumber' => 'sometimes|string|max:11|unique:users,nationalNumber,' . $user->id,
+
+            'dateOfBirth' => 'sometimes|date',
+            'gender' => 'sometimes|in:male,female,other',
+            'role' => 'sometimes|string|max:255',
+            'telecom' => 'sometimes|array',
+            'telecom.*.system' => 'sometimes|string|max:255',
+            'telecom.*.value' => 'sometimes|string|max:255',
+            'telecom.*.use' => 'sometimes|string|max:255',
+            'address' => 'sometimes|array',
+            'address.*.line' => 'sometimes|string|max:255',
+            'address.*.use' => 'sometimes|string|max:255',
+            'address.*.cityName' => 'sometimes|string|max:255',
+            'address.*.countryName' => 'sometimes|string|max:255',
+            'centerName' => 'sometimes|string|max:255',
+            'permissionNames' => 'sometimes|array'
+        ]);
+
+        if ($validator->fails()) {
+            throw new LogicException($validator->errors()->first());
+        }
+
+        $user->update($userData);
+        if (isset($userData['telecom'])) {
+            foreach ($userData['telecom'] as $telecomData) {
+                $telecom = Telecom::findOrFail($telecomData['id']);
+                if ($telecom->userID === $user->id) {
+                    $telecom->update($telecomData);
+                } else {
+                    throw new LogicException('Telecom ID does not belong to the given user.');
+                }
+            }
+        }
+
+        if (isset($userData['address'])) {
+            foreach ($userData['address'] as $addressData) {
+                $address = Address::findOrFail($addressData['id']);
+                if ($address->userID === $user->id) {
+                    $address->update($addressData);
+                } else {
+                    throw new LogicException('Address ID does not belong to the given user.');
+                }
+            }
+        }
+
+                if (isset($userData['role']) && $userData['role'] === 'secretary' && isset($userData['permissionNames'])) {
+            $this->updatePermissionsToUser($user->id, $userData['permissionNames']);
+        }
+
+
+
+        // if (isset($userData['role']) && $userData['role'] === 'secretary' && isset($userData['permissionNames'])) {
+        //     $this->updatePermissionsToUser($user->id, $userData['permissionNames']);
+        // }
+
+        DB::commit();
+
+        return $user;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw new LogicException('Error updating user: ' . $e->getMessage());
+    }
+}
+
+
+
+// public function updateUserTelecoms(User $user, array $telecomData)
+// {
+//     foreach ($telecomData as $data) {
+//         $telecom = Telecom::findOrFail($data['id']);
+//         if ($telecom->userID === $user->id) {
+//             $telecom->update($data);
+//         } else {
+//             throw new LogicException('Telecom ID does not belong to the given user.');
+//         }
+//     }
+// }
+
+// public function updateUserAddress(User $user, array $addressData)
+// {
+//     foreach ($addressData as $data) {
+//         $address = Address::findOrFail($data['id']);
+//         if ($address->userID === $user->id) {
+//             $address->update($data);
+//         } else {
+//             throw new LogicException('Address ID does not belong to the given user.');
+//         }
+//     }
+// }
+
+public function updatePermissionsToUser($userId, array $permissionNames)
+{
+    DB::transaction(function () use ($userId, $permissionNames) {
+        $user = User::findOrFail($userId);
+        $permissionsIds = Permission::whereIn('permissionName', $permissionNames)->pluck('id');
+        $user->permissions()->sync($permissionsIds);
+    });
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////
 
 
 }

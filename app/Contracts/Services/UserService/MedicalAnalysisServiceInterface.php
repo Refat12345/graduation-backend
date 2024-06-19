@@ -14,7 +14,7 @@ interface MedicalAnalysisServiceInterface
 {
  
 
-
+    public function updateMedicalAnalysis($medicalAnalysisId, array $MedicalAnalysisData);
     public function createAnalysisType(array $AnalysisTypeData);
     public function createMedicalAnalysis(array $MedicalAnalysisData );
     public function getMedicalAnalysisWithAnalysisType($userID);

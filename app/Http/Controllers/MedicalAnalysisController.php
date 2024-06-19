@@ -47,4 +47,20 @@ public function showMedicalAnalysis($userID)
 
 
 
+
+
+
+public function updateMedicalAnalysis(Request $request)
+{
+    $medicalAnalysisId = $request->input('Id');
+
+    $MedicalAnalysisData = $request->except('Id');
+
+    $updatedAnalysis = $this->medicalAnalysisService->updateMedicalAnalysis($medicalAnalysisId, $MedicalAnalysisData);
+
+    return response()->json($updatedAnalysis);
+}
+
+
+
 }

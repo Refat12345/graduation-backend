@@ -328,7 +328,7 @@ public function associateUserWithMedicalCenter(Request $request)
     }
     }
 
-
+    
 
     public function assignPermissions(Request $request)
     {
@@ -338,6 +338,20 @@ public function associateUserWithMedicalCenter(Request $request)
         try {
             $this->userService->addPermissionsToUser($userId, $permissionNames);
             return response()->json(['message' => 'Permissions assigned successfully.']);
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+ 
+    public function updatePermissionsUser(Request $request)
+    {
+        $userId = $request->input('userId');
+        $permissionNames = $request->input('permissionNames');
+    
+        try {
+            $this->userService->updatePermissionsToUser($userId, $permissionNames);
+            return response()->json(['message' => 'Permissions updated successfully.']);
         } catch (InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -741,6 +755,32 @@ public function getAllPatientInfoRequests($centerId)
 
     return response()->json(['message' =>  $this->userService->getAllPatientInfoRequests($centerId)]);
 
+}
+
+
+
+public function updateUser(Request $request)
+{
+   
+    $id = $request->input('id');
+    $userData = $request->except('id');
+
+    try {
+    
+        $updatedUser = $this->userService->updateUser($id, $userData);
+
+       
+        return response()->json([
+            'message' => 'User updated successfully',
+            'data' => $updatedUser
+        ], 200);
+    } catch (LogicException $e) {
+   
+        return response()->json([
+
+            'message' => $e->getMessage(),
+        ], 400);
+    }
 }
 
 

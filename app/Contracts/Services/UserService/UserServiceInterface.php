@@ -149,4 +149,10 @@ public function getMedicalRecordRequests($centerId);
 public function getChairsInCenter($centerId);
 public function getAllPatientInfoRequests($centerId);
 
+public function updatePermissionsUser($userId, array $permissionNames);
+
+// public function updateUserAddress(User $user, array $addressData);
+// public function updateUserTelecoms(User $user, array $telecomData);
+public function updateUser($id, array $userData): User;
+
 }

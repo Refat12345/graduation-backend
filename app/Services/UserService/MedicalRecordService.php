@@ -132,38 +132,6 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
     
     
     
-    
-    public function createAllergicCondition(array $AllergicConditionData )
-    {
-       $validator = Validator::make($AllergicConditionData, [
-        'allergy' => 'required|string|max:255',
-        'dateOfSymptomOnset' => 'required|date',
-        'generalDetails' => 'required|string|max:255',
-        'medicalRecordID' => [
-            'required',
-            'integer',
-            Rule::exists('medical_records', 'id'),
-        ],   ]);
-    
-    if ($validator->fails()) {
-        throw new LogicException($validator->errors()->first());
-    }
-    
-    DB::beginTransaction();
-    try {
-         $AllergicCondition = AllergicCondition::create($AllergicConditionData);
-        DB::commit();
-        return $AllergicCondition;
-    } catch (\Exception $e) {
-        DB::rollBack();
-        throw new LogicException('Error creating AllergicCondition: ' . $e->getMessage());
-    }
-    }
-    
-    
-
-    
-    
     public function createPathologicalHistory(array $PathologicalHistoryData )
     {
        $validator = Validator::make($PathologicalHistoryData, [
@@ -259,6 +227,38 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
     }
     
     
+    
+    public function createAllergicCondition(array $AllergicConditionData )
+    {
+       $validator = Validator::make($AllergicConditionData, [
+        'allergy' => 'required|string|max:255',
+        'dateOfSymptomOnset' => 'required|date',
+        'generalDetails' => 'required|string|max:255',
+        'medicalRecordID' => [
+            'required',
+            'integer',
+            Rule::exists('medical_records', 'id'),
+        ],   ]);
+    
+    if ($validator->fails()) {
+        throw new LogicException($validator->errors()->first());
+    }
+    
+    DB::beginTransaction();
+    try {
+         $AllergicCondition = AllergicCondition::create($AllergicConditionData);
+        DB::commit();
+        return $AllergicCondition;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw new LogicException('Error creating AllergicCondition: ' . $e->getMessage());
+    }
+    }
+    
+    
+
+    
+    
 
 
 
@@ -273,6 +273,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
         }
     
         $formattedRecord = [
+            'id' => $medicalRecord->id,
             'vascularEntrance' => $medicalRecord->vascularEntrance,
             'dryWeight' => $medicalRecord->dryWeight,
             'bloodType' => $medicalRecord->bloodType,
@@ -281,6 +282,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
             'kidneyTransplant' => $medicalRecord->kidneyTransplant ,
             'pharmacologicalPrecedents' => $medicalRecord->pharmacologicalHistories->map(function ($history) {
                 return [
+                    'id' => $history->id,
                     'medicineName' => $history->medicineName,
                     'dateStart' => $history->dateStart,
                     'dateEnd' => $history->dateEnd,
@@ -289,6 +291,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
             }),
             'pathologicalPrecedents' => $medicalRecord->pathologicalHistories->map(function ($history) {
                 return [
+                    'id' => $history->id,
                     'illnessName' => $history->illnessName,
                     'medicalDiagnosisDate' => $history->medicalDiagnosisDate,
                     'generalDetails' => $history->generalDetails
@@ -296,6 +299,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
             }),
             'surgicalPrecedents' => $medicalRecord->surgicalHistories->map(function ($history) {
                 return [
+                    'id' => $history->id,
                     'surgeryName' => $history->surgeryName,
                     'surgeryDate' => $history->surgeryDate,
                     'generalDetails' => $history->generalDetails
@@ -305,6 +309,170 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
     
         return $formattedRecord;
     }
+
+
+
+
+
+ ////////////////////////////  update  ///////////////////////////////////
+
+
+
+
+
+ public function updateMedicalRecord($id, array $MedicalRecordData)
+ {
+     $MedicalRecord = MedicalRecord::findOrFail($id);
+ 
+     $validator = Validator::make($MedicalRecordData, [
+         'dialysisStartDate' => 'sometimes|date',
+         'dryWeight' => 'sometimes|numeric',
+         'bloodType' => 'sometimes|string|max:255',
+         'vascularEntrance' => 'sometimes|string|max:255',
+         'kidneyTransplant' => 'sometimes|boolean',
+         'causeRenalFailure' => 'sometimes|string|max:255',
+       
+         // 'userID' => 'sometimes|integer|exists:users,id|unique:medical_records,userID,' . $MedicalRecord->id,
+     ]);
+ 
+     if ($validator->fails()) {
+         throw new LogicException($validator->errors()->first());
+     }
+ 
+     DB::beginTransaction();
+     try {
+         $MedicalRecord->update($MedicalRecordData);
+ 
+         $allAllergicConditionsData = request()->input('allergicConditions');
+         if (!empty($allAllergicConditionsData)) {
+             foreach ($allAllergicConditionsData as $AllergicConditionData) {
+                 $AllergicConditionData['medicalRecordID'] = $MedicalRecord->id;
+                 $this->updateAllergicCondition($AllergicConditionData);
+             }
+         }
+ 
+         $allPathologicalHistoriesData = request()->input('pathologicalHistories');
+         if (!empty($allPathologicalHistoriesData)) {
+             foreach ($allPathologicalHistoriesData as $PathologicalHistoryData) {
+                 $PathologicalHistoryData['medicalRecordID'] = $MedicalRecord->id;
+                 $this->updatePathologicalHistory($PathologicalHistoryData);
+             }
+         }
+ 
+         $allPharmacologicalHistoriesData = request()->input('pharmacologicalHistories');
+         if (!empty($allPharmacologicalHistoriesData)) {
+             foreach ($allPharmacologicalHistoriesData as $PharmacologicalHistoryData) {
+                 $PharmacologicalHistoryData['medicalRecordID'] = $MedicalRecord->id;
+                 $this->updatePharmacologicalHistory($PharmacologicalHistoryData);
+             }
+         }
+ 
+         $allSurgicalHistoriesData = request()->input('surgicalHistories');
+         if (!empty($allSurgicalHistoriesData)) {
+             foreach ($allSurgicalHistoriesData as $SurgicalHistoryData) {
+                 $SurgicalHistoryData['medicalRecordID'] = $MedicalRecord->id;
+                 $this->updateSurgicalHistory($SurgicalHistoryData);
+             }
+         }
+ 
+         DB::commit();
+         return $MedicalRecord;
+     } catch (\Exception $e) {
+         DB::rollBack();
+         throw new LogicException('Error updating MedicalRecord: ' . $e->getMessage());
+     }
+ }
+ 
+
+ public function updateAllergicCondition(array $AllergicConditionData)
+{
+    $validator = Validator::make($AllergicConditionData, [
+        'conditionName' => 'required|string|max:255',
+        'medicalRecordID' => 'required|integer|exists:medical_records,id',
+    ]);
+
+    if ($validator->fails()) {
+        throw new LogicException($validator->errors()->first());
+    }
+
+    $AllergicCondition = AllergicCondition::findOrFail($AllergicConditionData['id']);
+    $AllergicCondition->update($AllergicConditionData);
+    return $AllergicCondition;
+}
+
+
+
+public function updatePathologicalHistory(array $PathologicalHistoryData)
+{
+    $validator = Validator::make($PathologicalHistoryData, [
+        'illnessName' => 'required|string|max:255',
+        'medicalDiagnosisDate' => 'required|date',
+        'generalDetails' => 'required|string|max:255',
+        'medicalRecordID' => 'required|integer|exists:medical_records,id',
+    ]);
+
+    if ($validator->fails()) {
+        throw new LogicException($validator->errors()->first());
+    }
+
+    $PathologicalHistory = PathologicalHistory::findOrFail($PathologicalHistoryData['id']);
+    $PathologicalHistory->update($PathologicalHistoryData);
+    return $PathologicalHistory;
+}
+
+
+
+
+
+
+public function updatePharmacologicalHistory(array $PharmacologicalHistoryData)
+{
+    $validator = Validator::make($PharmacologicalHistoryData, [
+        'medicineName' => 'required|string|max:255',
+        'dateStart' => 'required|date',
+        'dateEnd' => 'required|date',
+        'generalDetails' => 'required|string|max:255',
+        'medicalRecordID' => 'required|integer|exists:medical_records,id',
+    ]);
+
+    if ($validator->fails()) {
+        throw new LogicException($validator->errors()->first());
+    }
+
+    $PharmacologicalHistory = PharmacologicalHistory::findOrFail($PharmacologicalHistoryData['id']);
+    $PharmacologicalHistory->update($PharmacologicalHistoryData);
+    return $PharmacologicalHistory;
+}
+
+
+
+
+
+
+public function updateSurgicalHistory(array $SurgicalHistoryData)
+{
+    $validator = Validator::make($SurgicalHistoryData, [
+        'surgeryName' => 'required|string|max:255',
+        'surgeryDate' => 'required|date',
+        'generalDetails' => 'required|string|max:255',
+        'medicalRecordID' => 'required|integer|exists:medical_records,id',
+    ]);
+
+    if ($validator->fails()) {
+        throw new LogicException($validator->errors()->first());
+    }
+
+    $SurgicalHistory = SurgicalHistory::findOrFail($SurgicalHistoryData['id']);
+    $SurgicalHistory->update($SurgicalHistoryData);
+    return $SurgicalHistory;
+}
+
+
+
+
+
+
+
 
 
 

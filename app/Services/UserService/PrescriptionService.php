@@ -131,9 +131,11 @@ public function getAllPrescriptionsForUser($userId) {
 
     return $prescriptions->map(function ($prescription) {
         return [
+            'prescriptionID' => $prescription->id ,
             'doctor' => $prescription->doctor->fullName ,
             'medicines' => $prescription->medicines->map(function ($medicine) {
                 return [
+                    'Id' => $medicine->id,
                     'status' => $medicine->pivot->status,
                     'name' => $medicine->name,
                     'dateOfStart' => $medicine->pivot->dateOfStart,

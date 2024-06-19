@@ -20,5 +20,9 @@ interface MedicalRecordServiceInterface
     public function createSurgicalHistory(array $SurgicalHistoryData );
     public function createPharmacologicalHistory(array $PharmacologicalHistoryData );
     public function createPathologicalHistory(array $PathologicalHistoryData );
+    public function updateMedicalRecord($id, array $MedicalRecordData);
+    public function updatePharmacologicalHistory(array $PharmacologicalHistoryData);
+    public function updateAllergicCondition(array $AllergicConditionData);
+    public function updatePathologicalHistory(array $PathologicalHistoryData);
 
 }

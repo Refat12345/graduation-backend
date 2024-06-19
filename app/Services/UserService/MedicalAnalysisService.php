@@ -179,4 +179,55 @@ public function getMedicalAnalysisWithAnalysisType($userID)
 
     return $medicalAnalyses;
 }
+
+
+
+public function updateMedicalAnalysis($medicalAnalysisId, array $MedicalAnalysisData)
+{
+    $validator = Validator::make($MedicalAnalysisData, [
+        'analysisName' => 'required|string|max:255',
+        'averageMin' => 'required|numeric',
+        'averageMax' => 'required|numeric',
+        'value' => 'required|numeric',
+        'analysisDate' => 'required|date',
+        'notes' => 'required|string|max:255',
+        'userID' => [
+            'nullable',
+            'integer',
+            Rule::exists('users', 'id')->where(function ($query) {
+                $query->where('role', 'patient');
+            }),
+        ],
+    ]);
+
+    if ($validator->fails()) {
+        throw new LogicException($validator->errors()->first());
+    }
+
+    DB::beginTransaction();
+    try {
+        $analysisType = AnalysisType::updateOrCreate(
+            ['analysisName' => $MedicalAnalysisData['analysisName']],
+            [
+                'recurrenceInterval' => $MedicalAnalysisData['recurrenceInterval'] ?? null,
+                'unitOfMeasurement' => $MedicalAnalysisData['unitOfMeasurement'] ?? null,
+            ]
+        );
+
+        $MedicalAnalysisData['analysisTypeID'] = $analysisType->id;
+
+        $medicalAnalysis = MedicalAnalysis::find($medicalAnalysisId);
+        if (!$medicalAnalysis) {
+            throw new LogicException('التحليل الطبي غير موجود.');
+        }
+        $medicalAnalysis->update($MedicalAnalysisData);
+
+        DB::commit();
+        return ['medicalAnalysis' => $medicalAnalysis, 'analysisType' => $analysisType];
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw new LogicException('Error updating MedicalAnalysis and AnalysisType: ' . $e->getMessage());
+    }
+}
+
 }

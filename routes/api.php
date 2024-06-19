@@ -20,6 +20,8 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 Route::post('/login', [UserController::class, 'loginUser']);
 Route::post('/search', [UserController::class, 'findUser']);
 Route::post('/createUser', 'App\Http\Controllers\UserController@createUser');
+Route::post('/updateUser', 'App\Http\Controllers\UserController@updateUser');
+
 
 Route::post('/getUserByVerificationCode', [UserController::class, 'getUserByVerificationCode']);
 Route::post('/verify', [UserController::class, 'verifyUser']);
@@ -30,6 +32,7 @@ Route::post('/change', [UserController::class, 'changeStatus']);
 Route::post('add-general-patient-info', [UserController::class, 'addGeneralPatientInformation']);
 Route::post('add-patient-companion', [UserController::class, 'addPatientCompanion']);
 Route::post('assign-permissions', [UserController::class, 'assignPermissions']);
+Route::post('updatePermissionsUser', [UserController::class, 'updatePermissionsUser']);
 Route::get('getUserPermissions/{userId}', [UserController::class, 'getUserPermissions']);
 
 Route::post('/createMedicalCenter', [UserController::class, 'createMedicalCenter']);
@@ -125,6 +128,10 @@ Route::get('/showMedicalRecord/{userID}', [MedicalRecordController::class, 'show
 
 Route::get('/showMedicalAnalysis/{userID}', [MedicalAnalysisController::class, 'showMedicalAnalysis']);
 Route::post('/addMedicalAnalysis', [MedicalAnalysisController::class, 'addMedicalAnalysis']);
+Route::post('/updateMedicalAnalysis', [MedicalAnalysisController::class, 'updateMedicalAnalysis']);
+
+
+
 Route::post('/addAnalysisType', [MedicalAnalysisController::class, 'addAnalysisType']);
 
 
@@ -143,7 +150,7 @@ Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatis
 
 
 Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
-
+Route::post('/updateMedicalRecord', [MedicalRecordController::class, 'updateMedicalRecord']);
 
 
 
@@ -159,11 +166,11 @@ Route::get('getChairsInCenter/{centerId}', [UserController::class, 'getChairsInC
 Route::get('getAllPatientInfoRequests/{centerId}', [UserController::class, 'getAllPatientInfoRequests']);
 
 
-//Route::post('/acceptaddShift', 'UserController@acceptaddShift');
-//Route::post('/acceptAddChair', 'UserController@acceptAddChair');
-//Route::post('/acceptAddMedicalRecord', 'UserController@acceptAddMedicalRecord');
-//Route::post('/acceptAddDisbursedMaterialsUser', 'UserController@acceptAddDisbursedMaterialsUser');
-//Route::post('/acceptPatientInformation', 'UserController@acceptPatientInformation');
+// Route::post('/acceptaddShift', 'UserController@acceptaddShift');
+// Route::post('/acceptAddChair', 'UserController@acceptAddChair');
+// Route::post('/acceptAddMedicalRecord', 'UserController@acceptAddMedicalRecord');
+// Route::post('/acceptAddDisbursedMaterialsUser', 'UserController@acceptAddDisbursedMaterialsUser');
+// Route::post('/acceptPatientInformation', 'UserController@acceptPatientInformation');
 // Route::get('/getAddShiftsRequests/{centerId}', 'UserController@getAddShiftsRequests');
 // Route::get('/getMedicalRecordRequests/{centerId}', 'UserController@getMedicalRecordRequests');
 // Route::get('/getChairsInCenter/{centerId}', 'UserController@getChairsInCenter');

@@ -36,6 +36,50 @@ public function createMedicalRecord(Request $request)
 
 
 
+public function updateMedicalRecord(Request $request)
+{
+
+    $id = $request->input('id');
+    $MedicalRecordData = $request->except('id');
+  
+    try {
+       
+
+        $medicalRecord = $this->medicalRecordService->updateMedicalRecord($id, $MedicalRecordData);
+      
+
+        return response()->json([$medicalRecord], 200);
+        
+    } catch (LogicException $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 public function showMedicalRecord($userID)
