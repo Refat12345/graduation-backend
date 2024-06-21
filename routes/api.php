@@ -93,6 +93,7 @@ Route::get('/getMedicines', [DisbursedMaterialController::class, 'getMedicines']
 Route::get('/getMaterialNames', [DisbursedMaterialController::class, 'getMaterialNames']);
 
 Route::post('/addPrescription', [PrescriptionController::class, 'addPrescription']);
+Route::post('/updatePrescription/{PrescriptionId}', [PrescriptionController::class, 'updatePrescription']);
 Route::get('/getPrescriptionsByPatient/{patientID?}', [PrescriptionController::class, 'getPrescriptionsByPatient']);
 
 

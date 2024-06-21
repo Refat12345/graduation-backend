@@ -71,5 +71,14 @@ public function getPrescriptionsByPatient($patientID = null)
 }
 
 
-
+    public function updatePrescription(Request $request, $prescriptionId)
+    {
+        $data = $request->all();
+        $updatedPrescription = $this->prescriptionService->updatePrescription($prescriptionId, $data);
+        return response()->json(['Prescription'=> $updatedPrescription]);
     }
+
+  
+}
+
+    
