@@ -57,6 +57,7 @@ public function addPrescription(Request $request)
 // }
 
 
+
 public function getPrescriptionsByPatient($patientID = null)
 {
     try {

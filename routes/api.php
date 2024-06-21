@@ -103,6 +103,9 @@ Route::post('/change-request-status', [UserController::class, 'changeReruestStat
 
 Route::post('/addPatientInfo', [UserController::class, 'addPatientInfo']);
 
+Route::get('/getPatientsByCenter/{centerID}', [UserController::class, 'getPatientsByCenter']);
+Route::post('/updatePatientStatus/{patientID}/{status}', [UserController::class, 'updatePatientStatus']);
+
 
 Route::post('/createDisbursedMaterial', [DisbursedMaterialController::class, 'createDisbursedMaterial']);
 Route::post('assignMaterialToUserCenter', [DisbursedMaterialController::class, 'assignMaterialToUserCenter']);

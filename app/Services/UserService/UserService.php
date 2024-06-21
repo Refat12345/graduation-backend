@@ -1956,11 +1956,9 @@ public function getAllPatientInfoRequests($centerId)
 
     $allPatientInfo = [];
     foreach ($patients as $patient) {
-        // تأكد من أن العلاقات محملة وأن البيانات موجودة
         $patientInfo = $patient->generalPatientInformation;
         $patientCompanions = $patient->patientCompanions;
 
-        // تنسيق المعلومات المطلوبة
         $formattedPatientInfo = [
             'patientID' => $patient->id,
             'maritalStatus' => $patientInfo ? $patientInfo->maritalStatus : null,
@@ -2124,9 +2122,100 @@ public function updatePermissionsToUser($userId, array $permissionNames)
 
 
 
+// public function getPatientInfo($patientID)
+// {
+//     $patientInfo = GeneralPatientInformation::where('patientID', $patientID)
+//                     ->with(['patientCompanion', 'telecoms' => function ($query) {
+//                         $query->where('system', 'phone');
+//                     }, 'addresses'])
+//                     ->get(['fullName', 'address', 'telecoms.value as phone', 'patientCompanion.fullName as companionName', 'patientCompanion.telecoms.value as companionPhone'])
+//                     ->toArray();
+
+//     $formattedPatientInfo = [];
+//     foreach ($patientInfo as $info) {
+//         $address = '';
+//         foreach ($info['addresses'] as $addr) {
+//             $address .= $addr['line'] . ', ' . $addr['cityName'] . ', ' . $addr['countryName'] . ' ';
+//         }
+
+//         $formattedPatientInfo[] = [
+//             'fullName' => $info['fullName'],
+//             'address' => $address,
+//             'phone' => $info['phone'],
+//             'companionName' => $info['patientCompanion']['companionName'],
+//             'companionPhone' => $info['patientCompanion']['telecoms']['companionPhone']
+//         ];
+//     }
+
+//     return $formattedPatientInfo;
+// }
+
+
+
 
 ///////////////////////////////////////////////////////////////////
 
+
+
+
+public function getPatientsByCenter($centerID)
+{
+    $patients = User::whereHas('userCenters', function ($query) use ($centerID) {
+                    $query->where('centerID', $centerID);
+                })
+                ->where('role', 'patient')
+                ->with(['patientCompanions.telecoms' => function ($query) {
+                    $query->where('system', 'phone');
+                }, 'telecom' => function ($query) {
+                    $query->where('system', 'phone');
+                }, 'address.city.country'])
+                ->get();
+
+    $formattedPatients = [];
+    foreach ($patients as $patient) {
+        $address = '';
+        foreach ($patient->address as $addr) {
+            $cityName = $addr->city->cityName ?? 'City not found';
+            $countryName = $addr->city->country->countryName ?? 'Country not found';
+            $address .= $addr['line'] . ', ' . $cityName . ', ' . $countryName . ' ';
+        }
+
+        $companionName = '';
+        $companionPhone = '';
+        if ($patient->patientCompanions->isNotEmpty()) {
+            $companion = $patient->patientCompanions->first();
+            $companionName = $companion->fullName;
+            $companionPhone = $companion->telecoms->where('system', 'phone')->first()->value ?? null;
+        }
+
+        $phone = $patient->telecom->where('system', 'phone')->first()->value ?? null;
+
+        $formattedPatients[] = [
+            'fullName' => $patient->fullName,
+            'address' => $address,
+            'phone' => $phone,
+            'companionName' => $companionName,
+            'companionPhone' => $companionPhone
+        ];
+    }
+
+    return $formattedPatients;
+}
+
+
+public function updatePatientStatus($patientID, $newStatus)
+{
+    $patientInfo = User::where('id', $patientID)->first();
+    
+    if (!$patientInfo) {
+       
+        return  'لم يتم العثور على المريض';
+    }
+
+    $patientInfo->generalPatientInformation->status = $newStatus;
+    $patientInfo->generalPatientInformation->save();
+    return 'تم تحديث حالة المريض';
+}
 
 }
 

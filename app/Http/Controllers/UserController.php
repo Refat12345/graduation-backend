@@ -786,5 +786,30 @@ public function updateUser(Request $request)
 
 
 
+public function getPatientsByCenter($centerID)
+{
+   // $centerID = $request->input('center_id'); 
+    $patientsData = $this->userService->getPatientsByCenter($centerID);
+
+
+    return response()->json([
+        'patients' => $patientsData
+    ]);
+}
+
+
+public function updatePatientStatus($patientID, $newStatus)
+{
+    $message = $this->userService->updatePatientStatus($patientID, $newStatus);
+
+
+    return response()->json([
+        'message' => $message
+    ]);
+}
+
+
+
+
 
 }
