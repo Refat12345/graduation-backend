@@ -2059,6 +2059,12 @@ public function updateUser($id, array $userData): User
                 $address = Address::findOrFail($addressData['id']);
                 if ($address->userID === $user->id) {
                     $address->update($addressData);
+                $address->city->cityName = $addressData['cityName'];
+                $address->city->country->countryName = $addressData['countryName'];
+                $address->city->save();
+                $address->city->country->save();
+
+
                 } else {
                     throw new LogicException('Address ID does not belong to the given user.');
                 }
