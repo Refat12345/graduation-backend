@@ -882,7 +882,7 @@ public function addPatientInfo(array $data)
         'maritalStatus' => 'required|string|max:255',
         'nationality' => 'required|string|max:255',
         'status' => 'required|string|max:255',
-        'reasonOfStatus' => 'required|string|max:255',
+        'reasonOfStatus' => 'nullable|string|max:255',
         'educationalLevel' => 'required|string|max:255',
         'generalIncome' => 'required|numeric',
         'incomeType' => 'required|string|max:255',
@@ -1458,7 +1458,7 @@ public function getMedicalCenterDetails($centerId)
        'totalChairs' => $totalChairs,
        'totalNurses' => $totalNurses,
        'totalDoctors' => $totalDoctors,
-       'shifts' => $totalShifts,
+       'shifts' => array_values($totalShifts->toArray()),
         
       
        'telecom' => $contactDetails,
@@ -1476,7 +1476,7 @@ public function getMedicalCenterDetails($centerId)
             'cityName' => $address->city->cityName,
             'countryName' => $address->city->country->countryName
         ];
-    
+        $details['shifts'] = array_values($details['shifts']);
 }
 
 return  $details;
