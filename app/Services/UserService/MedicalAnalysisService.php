@@ -168,6 +168,7 @@ public function getMedicalAnalysisWithAnalysisType($userID)
                                           $formattedDate = $day . '-' . $month . '-' . $year;
 
                                           return [
+                                            'id' => $analysis->id,
                                               'analysisName' => $analysis->analysisType->analysisName,
                                               'value' => $analysis->value,
                                               'unitOfMeasurement' => $analysis->analysisType->unitOfMeasurement ?? 'null',

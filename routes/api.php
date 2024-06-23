@@ -21,7 +21,8 @@ Route::post('/login', [UserController::class, 'loginUser']);
 Route::post('/search', [UserController::class, 'findUser']);
 Route::post('/createUser', 'App\Http\Controllers\UserController@createUser');
 Route::post('/updateUser', 'App\Http\Controllers\UserController@updateUser');
-
+Route::post('/updateMedicalCenter', 'App\Http\Controllers\UserController@updateMedicalCenter');
+Route::post('/updatePatientInfo', 'App\Http\Controllers\UserController@updatePatientInfo');
 
 Route::post('/getUserByVerificationCode', [UserController::class, 'getUserByVerificationCode']);
 Route::post('/verify', [UserController::class, 'verifyUser']);
@@ -36,7 +37,6 @@ Route::post('updatePermissionsUser', [UserController::class, 'updatePermissionsU
 Route::get('getUserPermissions/{userId}', [UserController::class, 'getUserPermissions']);
 
 Route::post('/createMedicalCenter', [UserController::class, 'createMedicalCenter']);
-
 
 
 Route::post('/global-requests', [UserController::class, 'createGlobalRequest']);

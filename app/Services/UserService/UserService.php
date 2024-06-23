@@ -1051,6 +1051,72 @@ public function addMedicalCenterWithUser(array $centerData)
 
 
 
+public function updateMedicalCenter($centerId, array $centerData)
+{
+    
+    DB::beginTransaction();
+    try {
+        $medicalCenter = MedicalCenter::findOrFail($centerId);
+
+        $validator = Validator::make($centerData, [
+            'centerName' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string|max:1000',
+            'charityName' => 'nullable|string|max:255',
+            'telecom' => 'sometimes|array',
+            'telecom.*.system' => 'sometimes|string|max:255',
+            'telecom.*.value' => 'sometimes|string|max:255',
+            'telecom.*.use' => 'sometimes|string|max:255',
+            'address' => 'sometimes|array',
+            'address.use' => 'sometimes|string|max:255',
+            'address.line' => 'sometimes|string',
+            'address.cityName' => 'sometimes|string|max:255',
+            'address.countryName' => 'sometimes|string|max:255',
+        
+        ]);
+
+        if ($validator->fails()) {
+            throw new LogicException($validator->errors()->first());
+        }
+
+        $medicalCenter->update($centerData);
+    
+
+      
+        if (isset($centerData['telecom'])) {
+            foreach ($centerData['telecom'] as $telecomData) {
+                $telecom = Telecom::where('centerID', $medicalCenter->id)
+                                  ->where('id', $telecomData['id'])
+                                  ->firstOrFail();
+                $telecom->update($telecomData);
+            }
+        }
+
+        if (isset($centerData['address'])) {
+            foreach ($centerData['address'] as $addressData) {
+                $address = Address::findOrFail($addressData['id']);
+                if ($address->centerID === $medicalCenter->id) {
+                    $address->update($addressData);
+                $address->city->cityName = $addressData['cityName'];
+                $address->city->country->countryName = $addressData['countryName'];
+                $address->city->save();
+                $address->city->country->save();
+
+
+                } else {
+                    throw new LogicException('Address ID does not belong to the given user.');
+                }
+            }
+        }
+
+        DB::commit();
+        return $medicalCenter;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw new LogicException('Error updating medical center: ' . $e->getMessage());
+    }
+}
+
+
 
 public function getAllMedicalCenters()
 {   
@@ -1379,6 +1445,7 @@ public function getUserDetails($userId)
                 
            
         }
+        
     }
     
 
@@ -1451,6 +1518,7 @@ public function getMedicalCenterDetails($centerId)
     $contactDetails = $medicalCenter->centertelecoms;
 
     $details = [
+        'id' => $medicalCenter->id,
        'centerName' => $medicalCenter->centerName,
        'description' => $medicalCenter->description,
        'charityName' => $medicalCenter->charityName,
@@ -1471,6 +1539,7 @@ public function getMedicalCenterDetails($centerId)
      
            
         $details['address'][] = [
+            'id' => $address->id, 
             'line' => $address->line,
             'use' => $address->use,
             'cityName' => $address->city->cityName,
@@ -2222,6 +2291,70 @@ public function updatePatientStatus($patientID, $newStatus)
     $patientInfo->generalPatientInformation->save();
     return 'تم تحديث حالة المريض';
 }
+
+
+
+
+
+
+public function updatePatientInfo($patientId, array $data)
+{
+    $validator = Validator::make($data, [
+        'maritalStatus' => 'sometimes|string|max:255',
+        'nationality' => 'sometimes|string|max:255',
+        'status' => 'sometimes|string|max:255',
+        'reasonOfStatus' => 'nullable|string|max:255',
+        'educationalLevel' => 'sometimes|string|max:255',
+        'generalIncome' => 'sometimes|numeric',
+        'incomeType' => 'sometimes|string|max:255',
+        'sourceOfIncome' => 'sometimes|string|max:255',
+        'workDetails' => 'sometimes|string|max:255',
+        'residenceType' => 'sometimes|string|max:255',
+        'fullName' => 'sometimes|string|max:255',
+        'degreeOfKinship' => 'sometimes|string|max:255',
+    
+    ]);
+
+    if ($validator->fails()) {
+        throw new InvalidArgumentException($validator->errors()->first());
+    }
+
+    DB::transaction(function () use ($patientId, $data) {
+        $generalPatientInfo = GeneralPatientInformation::where('patientID', $patientId)->firstOrFail();
+        $generalPatientInfo->update($data);
+
+        if (isset($data['maritalStatusData'])) {
+            $maritalStatus = MaritalStatus::where('generalPatientInformationID', $generalPatientInfo->id)->firstOrFail();
+            $maritalStatus->update($data['maritalStatusData']);
+        }
+
+        if (isset($data['companionData'])) {
+            $patientCompanion = PatientCompanion::where('userID', $patientId)->firstOrFail();
+            $patientCompanion->update($data['companionData']);
+        }
+
+        if (isset($data['telecomDataArray'])) {
+            foreach ($data['telecomDataArray'] as $telecomData) {
+                $telecom = Telecom::where('patientCompanionID', $patientCompanion->id)
+                                  ->where('id', $telecomData['id'])
+                                  ->firstOrFail();
+                $telecom->update($telecomData);
+            }
+        }
+
+        if (isset($data['address'])) {
+            foreach ($data['address'] as $addressData) {
+                $address = Address::where('patientCompanionID', $patientCompanion->id)
+                                  ->where('id', $addressData['id'])
+                                  ->firstOrFail();
+                $address->update($addressData);
+            }
+        }
+    });
+
+    return ['message' => 'Patient information updated successfully'];
+}
+
 
 }
 

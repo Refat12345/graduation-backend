@@ -767,11 +767,12 @@ public function updateUser(Request $request)
 
     try {
     
-        $updatedUser = $this->userService->updateUser($id, $userData);
+       $updatedUser = $this->userService->updateUser($id, $userData);
 
        
         return response()->json([
-            'message' => 'User updated successfully',
+            
+            'message' => 'تم تحديث بيانات المستخدم' ,
             'data' => $updatedUser
         ], 200);
     } catch (LogicException $e) {
@@ -784,6 +785,83 @@ public function updateUser(Request $request)
 }
 
 
+public function updateMedicalCenter(Request $request)
+{
+   
+    $id = $request->input('id');
+    $userData = $request->except('id');
+
+    try {
+    
+     $updatedUser = $this->userService->updateMedicalCenter($id, $userData);
+
+       
+        return response()->json([
+          //  'xx' =>  $id,
+          'message' => 'تم تحديث بيانات المركز' ,
+          'data' => $updatedUser
+        ], 200);
+    } catch (LogicException $e) {
+   
+        return response()->json([
+
+            'message' => $e->getMessage(),
+        ], 400);
+    }
+}
+
+
+public function updatePatientInfo(Request $request)
+{
+   
+    $id = $request->input('id');
+    $data = $request->except('id');
+
+    try {
+    
+     $updated = $this->userService->updatePatientInfo($id, $data);
+
+       
+        return response()->json([
+          //  'xx' =>  $id,
+          'message' => 'تم تحديث المعلومات العامة للمستخدم' ,
+          'data' => $updated
+        ], 200);
+    } catch (LogicException $e) {
+   
+        return response()->json([
+
+            'message' => $e->getMessage(),
+        ], 400);
+    }
+}
+
+
+
+
+// public function updateMedicalCenter(Request $request)
+// {
+   
+//     $id = $request->input('id');
+//     $userData = $request->except('id');
+
+//     try {
+    
+//       //  $updated= $this->userService->updateMedicalCenter( $id , $data);
+
+       
+//         return response()->json([
+//             'message' => $id,
+//         //    'data' => $updated
+//         ], 200);
+//     } catch (LogicException $e) {
+   
+//         return response()->json([
+
+//             'message' => $e->getMessage(),
+//         ], 400);
+//     }
+// }
 
 
 public function getPatientsByCenter($centerID)
