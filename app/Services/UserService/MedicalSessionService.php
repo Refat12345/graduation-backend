@@ -312,6 +312,8 @@ public function getCompleteDialysisSessionDetails($sessionId)
         'status' => $dialysisSession->status,
         'medicines' => $dialysisSession->medicineTakens->map(function ($medicineTaken) {
             return [
+                'medicineTakenID' => $medicineTaken->id,
+                'medicineID' => $medicineTaken->medicine->id,
                 'medicineName' => $medicineTaken->medicine->name,
                 'value' => $medicineTaken->value,
             ];
@@ -326,6 +328,7 @@ public function getCompleteDialysisSessionDetails($sessionId)
 
     
     
+
     
     public function addSessionMedicine(array $data, $sessionId)
     {
@@ -455,6 +458,115 @@ public function startAppointment($appointmentId)
         return 'الموعد غير موجود';
     }
 }
+
+
+
+
+
+
+
+
+public function updateDialysisSession($sessionId, array $data)
+{
+    $dialysisSession = DialysisSession::findOrFail($sessionId);
+
+    $validator = Validator::make($data, [
+        'sessionStartTime' => 'required|date',
+        'sessionEndTime' => 'required|date|after:sessionStartTime',
+        'weightBeforeSession' => 'required|numeric|min:0',
+        'weightAfterSession' => 'required|numeric|min:0',
+        'totalWithdrawalRate' => 'required|numeric|min:0',
+        'withdrawalRateHourly' => 'required|numeric|min:0',
+        'pumpSpeed' => 'required|numeric|min:0',
+        'filterColor' => 'required|string|max:255',
+        'filterType' => 'required|string|max:255',
+        'vascularConnection' => 'required|string|max:255',
+        'naConcentration' => 'required|numeric|min:0',
+        'venousPressure' => 'required|integer|min:0',
+        'status' => 'required|string|max:255',
+        'sessionDate' => 'required|date',
+        'patientID' => 'nullable|exists:users,id',
+        'doctorID' => 'nullable|exists:users,id',
+    ]);
+
+    if ($validator->fails()) {
+        throw new InvalidArgumentException($validator->errors()->first());
+    }
+
+    $validatedData = $validator->validated();
+    
+    DB::beginTransaction();
+    try {
+        $dialysisSession->update($validatedData);
+
+        // تعديل الأدوية
+        if (isset($data['medicines'])) {
+            foreach ($data['medicines'] as $medicineData) {
+                $this->updateSessionMedicine($medicineData);
+            }
+        }
+
+        // تعديل قياسات ضغط الدم
+        if (isset($data['bloodPressures'])) {
+            foreach ($data['bloodPressures'] as $bloodPressureData) {
+                $this->updateBloodPressureMeasurement($bloodPressureData);
+            }
+        }
+
+        DB::commit();
+        return $dialysisSession;
+    } catch (\Exception $e) {
+        DB::rollback();
+        throw $e;
+    }
+}
+
+public function updateSessionMedicine(  array $data)
+{
+    $validator = Validator::make($data, [
+        'medicineTakenID'=> 'required|exists:medicine_takens,id',
+        'medicineID' => 'required|exists:medicines,id',
+        'value' => 'required|numeric|min:0'
+    ]);
+
+    if ($validator->fails()) {
+        throw new InvalidArgumentException($validator->errors()->first());
+    }
+
+    $validatedData = $validator->validated();
+    $medicine = MedicineTaken::findOrFail($validatedData['medicineTakenID']);
+                           
+
+    if (!$medicine) {
+        throw new ModelNotFoundException('Medicine record not found for the given session.');
+    }
+
+    $medicine->update([
+        'value' => $validatedData['value'],
+       'medicineID' =>$validatedData['medicineID']
+    ]);
+}
+
+
+public function updateBloodPressureMeasurement(array $data)
+{
+    $validator = Validator::make($data, [
+        'id' => 'required|exists:blood_pressure_measurements,id',
+        'pressureValue' => 'required|numeric|min:0',
+        'pulseValue' => 'required|numeric|min:0',
+        'time' => 'required|date_format:Y-m-d H:i:s'
+       
+    ]);
+
+    if ($validator->fails()) {
+        throw new InvalidArgumentException($validator->errors()->first());
+    }
+
+    $validatedData = $validator->validated();
+    $bloodPressure = BloodPressureMeasurement::findOrFail($validatedData['id']);
+    $bloodPressure->update($validatedData);
+}
+
 
 
 
