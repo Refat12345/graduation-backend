@@ -508,7 +508,7 @@ public function showUserDetails( $userId)
     try {
     $userDetails = $this->userService->getUserDetails($userId);
 
-    return response()->json([$userDetails], 200);
+    return response()->json(['userDetails'=>$userDetails], 200);
 } catch (\Exception $e) {
            
     return response()->json(['error' => $e->getMessage()], 400);
@@ -813,6 +813,7 @@ public function updateMedicalCenter(Request $request)
 
 public function updatePatientInfo(Request $request)
 {
+
    
     $id = $request->input('id');
     $data = $request->except('id');
@@ -821,11 +822,8 @@ public function updatePatientInfo(Request $request)
     
      $updated = $this->userService->updatePatientInfo($id, $data);
 
-       
         return response()->json([
-          //  'xx' =>  $id,
-          'message' => 'تم تحديث المعلومات العامة للمستخدم' ,
-          'data' => $updated
+          'message' => $updated
         ], 200);
     } catch (LogicException $e) {
    
@@ -885,9 +883,6 @@ public function updatePatientStatus($patientID, $newStatus)
         'message' => $message
     ]);
 }
-
-
-
 
 
 }

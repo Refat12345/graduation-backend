@@ -200,9 +200,6 @@ public function assignMaterialToUserCenter(array $assignmentData)
 
 
 
-
-
-
 public function getDisbursedMaterialsDetailsForUser($userID) {
     $disbursedMaterials = DisbursedMaterialsUser::with(['disbursedMaterial', 'medicalCenter'])
                                 ->where('userID', $userID)

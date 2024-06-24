@@ -203,7 +203,7 @@ public function doctorSessionsWithRelatedData()
 
         public function patientCompanions()
         {
-            return $this->hasMany(PatientCompanion::class, 'userID', 'id');
+            return $this->hasMany(PatientCompanion::class, 'userID', 'id') ->with(['address', 'telecoms']);
         }
 
 

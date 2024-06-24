@@ -766,11 +766,12 @@ public function loginUser(string $nationalNumber, string $password)
 
         $userCenter = $user->userCenters()->where('valid', -1)->first();
         $centerId = $userCenter ? $userCenter->centerID : null;
-
+        $centerName = $userCenter ? $userCenter->medicalCenter->centerName: null;
         $token = $user->createToken('auth_token', ['center_id' => $centerId])->plainTextToken;
 
         $user->token = $token;
         $user->centerID =  $centerId;
+        $user->centerName =  $centerName;
         return $user;
     }
 
@@ -1438,15 +1439,44 @@ public function getUserDetails($userId)
 
     if ($user->role === 'patient') {
         $generalPatientInformation = $user->generalPatientInformation;
+        $patientCompanions=$user->patientCompanions;
         if ($generalPatientInformation) {
             $userDetails['generalInformation'] = 
                 $generalPatientInformation;
-              
-                
-           
         }
-        
+
+
+        if ($patientCompanions) {
+            $userDetails['patientCompanion'] = $patientCompanions->map(function ($companion) {
+                return [
+                    'id' => $companion->id,
+                    'fullName' => $companion->fullName,
+                    'degreeOfKinship' => $companion->degreeOfKinship,
+                    'address' => $companion->address->map(function ($address) {
+                        return [
+                            'id' => $address->id,
+                            'line' => $address->line,
+                            'use' => $address->use,
+                            'cityName' => $address->city->cityName,
+                            'countryName' => $address->city->country->countryName
+                        ];
+                    })->toArray(),
+
+                    'telecom' => $companion->telecoms->map(function ($telecom) {
+                        return [
+                            'id' => $telecom->id,
+                            'system' => $telecom->system,
+                            'value' => $telecom->value,
+                            'use' => $telecom->use
+                        ];
+                    })->toArray(),
+                ];
+            })->toArray();
+        }
     }
+
+
+    
     
 
     return $userDetails;
@@ -2348,11 +2378,17 @@ public function updatePatientInfo($patientId, array $data)
                                   ->where('id', $addressData['id'])
                                   ->firstOrFail();
                 $address->update($addressData);
+            
+                $address->city->cityName = $addressData['cityName'];
+                $address->city->country->countryName = $addressData['countryName'];
+                $address->city->save();
+                $address->city->country->save();
             }
         }
+   
     });
 
-    return ['message' => 'Patient information updated successfully'];
+    return 'تم تعديل معلومات المستخدم';
 }
 
 
