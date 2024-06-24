@@ -1247,8 +1247,8 @@ public function updateShift($shiftId, array $data)
 {
     $validatedData = Validator::make($data, [
         'centerID' => 'required|integer|exists:medical_centers,id',
-        'shiftStart' => 'required|date_format:H:i',
-        'shiftEnd' => 'required|date_format:H:i|after:shiftStart',
+        'shiftStart' => 'required|date_format:H:i:s',
+        'shiftEnd' => 'required|date_format:H:i:s|after:shiftStart',
         'name' => 'required|string|max:255',
     ])->validate();
 
