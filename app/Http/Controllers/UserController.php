@@ -837,6 +837,53 @@ public function updatePatientInfo(Request $request)
 
 
 
+
+public function updateShift(Request $request)
+{
+
+   
+    $id = $request->input('id');
+    $data = $request->except('id');
+
+    try {
+    
+     $updated = $this->userService->updateShift($id, $data);
+
+        return response()->json([
+          'message' => $updated
+        ], 200);
+    } catch (LogicException $e) {
+   
+        return response()->json([
+
+            'message' => $e->getMessage(),
+        ], 400);
+    }
+}
+
+public function updateChair(Request $request)
+{
+
+   
+    $id = $request->input('id');
+    $data = $request->except('id');
+
+    try {
+    
+     $updated = $this->userService->updateChair($id, $data);
+
+        return response()->json([
+          'message' => $updated
+        ], 200);
+    } catch (LogicException $e) {
+   
+        return response()->json([
+
+            'message' => $e->getMessage(),
+        ], 400);
+    }
+}
+
 // public function updateMedicalCenter(Request $request)
 // {
    

@@ -159,4 +159,7 @@ public function getPatientsByCenter($centerID);
 
 public function updatePatientStatus($patientID, $newStatus);
 public function updatePatientInfo($patientId, array $data);
+
+public function updateShift($shiftId, array $data);
+public function updateChair($chairId, array $data);
 }

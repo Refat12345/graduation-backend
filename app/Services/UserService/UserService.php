@@ -763,7 +763,14 @@ public function loginUser(string $nationalNumber, string $password)
 {
     if (Auth::attempt(['nationalNumber' => $nationalNumber, 'password' => $password])) {
         $user = Auth::user();
+        if ($user->valid === 0){
 
+            return 'لم يتم تأكيد حسابك بعد ';
+        }
+        if ($user->valid === -2){
+
+            return 'الحساب غير موجود';
+        }
         $userCenter = $user->userCenters()->where('valid', -1)->first();
         $centerId = $userCenter ? $userCenter->centerID : null;
         $centerName = $userCenter ? $userCenter->medicalCenter->centerName: null;
@@ -1167,8 +1174,22 @@ public function getAllMedicalCenters()
  }
  
 
-
-
+ public function updateChair($chairId, array $data)
+ {
+     $validatedData = Validator::make($data, [
+         'chairNumber' => 'required|integer|max:255',
+         'roomName' => 'required|string|max:255',
+     ])->validate();
+ 
+     $chair = Chair::findOrFail($chairId);
+     $chair->update([
+         'chairNumber' => $validatedData['chairNumber'],
+         'roomName' => $validatedData['roomName'],
+     ]);
+ 
+     return $chair;
+ }
+ 
 
 //  public function addShift(array $data)
 //  {
@@ -1221,6 +1242,31 @@ public function addShift(array $data)
     $shift->save();
     return $shift;
 }
+
+public function updateShift($shiftId, array $data)
+{
+    $validatedData = Validator::make($data, [
+        'centerID' => 'required|integer|exists:medical_centers,id',
+        'shiftStart' => 'required|date_format:H:i',
+        'shiftEnd' => 'required|date_format:H:i|after:shiftStart',
+        'name' => 'required|string|max:255',
+    ])->validate();
+
+    $shift = Shift::findOrFail($shiftId);
+
+    $shiftStart = Carbon::createFromFormat('H:i', $validatedData['shiftStart'])->toTimeString();
+    $shiftEnd = Carbon::createFromFormat('H:i', $validatedData['shiftEnd'])->toTimeString();
+
+    $shift->update([
+        'shiftStart' => $shiftStart,
+        'shiftEnd' => $shiftEnd,
+        'name' => $validatedData['name'],
+        'centerID' => $validatedData['centerID'],
+    ]);
+
+    return $shift;
+}
+
 
     public function createCenterTelecoms($centerId, array $telecomsData)
     {

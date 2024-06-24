@@ -30,6 +30,9 @@ Route::post('/change', [UserController::class, 'changeStatus']);
 
 
 
+
+
+
 Route::post('add-general-patient-info', [UserController::class, 'addGeneralPatientInformation']);
 Route::post('add-patient-companion', [UserController::class, 'addPatientCompanion']);
 Route::post('assign-permissions', [UserController::class, 'assignPermissions']);
@@ -49,9 +52,11 @@ Route::get('/all-requests', [UserController::class, 'getAllRequests']);
 Route::post('/associateUserWithMedicalCenter', [UserController::class, 'associateUserWithMedicalCenter']);
 
 Route::post('/chairs', [UserController::class, 'createChair']);
+Route::post('/updateChair', [UserController::class, 'updateChair']);
+
+
 Route::post('/shifts', [UserController::class, 'createShift']);
-
-
+Route::post('/updateShift', [UserController::class, 'updateShift']);
 
 
 Route::post('/appointments', [AppointmentController::class, 'createAppointment']);
