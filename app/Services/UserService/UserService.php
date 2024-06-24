@@ -1254,8 +1254,8 @@ public function updateShift($shiftId, array $data)
 
     $shift = Shift::findOrFail($shiftId);
 
-    $shiftStart = Carbon::createFromFormat('H:i', $validatedData['shiftStart'])->toTimeString();
-    $shiftEnd = Carbon::createFromFormat('H:i', $validatedData['shiftEnd'])->toTimeString();
+    $shiftStart = Carbon::createFromFormat('H:i:s', $validatedData['shiftStart'])->toTimeString();
+    $shiftEnd = Carbon::createFromFormat('H:i:s', $validatedData['shiftEnd'])->toTimeString();
 
     $shift->update([
         'shiftStart' => $shiftStart,
