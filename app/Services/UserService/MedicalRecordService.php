@@ -300,7 +300,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
             'dryWeight' => $medicalRecord->dryWeight,
             'bloodType' => $medicalRecord->bloodType,
             'causeRenalFailure' => $medicalRecord->causeRenalFailure,
-            'dialysisStartDate' => Carbon::parse($medicalRecord->dialysisStartDate),
+            'dialysisStartDate' => Carbon::parse($medicalRecord->dialysisStartDate)->format('Y-m-d'),
             'kidneyTransplant' => $medicalRecord->kidneyTransplant ,
             'pharmacologicalPrecedents' => $medicalRecord->pharmacologicalHistories->map(function ($history) {
                 return [
