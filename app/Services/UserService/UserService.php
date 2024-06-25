@@ -1360,6 +1360,41 @@ public function updateShift($shiftId, array $data)
 }
 
 
+
+
+public function updateShifts(array $shiftsData)
+{
+    $updatedShifts = collect();
+
+    foreach ($shiftsData as $shiftData) {
+        $validatedData = Validator::make($shiftData, [
+            'id' => 'required|integer|exists:shifts,id',
+            'centerID' => 'required|integer|exists:medical_centers,id',
+            'shiftStart' => 'required|date_format:H:i:s',
+            'shiftEnd' => 'required|date_format:H:i:s|after:shiftStart',
+            'name' => 'required|string|max:255',
+        ])->validate();
+
+        $shift = Shift::findOrFail($validatedData['id']);
+
+        $shiftStart = Carbon::createFromFormat('H:i:s', $validatedData['shiftStart'])->toTimeString();
+        $shiftEnd = Carbon::createFromFormat('H:i:s', $validatedData['shiftEnd'])->toTimeString();
+
+        $shift->update([
+            'shiftStart' => $shiftStart,
+            'shiftEnd' => $shiftEnd,
+            'name' => $validatedData['name'],
+            'centerID' => $validatedData['centerID'],
+        ]);
+
+        $updatedShifts->push($shift);
+    }
+
+    return $updatedShifts;
+}
+
+
+
     public function createCenterTelecoms($centerId, array $telecomsData)
     {
         $center = MedicalCenter::find($centerId);

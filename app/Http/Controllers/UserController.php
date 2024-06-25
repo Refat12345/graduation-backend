@@ -861,6 +861,29 @@ public function updateShift(Request $request)
     }
 }
 
+
+
+
+
+public function updateShifts(Request $request)
+{
+    $shiftsData = $request->input('shifts');
+
+    try {
+        $updatedShifts = $this->userService->updateShifts($shiftsData);
+
+        return response()->json([
+            'message' => 'Shifts updated successfully',
+            'updatedShifts' => $updatedShifts
+        ], 200);
+    } catch (LogicException $e) {
+        return response()->json([
+            'message' => $e->getMessage(),
+        ], 400);
+    }
+}
+
+
 public function updateChair(Request $request)
 {
 

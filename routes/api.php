@@ -58,6 +58,10 @@ Route::post('/updateChair', [UserController::class, 'updateChair']);
 Route::post('/shifts', [UserController::class, 'createShift']);
 Route::post('/updateShift', [UserController::class, 'updateShift']);
 
+Route::post('/updateShifts', [UserController::class, 'updateShifts']);
+
+
+
 
 Route::post('/appointments', [AppointmentController::class, 'createAppointment']);
 Route::get('/centerappointments/{centerId}', [AppointmentController::class, 'showAppointmentsByCenter']);
