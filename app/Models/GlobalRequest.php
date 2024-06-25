@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class GlobalRequest extends Model
 {
     
-    protected $fillable = ['content', 'direction', 'requestID', 'requesterID', 'reciverID','valid'];
+    protected $fillable = ['content',  'requestID', 'requesterID', 'requestable_id','valid','requestable_type'];
     
+
     public function request()
     {
         return $this->belongsTo(Requests::class, 'requestID', 'id');
@@ -25,12 +26,14 @@ class GlobalRequest extends Model
         return $this->belongsTo(User::class, 'reciverID', 'id');
     }
 
+    public function requestable()
+    {
+        return $this->morphTo();
+    }
+
     use HasFactory;
 
 
-    public function globalRequests()
-    {
-        return $this->morphMany(GlobalRequest::class, 'requestable');
-    }
+
     
 }

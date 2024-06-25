@@ -26,12 +26,11 @@ class GeneralPatientInformation extends Model
         return $this->hasOne(MaritalStatus::class, 'generalPatientInformationID', 'id');
     }
 
-
     public function globalRequests()
-    {
-        return $this->morphMany(GlobalRequest::class, 'requestable');
-    }
-    
+{
+    return $this->morphMany(GlobalRequest::class, 'requestable');
+}
+
 
 
     

@@ -403,22 +403,70 @@ public function getDialysisSessions($centerId)
 
 
 
+// public function getNurseDialysisSessions($sessionStatus, $day = null, $month = null, $year = null)
+// {
+//     $nurse = auth('user')->user();
+//     $centerId = $nurse->medicalCenters()->first()->id;
+
+//     $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair']);
+
+
+
+
+
+
+    
+//     if ($sessionStatus === 'coming') {
+//         $query->where('centerID', $centerId);
+
+//     } else {
+//         $query->where('nurseID', $nurse->id);
+//     }
+
+//     $query->where('valid', $sessionStatus);
+
+//     if ($day && $month && $year) {
+//         $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+//         $query->whereRaw('DATE_FORMAT(appointmentTimeStamp, "%Y-%m-%d") = ?', [$dateString]);
+//     }
+
+//     $dialysisSessions = $query->get()
+//         ->map(function ($appointment) {
+//             return [
+//                 'id' => $appointment->session->id,
+//                 'patientName' => $appointment->session->patient->fullName,
+//                 'nurseName' => $appointment->session->nurse->fullName,
+//                 'sessionStartTime' => $appointment->session->sessionStartTime,
+//                 'sessionEndTime' => $appointment->session->sessionEndTime,
+//                 'chair' => $appointment->chair->chairNumber,
+//                 'roomName' => $appointment->chair->roomName,
+//                 'sessionStatus' => $appointment->valid 
+//             ];
+//         });
+
+//     return $dialysisSessions;
+// }
+
+
+
 
 public function getNurseDialysisSessions($sessionStatus, $day = null, $month = null, $year = null)
 {
-    $nurse = auth('user')->user();
-    $centerId = $nurse->medicalCenters()->first()->id;
-
+    $user = auth('user')->user();
     $query = Appointment::with(['session', 'session.patient', 'session.nurse', 'chair']);
 
-    
-    if ($sessionStatus === 'coming') {
-        $query->where('centerID', $centerId);
+    if ($user->role === 'admin') {
+        $centerId = $user->medicalCenters()->first()->id;
+        $query->where('centerID', $centerId)->where('valid', 'active');
     } else {
-        $query->where('nurseID', $nurse->id);
+        if ($sessionStatus === 'coming') {
+            $centerId = $user->medicalCenters()->first()->id;
+            $query->where('centerID', $centerId);
+        } else {
+            $query->where('nurseID', $user->id);
+        }
+        $query->where('valid', $sessionStatus);
     }
-
-    $query->where('valid', $sessionStatus);
 
     if ($day && $month && $year) {
         $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
@@ -427,12 +475,15 @@ public function getNurseDialysisSessions($sessionStatus, $day = null, $month = n
 
     $dialysisSessions = $query->get()
         ->map(function ($appointment) {
+
+            $sessionStartTime = Carbon::parse($appointment->session->sessionStartTime);
+            $sessionEndTime = Carbon::parse($appointment->session->sessionEndTime);
             return [
                 'id' => $appointment->session->id,
                 'patientName' => $appointment->session->patient->fullName,
                 'nurseName' => $appointment->session->nurse->fullName,
-                'sessionStartTime' => $appointment->session->sessionStartTime,
-                'sessionEndTime' => $appointment->session->sessionEndTime,
+                'sessionStartTime' => $sessionStartTime->format('h:i:s'),
+                'sessionEndTime' => $sessionEndTime->format('h:i:s'),
                 'chair' => $appointment->chair->chairNumber,
                 'roomName' => $appointment->chair->roomName,
                 'sessionStatus' => $appointment->valid 
@@ -440,6 +491,22 @@ public function getNurseDialysisSessions($sessionStatus, $day = null, $month = n
         });
 
     return $dialysisSessions;
+}
+
+
+
+
+function formatTimeToArabic($time) {
+    $time = Carbon::createFromFormat('H:i:s', $time);
+    $hours = $time->format('g');
+    $minutes = $time->format('i');
+    $meridiem = $time->format('A') === 'AM' ? 'صباحاً' : 'مساءً';
+
+    $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    $arabicNumbers = str_replace(range(0, 9), $numbers, $hours . ':' . $minutes);
+    $text = 'الساعة ' . $arabicNumbers . ' ' . $meridiem;
+
+    return $text;
 }
 
 

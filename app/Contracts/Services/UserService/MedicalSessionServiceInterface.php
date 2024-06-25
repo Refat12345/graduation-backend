@@ -24,5 +24,6 @@ interface MedicalSessionServiceInterface
     public function startAppointment($appointmentId);
     
 
+   
     
 }

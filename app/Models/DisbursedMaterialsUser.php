@@ -27,7 +27,8 @@ class DisbursedMaterialsUser extends Model
 
 
     public function globalRequests()
-    {
-        return $this->morphMany(GlobalRequest::class, 'requestable');
-    }
+{
+    return $this->morphMany(GlobalRequest::class, 'requestable');
+}
+
 }

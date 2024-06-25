@@ -592,9 +592,45 @@ public function approveTelecomEdits(User $editUser)
              ];
      
              if ($request->globalRequest) {
-                 $processedRequest['type'] = 'Global';
+                 $processedRequest['type'] = $request->globalRequest->content;
                 // $processedRequest['content'] = $request->globalRequest->content;
                  $processedRequest['senderName'] = $request->globalRequest->requester;
+                 if ($request->globalRequest->requestable) {
+                    $requestable = $request->globalRequest->requestable;
+                    $requestableType = class_basename($requestable->getMorphClass());
+
+                    switch ($requestableType) {
+                        case 'Chair':
+                            $processedRequest['content'] = " تم إضافة كرسي رقم " . $requestable->chairNumber;
+                            break;
+                        case 'Shift':
+                            $processedRequest['content'] = " تم إضافة وردية " . $requestable->name ;
+                            break;
+                        case 'MedicalRecord':
+                            $processedRequest['content'] = " تم إضافة سجل طبي للمريض " . $requestable->user->fullName;
+                            break;
+
+                        case 'User':
+                            $processedRequest['content'] = " تم إضافةالمريض " . $requestable->fullName;
+                            break;
+
+                        case 'DisbursedMaterialsUser':
+                            $processedRequest['content'] = " تم صرف مادة للمريض " . $requestable->user->fullName;
+                            break;
+
+                            case 'GeneralPatientInformation':
+                                $processedRequest['content'] = " تم اضافة معلومات الحالة الاحتماعية للمريض" . $requestable->user->fullName;
+                                break;
+                    }
+
+
+                  
+
+
+
+                } else {
+                    $processedRequest['requestableType'] = 'غير متوفر';
+                }
              }
              
              
@@ -604,12 +640,16 @@ public function approveTelecomEdits(User $editUser)
                  $patientName = $request->patientTransferRequest->user->fullName;
                  $centerPatientName = $request->patientTransferRequest->centerPatient->centerName;
                  $destinationCenterName = $request->patientTransferRequest->destinationCenter->centerName;
-                 $processedRequest['type'] = 'Patient Transfer';
+                 $processedRequest['type'] = 'طلب نقل مريض';
                  $processedRequest['senderName'] = $user->fullName;
                  $processedRequest['content'] = "نريد نقل المريض " . $patientName . " من مركز " . $centerPatientName . " الى مركز " . $destinationCenterName . " بسبب " . $request->cause;
              } elseif ($request->requestModifyAppointment) {
-                 $processedRequest['type'] = 'Modify Appointment';
-                 $processedRequest['newTime'] = $request->requestModifyAppointment->newTime;
+
+                $patientName = $request->requestModifyAppointment->user->fullName;
+                 $processedRequest['type'] = 'طلب تعديل موعد';
+                  $oldTime= $request->requestModifyAppointment->newTime;
+                $newTime = $request->requestModifyAppointment->appointment->appointmentTimeStamp;
+                 $processedRequest['content'] = "نريد تعديل موعد المريض " . $patientName . " من  " . $oldTime . " الى " .  $newTime . " بسبب " . $request->cause;
              }
      
              return $processedRequest;

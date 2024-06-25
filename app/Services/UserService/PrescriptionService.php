@@ -140,8 +140,8 @@ public function getAllPrescriptionsForUser($userId) {
                     'status' => $medicine->pivot->status,
                     'name' => $medicine->name,
                     'titer'=> $medicine->titer,
-                    'dateOfStart' => $medicine->pivot->dateOfStart,
-                    'dateOfEnd' => $medicine->pivot->dateOfEnd,
+                    'dateOfStart' => Carbon::parse($medicine->pivot->dateOfStart)->format('Y-m-d'),
+                    'dateOfEnd' => Carbon::parse($medicine->pivot->dateOfEnd)->format('Y-m-d'),
                     'details' => $medicine->pivot->details
                 ];
             })

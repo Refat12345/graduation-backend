@@ -16,9 +16,8 @@ class Chair extends Model
         return $this->belongsTo(MedicalCenter::class, 'centerID', 'id');
     }
 
-
-    public function globalRequests()
+    public function requestable()
     {
-        return $this->morphMany(GlobalRequest::class, 'requestable');
+        return $this->morphTo();
     }
 }

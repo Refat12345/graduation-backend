@@ -270,11 +270,11 @@ public function permissions()
     return $this->hasMany(UserCenter::class, 'userID', 'id');
 }
 
-
 public function globalRequests()
 {
     return $this->morphMany(GlobalRequest::class, 'requestable');
 }
+
 
 }
 
