@@ -594,7 +594,7 @@ public function approveTelecomEdits(User $editUser)
              if ($request->globalRequest) {
                  $processedRequest['type'] = $request->globalRequest->content;
                 // $processedRequest['content'] = $request->globalRequest->content;
-                 $processedRequest['senderName'] = $request->globalRequest->requester;
+                 $processedRequest['senderName'] = $request->globalRequest->requester->fullName;
                  if ($request->globalRequest->requestable) {
                     $requestable = $request->globalRequest->requestable;
                     $requestableType = class_basename($requestable->getMorphClass());
