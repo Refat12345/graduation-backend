@@ -1886,7 +1886,6 @@ public function acceptaddShift($shiftId, $status)
 //     return 'تم اضافة الكرسي';
 // }
 
-
 public function acceptAddChair($chairID, $status)
 {
     if ($status === 'approved') {
@@ -1931,6 +1930,47 @@ public function updateStatus( $requestId, $newStatus)
 
 
     if ($requestModel->globalRequest) { 
+
+if ($requestModel->globalRequest->requestable) {
+    $requestable = $requestModel->globalRequest->requestable;
+    $requestableType = class_basename($requestable->getMorphClass());
+   $id= $requestable->id;
+
+   
+//    return $this->acceptAddDisbursedMaterialsUser($id, $newStatus);
+//    return $this->acceptPatientInformation($id, $newStatus);
+//    return $this->acceptaddShift($id, $newStatus);
+//    return $this->acceptAddMedicalRecord($id, $newStatus);
+//    return $this->acceptPatientInformation($id, $newStatus);
+//    acceptPatientInformation
+
+    switch ($requestableType) {
+        case 'Chair':
+        return $this->acceptAddChair($id, $newStatus);
+            break;
+        case 'Shift':
+            return $this->acceptaddShift($id, $newStatus);
+            break;
+        case 'MedicalRecord':
+            return $this->acceptAddMedicalRecord($id, $newStatus);
+            break;
+
+        case 'User':
+            $processedRequest['content'] = " تم إضافةالمريض " . $requestable->fullName;
+            break;
+
+        case 'DisbursedMaterialsUser':
+            return $this->acceptAddDisbursedMaterialsUser($id, $newStatus);
+            break;
+
+            case 'GeneralPatientInformation':
+                return $this->acceptPatientInformation($id, $newStatus);
+                break;
+    }
+
+}
+
+
 
 
 
@@ -1978,6 +2018,7 @@ elseif ($requestModel->patientTransferRequest && $newStatus === 'approved') {
 //     return 'تم اضافة السجل الطبي';
 // }
 
+
 public function acceptAddMedicalRecord($medicalRecordID, $status)
 {
     if ($status === 'approved') {
@@ -2011,7 +2052,6 @@ public function acceptAddMedicalRecord($medicalRecordID, $status)
 
 //     return 'تم قبول المعلومات العامة للمريض';
 // }
-
 
 public function acceptAddDisbursedMaterialsUser($disbursedMaterialdID, $status)
 {
