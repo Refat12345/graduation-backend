@@ -15,4 +15,10 @@ class Shift extends Model
     {
         return $this->belongsTo(MedicalCenter::class, 'centerID', 'id');
     }
+
+
+    public function globalRequests()
+    {
+        return $this->morphMany(GlobalRequest::class, 'requestable');
+    }
 }

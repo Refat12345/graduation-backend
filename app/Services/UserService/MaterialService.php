@@ -54,6 +54,15 @@ use Illuminate\Support\Collection;
 class MaterialService implements MaterialServiceInterface
 {
 
+
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
+
     
 public function addNewMedicine(array $data): Medicine
 {
@@ -152,10 +161,14 @@ public function createDisbursedMaterial(array $materialData)
 // }
 
 
+
+
+
+
 public function assignMaterialToUserCenter(array $assignmentData)
 {
-   
-    $validator = Validator::make($assignmentData, [
+  
+     $validator = Validator::make($assignmentData, [
         'userID' => 'required|exists:users,id',
         'centerID' => 'required|exists:medical_centers,id',
         'materials' => 'required|array',
@@ -182,11 +195,24 @@ public function assignMaterialToUserCenter(array $assignmentData)
                 'centerID' => $validatedAssignmentData['centerID'],
                 'disbursedMaterialID' => $disbursedMaterial->id,
                 'quantity' => $materialData['quantity'],
-                'status' => 'pending',
+               // 'status' => 'pending',
             ]);
 
             array_push($assignedMaterials, $disbursedMaterialsUser);
         }
+
+
+              
+        $globalRequestData = [
+            'operation' => 'صرف مادة لمريض',
+            'requestable_id' => $disbursedMaterialsUser->id,
+            'requestable_type' => DisbursedMaterialsUser::class,
+            'requestStatus' => 'pending',
+            'cause' => '.'
+        ];
+        $this->userService->addGlobalRequest($globalRequestData);
+    
+    
 
         DB::commit();
         return $assignedMaterials;

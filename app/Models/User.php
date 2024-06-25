@@ -271,7 +271,10 @@ public function permissions()
 }
 
 
-
+public function globalRequests()
+{
+    return $this->morphMany(GlobalRequest::class, 'requestable');
+}
 
 }
 

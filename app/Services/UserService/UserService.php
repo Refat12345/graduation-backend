@@ -67,6 +67,36 @@ class UserService implements UserServiceInterface
         $this->requestsModel = $requestsModel;
     }
 
+    public function addGlobalRequest(array $data)
+    {
+        $validator = Validator::make($data, [
+            'operation' => 'required|string',
+            'requestable_id' => 'required|integer',
+            'requestable_type' => 'required|string ',
+            'requestStatus' => 'required|in:pending,approved,rejected',
+            'cause' => 'sometimes|required|string'
+        ]);
+    
+        if ($validator->fails()) {
+            return $validator->errors();
+        }
+        $request = new Requests();
+        $request->requestStatus = $data['requestStatus'];
+        $request->cause = $data['cause'] ; 
+        $request->save();
+    
+        $user=  auth('user')->user();
+        $globalRequest = new GlobalRequest();
+        $globalRequest->content = $data['operation'];
+        $globalRequest->requestID = $request->id; 
+        $globalRequest->requestable_id = $data['requestable_id'];
+        $globalRequest->requestable_type = $data['requestable_type'];
+        $globalRequest->requesterID = $user->id;
+        $globalRequest->save();
+
+        return $globalRequest;
+    }
+
     // دكتور: doctor
     // ممرض: nurse
     // مريض: patient
@@ -115,7 +145,7 @@ class UserService implements UserServiceInterface
          'address.*.cityName' => 'required|string|max:255',
          'address.*.countryName' => 'required|string|max:255',
          'centerName' => 'required|string|max:255',
-          'permissionNames' => 'array'
+        'permissionNames' => 'array'
      ]);
  
      if ($validator->fails()) {
@@ -137,10 +167,17 @@ class UserService implements UserServiceInterface
             $this->addPermissionsToUser($user->id, $userData['permissionNames']);
         }
 
-         
-         DB::commit();
 
-       
+        $globalRequestData = [
+            'operation' => 'انشاء حساب مستخدم',
+            'requestable_id' => $user->id,
+            'requestable_type' => User::class,
+            'requestStatus' => 'pending',
+            'cause' => '.'
+        ];
+        $this->addGlobalRequest($globalRequestData);
+
+         DB::commit();
          return $user;
      } catch (\Exception $e) {
          DB::rollBack();
@@ -469,40 +506,10 @@ public function approveTelecomEdits(User $editUser)
      }
 
 
-     public function addGlobalRequest(array $data)
-     {
-         
-         $validator = Validator::make($data, [
-             'operation' => 'required|string',
-           //  'direction' => 'required|string',
-            // 'requesterID' => 'required|exists:users,id',
-             'reciverID' => 'required|exists:users,id',
-             'requestStatus' => 'required|in:pending,approved,rejected',
-             'cause' => 'sometimes|required|string'
-         ]);
-     
-         if ($validator->fails()) {
-             return $validator->errors();
-         }
-     
-        
-         $request = new Requests();
-         $request->requestStatus = $data['requestStatus'];
-         $request->cause = $data['cause'] ; 
-         $request->save();
-     
-         $user=  auth('user')->user();
-       
-         $globalRequest = new GlobalRequest();
-         $globalRequest->content = $data['operation'];
-         $globalRequest->direction = $data['direction'];
-         $globalRequest->requestID = $request->id; 
-         $globalRequest->requesterID = $user->id;
-         $globalRequest->reciverID = $data['reciverID'];
-         $globalRequest->save();
-     
-         return $globalRequest;
-     }
+
+
+
+    
      
      
  
@@ -962,6 +969,21 @@ public function addPatientInfo(array $data)
         foreach ($data['address'] as $addressData) {
             $this->createCompanionAddress($patientCompanion, $addressData);
         }
+
+      
+        $globalRequestData = [
+            'operation' => 'اضافة المعلومات العامة لمريض',
+            'requestable_id' => $generalPatientInfo->id,
+            'requestable_type' => GeneralPatientInformation::class,
+            'requestStatus' => 'pending',
+            'cause' => '.'
+        ];
+        $this->addGlobalRequest($globalRequestData);
+    
+    
+    
+    
+        
     });
 
 
@@ -1170,6 +1192,21 @@ public function getAllMedicalCenters()
          'centerID' => $centerId
      ]);
      $chair->save();
+
+
+     $globalRequestData = [
+        'operation' => 'اضافة كرسي',
+        'requestable_id' => $user->id,
+        'requestable_type' => Chair::class,
+        'requestStatus' => 'pending',
+        'cause' => '.'
+    ];
+    $this->addGlobalRequest($globalRequestData);
+
+
+
+
+
      return $chair;
  }
  
@@ -1240,6 +1277,21 @@ public function addShift(array $data)
 
 
     $shift->save();
+
+
+
+    $globalRequestData = [
+        'operation' => 'اضافة وردية',
+        'requestable_id' => $shift->id,
+        'requestable_type' => Shift::class,
+        'requestStatus' => 'pending',
+        'cause' => '.'
+    ];
+    $this->addGlobalRequest($globalRequestData);
+
+
+
+
     return $shift;
 }
 
@@ -1705,6 +1757,9 @@ public function getlogs($centerId)
 
     return $formattedLogs ;
 }
+
+
+
 
 
 

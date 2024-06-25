@@ -24,4 +24,10 @@ class DisbursedMaterialsUser extends Model
     {
         return $this->belongsTo(DisbursedMaterial::class, 'disbursedMaterialID', 'id');
     }
+
+
+    public function globalRequests()
+    {
+        return $this->morphMany(GlobalRequest::class, 'requestable');
+    }
 }

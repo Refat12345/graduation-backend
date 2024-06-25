@@ -13,19 +13,22 @@ return new class extends Migration
     {
         Schema::create('global_requests', function (Blueprint $table) {
             $table->id();
-            $table->text('content');
-            $table->string('direction');
+            $table->string('content');
             $table->unsignedBigInteger('requestID');
             $table->unsignedBigInteger('requesterID');
-            $table->unsignedBigInteger('reciverID');
             $table->foreign('requestID')->references('id')->on('requests');
             $table->foreign('requesterID')->references('id')->on('users');
-            $table->foreign('reciverID')->references('id')->on('users');
+
+
+            $table->unsignedBigInteger('requestable_id'); // Polymorphic relation id
+            $table->string('requestable_type'); // Polymorphic relation type
+
+
             $table->timestamps();
             $table->unsignedBigInteger('valid')->default(0);
 
             
-           $table->index(['requesterID', 'reciverID']);
+         //  $table->index(['requesterID', 'reciverID']);
         });
     }
 

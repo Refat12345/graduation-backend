@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('disbursed_materials_users', function (Blueprint $table) {
             $table->id(); 
             $table->integer('quantity');
-            $table->string('status');
+           // $table->string('status');
             $table->unsignedBigInteger('userID');
             $table->unsignedBigInteger('centerID');
             $table->unsignedBigInteger('disbursedMaterialID');

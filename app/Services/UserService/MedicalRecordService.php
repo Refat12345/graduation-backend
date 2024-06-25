@@ -54,6 +54,16 @@ use Illuminate\Support\Collection;
 class MedicalRecordService  implements MedicalRecordServiceInterface
 {
 
+    
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
+
+
 
     public function createMedicalRecord(array $MedicalRecordData)
     {
@@ -119,6 +129,18 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
                 $this->createSurgicalHistory($SurgicalHistoryData);
             }
         }
+
+
+        $globalRequestData = [
+            'operation' => 'اضافة سجل طبي لمريض',
+            'requestable_id' => $MedicalRecord->id,
+            'requestable_type' => MedicalRecord::class,
+            'requestStatus' => 'pending',
+            'cause' => '.'
+        ];
+        $this->userService->addGlobalRequest($globalRequestData);
+    
+
             DB::commit();
             return $MedicalRecord;
         } catch (\Exception $e) {
@@ -278,7 +300,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
             'dryWeight' => $medicalRecord->dryWeight,
             'bloodType' => $medicalRecord->bloodType,
             'causeRenalFailure' => $medicalRecord->causeRenalFailure,
-            'dialysisStartDate' => $medicalRecord->dialysisStartDate,
+            'dialysisStartDate' => Carbon::parse($medicalRecord->dialysisStartDate),
             'kidneyTransplant' => $medicalRecord->kidneyTransplant ,
             'pharmacologicalPrecedents' => $medicalRecord->pharmacologicalHistories->map(function ($history) {
                 return [
