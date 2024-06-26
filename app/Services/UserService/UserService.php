@@ -1178,9 +1178,9 @@ public function updateMedicalCenter($centerId, array $centerData)
             'telecom' => 'sometimes|array',
             'telecom.*.system' => 'sometimes|string|max:255',
             'telecom.*.value' => 'sometimes|string|max:255',
-            'telecom.*.use' => 'sometimes|string|max:255',
+            'telecom.*.use' => 'nullable|string|max:255',
             'address' => 'sometimes|array',
-            'address.use' => 'sometimes|string|max:255',
+            'address.use' => 'nullable|string|max:255',
             'address.line' => 'sometimes|string',
             'address.cityName' => 'sometimes|string|max:255',
             'address.countryName' => 'sometimes|string|max:255',
@@ -1881,11 +1881,10 @@ public function getlogs($centerId)
 
 
 
-public function getMedicineNames()
+public function getMedicineNames($type)
 {
-    return Medicine::pluck('name');
+    return Medicine::where('type', $type)->pluck('name');
 }
-
 
 
 

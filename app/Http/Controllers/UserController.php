@@ -652,9 +652,9 @@ public function getAllMedicalCenters()
 
 
 
-public function getMedicineNames()
+public function getMedicineNames($type)
 {
-    $medicineNames = $this->userService->getMedicineNames();
+    $medicineNames = $this->userService->getMedicineNames($type);
     return response()->json(['medicine_names' => $medicineNames]);
 }
 

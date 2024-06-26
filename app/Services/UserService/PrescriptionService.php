@@ -61,7 +61,7 @@ class PrescriptionService implements PrescriptionServiceInterface
         $validator = Validator::make($data, [
             'patientID' => 'required|exists:users,id',
             'medicines' => 'required|array',
-            'medicines.*.name' => 'required|exists:medicines,name', 
+            'medicines.*.name' => 'required|string', 
          //   'medicines.*.titer' => 'required|string|max:255',
             'medicines.*.dateOfStart' => 'required|date',
             'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
@@ -84,7 +84,14 @@ class PrescriptionService implements PrescriptionServiceInterface
             ]);
     
             foreach ($validatedData['medicines'] as $medicineData) {
-                $medicine = Medicine::where('name', $medicineData['name'])->firstOrFail(); 
+              //  $medicine = Medicine::where('name', $medicineData['name'])->firstOrFail(); 
+              $medicine = Medicine::firstOrNew(['name' => $medicineData['name']]);
+    
+              if (!$medicine->exists) {
+                  // إذا لم يكن الدواء موجودًا، قم بإضافته
+                  $medicine->fill($medicineData);
+                  $medicine->save();
+              }
                 $prescription->medicines()->attach($medicine->id, [
                     'dateOfStart' => $medicineData['dateOfStart'],
                     'dateOfEnd' => $medicineData['dateOfEnd'],
@@ -157,13 +164,62 @@ public function getAllPrescriptionsForUser($userId) {
 
 
 
+// public function updatePrescription($prescriptionId, array $data)
+// {
+//     $validator = Validator::make($data, [
+//         'patientID' => 'required|exists:users,id',
+//         'medicines' => 'required|array',
+//         'medicines.*.id' => 'required|integer',
+//         'medicines.*.name' => 'required|name',
+//         'medicines.*.dateOfStart' => 'required|date',
+//         'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
+//         'medicines.*.amount' => 'nullable|numeric|min:0',
+//         'medicines.*.details' => 'required|string|max:255',
+//     ]);
+
+//     if ($validator->fails()) {
+//         throw new InvalidArgumentException($validator->errors()->first());
+//     }
+
+//     $validatedData = $validator->validated();
+
+//     \DB::beginTransaction();
+//     try {
+//         $prescription = Prescription::findOrFail($prescriptionId);
+//         $prescription->update([
+//             'patientID' => $validatedData['patientID'],
+//         ]);
+
+//         $prescription->medicines()->detach(); 
+//         foreach ($validatedData['medicines'] as $medicineData) {
+//             $medicine = Medicine::where('id', $medicineData['id'])->firstOrFail();
+//             $prescription->medicines()->attach($medicine->name, [
+              
+//                 //'name' => $medicineData['name'],
+//                 'dateOfStart' => $medicineData['dateOfStart'],
+//                 'dateOfEnd' => $medicineData['dateOfEnd'],
+//                 'amount' => $medicineData['amount'],
+//                 'details' => $medicineData['details'],
+//                 'status' => 'nonActive', 
+//             ]);
+//         }
+
+//         \DB::commit();
+//         return $prescription;
+//     } catch (\Exception $e) {
+//         \DB::rollback();
+//         throw $e;
+//     }
+// }
+
+
 public function updatePrescription($prescriptionId, array $data)
 {
     $validator = Validator::make($data, [
         'patientID' => 'required|exists:users,id',
         'medicines' => 'required|array',
-        'medicines.*.id' => 'required|integer',
-        'medicines.*.name' => 'required|name',
+    // 'medicines.*.id' => 'required|integer',
+        'medicines.*.name' => 'required|string',
         'medicines.*.dateOfStart' => 'required|date',
         'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
         'medicines.*.amount' => 'nullable|numeric|min:0',
@@ -183,17 +239,21 @@ public function updatePrescription($prescriptionId, array $data)
             'patientID' => $validatedData['patientID'],
         ]);
 
-        $prescription->medicines()->detach(); 
         foreach ($validatedData['medicines'] as $medicineData) {
-            $medicine = Medicine::where('id', $medicineData['id'])->firstOrFail();
-            $prescription->medicines()->attach($medicine->name, [
-              
-                //'name' => $medicineData['name'],
+            $medicine = Medicine::firstOrNew(['name' => $medicineData['name']]);
+
+            if (!$medicine->exists) {
+                // إذا لم يكن الدواء موجودًا، قم بإضافته
+                $medicine->fill($medicineData);
+                $medicine->save();
+            }
+
+            $prescription->medicines()->attach($medicine->id, [
                 'dateOfStart' => $medicineData['dateOfStart'],
                 'dateOfEnd' => $medicineData['dateOfEnd'],
                 'amount' => $medicineData['amount'],
                 'details' => $medicineData['details'],
-                'status' => 'nonActive', 
+                'status' => 'nonActive',
             ]);
         }
 
@@ -204,7 +264,4 @@ public function updatePrescription($prescriptionId, array $data)
         throw $e;
     }
 }
-
-
-
 }

@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('medicines', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('titer');
+            $table->string('titer')->nullable();
+            $table->string('type')->default('global');
+            
             $table->unsignedBigInteger('valid')->default(0);
             $table->timestamps();
 

@@ -155,7 +155,7 @@ Route::get('getAllMedicalCenters', [UserController::class, 'getAllMedicalCenters
 Route::get('getPieCharts/{month?}/{year?}', [StatisticsController::class, 'getPieCharts']);
 
 
-Route::get('getMedicineNames', [UserController::class, 'getMedicineNames']);
+Route::get('getMedicineNames/{type}', [UserController::class, 'getMedicineNames']);
 
 
 Route::get('causeRenalFailure', [StatisticsController::class, 'causeRenalFailure']);

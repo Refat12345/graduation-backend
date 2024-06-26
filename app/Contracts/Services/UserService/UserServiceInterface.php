@@ -127,7 +127,7 @@ interface UserServiceInterface
 
     public function addPatientInfo(array $data);
 
-    public function getMedicineNames();
+    //public function getMedicineNames();
     
 
 
@@ -165,4 +165,6 @@ public function updateShift($shiftId, array $data);
 public function updateShifts(array $shiftsData);
 
 public function updateChair($chairId, array $data);
+
+public function getMedicineNames($type);
 }
