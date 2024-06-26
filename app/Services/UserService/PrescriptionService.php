@@ -163,7 +163,7 @@ public function updatePrescription($prescriptionId, array $data)
         'patientID' => 'required|exists:users,id',
         'medicines' => 'required|array',
         'medicines.*.id' => 'required|integer',
-        'medicines.*.name' => 'required|integer',
+        'medicines.*.name' => 'required|name',
         'medicines.*.dateOfStart' => 'required|date',
         'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
         'medicines.*.amount' => 'nullable|numeric|min:0',
@@ -186,8 +186,9 @@ public function updatePrescription($prescriptionId, array $data)
         $prescription->medicines()->detach(); 
         foreach ($validatedData['medicines'] as $medicineData) {
             $medicine = Medicine::where('id', $medicineData['id'])->firstOrFail();
-            $prescription->medicines()->attach($medicine->id, [
-
+            $prescription->medicines()->attach($medicine->name, [
+              
+                //'name' => $medicineData['name'],
                 'dateOfStart' => $medicineData['dateOfStart'],
                 'dateOfEnd' => $medicineData['dateOfEnd'],
                 'amount' => $medicineData['amount'],

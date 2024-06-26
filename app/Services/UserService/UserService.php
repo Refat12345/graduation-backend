@@ -144,7 +144,7 @@ class UserService implements UserServiceInterface
          'address.*.use' => 'required|string|max:255',
          'address.*.cityName' => 'required|string|max:255',
          'address.*.countryName' => 'required|string|max:255',
-         'centerName' => 'required|string|max:255',
+       //  'centerName' => 'required|string|max:255',
         'permissionNames' => 'array'
      ]);
  
@@ -153,10 +153,23 @@ class UserService implements UserServiceInterface
      }
  
      try {
+      
+        
+        $us=  auth('user')->user();
+        if ($us->role != 'superAdmin')
+        {
+            $userCenter = $us->userCenters()->where('valid', -1)->first();
+            $centerId = $userCenter ? $userCenter->centerID : null;
+            $centerName = $userCenter ? $userCenter->medicalCenter->centerName: null;
+            $userData['centerName']=$centerName;
+
+
+        }
+
          $userData['verificationCode'] = rand(100000, 999999);
         // $userData['password'] = Hash::make($userData['password']);
          $user = User::create($userData);
- 
+       
          $this->createUserTelecoms($user, $userData['telecom']);
          foreach ($userData['address'] as $addressData) {
              $this->createUserAddress($user, $addressData);
@@ -166,8 +179,8 @@ class UserService implements UserServiceInterface
           
             $this->addPermissionsToUser($user->id, $userData['permissionNames']);
         }
-
-
+        
+        if (!in_array($userData['role'], ['secretary', 'admin'])) {
         $globalRequestData = [
             'operation' => 'انشاء حساب مستخدم',
             'requestable_id' => $user->id,
@@ -175,8 +188,16 @@ class UserService implements UserServiceInterface
             'requestStatus' => 'pending',
             'cause' => '.'
         ];
-        $this->addGlobalRequest($globalRequestData);
 
+        
+        
+        $this->addGlobalRequest($globalRequestData);
+  }
+
+  else {
+    $user->valid= -1;
+    $user->save(); 
+}    
          DB::commit();
          return $user;
      } catch (\Exception $e) {
@@ -185,6 +206,9 @@ class UserService implements UserServiceInterface
      }
  }
  
+
+
+
      public function addPermissionsToUser($userId, array $permissionNames)
      {
          DB::transaction(function () use ($userId, $permissionNames) {
@@ -777,6 +801,10 @@ public function verifyAccount(string $verificationCode, string $password)
     
     if (!$user) {
         throw new LogicException('Verification code is invalid.');
+    }
+
+    if ($user->valid != -1) {
+        throw new LogicException('الحساب لم ');
     }
 
     $hashedPassword = Hash::make($password);
