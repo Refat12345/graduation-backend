@@ -80,12 +80,14 @@ class UserService implements UserServiceInterface
         if ($validator->fails()) {
             return $validator->errors();
         }
+        $user=  auth('user')->user();
         $request = new Requests();
+        $request->center_id=$user->center->centerID;
         $request->requestStatus = $data['requestStatus'];
         $request->cause = $data['cause'] ; 
         $request->save();
     
-        $user=  auth('user')->user();
+       
         $globalRequest = new GlobalRequest();
         $globalRequest->content = $data['operation'];
         $globalRequest->requestID = $request->id; 
@@ -515,6 +517,8 @@ public function approveTelecomEdits(User $editUser)
              return $validator->errors();
          }
          $request = new Requests();
+         $us=  auth('user')->user();
+         $request->center_id=$us->center->centerID;
          $request->requestStatus = 'pending';
          $request->cause = $data['cause'] ?? null;
          $request->save();
@@ -555,15 +559,15 @@ public function approveTelecomEdits(User $editUser)
          if ($validator->fails()) {
              return $validator->errors();
          }
-     
-        
          $request = new Requests();
+         $user=  auth('user')->user();
+         $request->center_id=$user->center->centerID;
          $request->requestStatus = $data['requestStatus'];
          $request->cause = $data['cause'] ?? null;
          $request->save();
      
          
-         $user=  auth('user')->user();
+       
      
          $requestModifyAppointment = new RequestModifyAppointment();
          $requestModifyAppointment->newTime = $data['newTime'];
@@ -575,33 +579,43 @@ public function approveTelecomEdits(User $editUser)
          return $requestModifyAppointment;
      }
      
-     
- 
- 
      public function getAllRequests()
      {
          $user = auth('user')->user();
-         $userId = $user->id;
+         $centerId = $user->center->centerID; // تأكد من أن العلاقة center محددة بشكل صحيح في نموذج المستخدم
      
-         $centerIds = UserCenter::where('userID', $userId)->pluck('centerID')->toArray();
-     
-         $requests = Requests::whereHas('globalRequest', function ($query) use ($centerIds) {
-             $query->whereIn('requesterID', $centerIds);
-         })
-         ->orWhereHas('patientTransferRequest', function ($query) use ($centerIds) {
-             $query->whereIn('centerPatientID', $centerIds)
-                 ->orWhereIn('destinationCenterID', $centerIds);
-         })
-         ->orWhereHas('requestModifyAppointment', function ($query) use ($centerIds) {
-             $query->whereIn('requesterID', $centerIds);
-         })
-         ->with(['globalRequest', 'patientTransferRequest', 'requestModifyAppointment'])
-         ->get();
+         // تحديث الاستعلامات للتحقق من center_id في جدول Requests
+         $requests = Requests::where('center_id', $centerId)
+             ->whereHas('globalRequest', function ($query) use ($centerId) {
+                 $query->where('center_id', $centerId);
+             })
+             ->orWhereHas('patientTransferRequest', function ($query) use ($centerId) {
+                 $query->where(function ($q) use ($centerId) {
+                     $q->where('centerPatientID', $centerId)
+                       ->orWhere('destinationCenterID', $centerId);
+                 });
+             })
+             ->orWhereHas('requestModifyAppointment', function ($query) use ($centerId) {
+                 $query->where('center_id', $centerId);
+             })
+             ->with(['globalRequest', 'patientTransferRequest', 'requestModifyAppointment'])
+             ->get();
      
          return $this->mapRequests($requests);
      }
 
-
+    // public function getAllRequests()
+    // {
+    //     $user = auth('user')->user();
+    //     $centerId = $user->center->centerID; // تأكد من أن العلاقة center محددة بشكل صحيح في نموذج المستخدم
+    
+    //     // جلب الطلبات حسب center_id
+    //     $requests = Requests::where('center_id', $centerId) // تأكد من أن لديك عمود center_id في جدول Requests
+    //         ->with(['globalRequest', 'patientTransferRequest', 'requestModifyAppointment'])
+    //         ->get();
+    
+    //     return $this->mapRequests($requests);
+    // }
 
 
      public function mapRequests($requests)
@@ -671,6 +685,7 @@ public function approveTelecomEdits(User $editUser)
 
                 $patientName = $request->requestModifyAppointment->user->fullName;
                  $processedRequest['type'] = 'طلب تعديل موعد';
+                 $processedRequest['senderName'] = $user->fullName;
                   $oldTime= $request->requestModifyAppointment->newTime;
                 $newTime = $request->requestModifyAppointment->appointment->appointmentTimeStamp;
                  $processedRequest['content'] = "نريد تعديل موعد المريض " . $patientName . " من  " . $oldTime . " الى " .  $newTime . " بسبب " . $request->cause;

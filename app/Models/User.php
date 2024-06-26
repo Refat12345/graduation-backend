@@ -270,6 +270,12 @@ public function permissions()
     return $this->hasMany(UserCenter::class, 'userID', 'id');
 }
 
+public function center()
+{
+    return $this->hasOne(UserCenter::class, 'userID', 'id');
+}
+
+
 public function globalRequests()
 {
     return $this->morphMany(GlobalRequest::class, 'requestable');
