@@ -236,7 +236,7 @@ public function assignMaterialToUserCenter(array $assignmentData)
 
 public function getDisbursedMaterialsDetailsForUser($userID) {
     $disbursedMaterials = DisbursedMaterialsUser::with(['disbursedMaterial', 'medicalCenter'])
-                                ->where('userID', $userID)
+                                ->where('userID', $userID) ->where('valid', -1)
                                 ->get()
                                 ->map(function ($item) {
                                     return [
@@ -245,7 +245,7 @@ public function getDisbursedMaterialsDetailsForUser($userID) {
                                         'expenseQuantity' => $item->expenseQuantity,
                                         'availableQuantity' => $item->quantity-$item->expenseQuantity,
                                         'centerName' => $item->medicalCenter->centerName,
-                                        'valid' => $item->valid
+                                        //'valid' => $item->valid
                                         
                                        
                                        
