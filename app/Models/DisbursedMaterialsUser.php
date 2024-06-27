@@ -24,7 +24,7 @@ class DisbursedMaterialsUser extends Model
     {
         return $this->belongsTo(DisbursedMaterial::class, 'disbursedMaterialID', 'id');
     }
-
+   
 
     public function globalRequests()
 {

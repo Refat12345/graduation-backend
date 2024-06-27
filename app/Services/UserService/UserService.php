@@ -854,13 +854,11 @@ public function loginUser(string $nationalNumber, string $password)
 {
     if (Auth::attempt(['nationalNumber' => $nationalNumber, 'password' => $password])) {
         $user = Auth::user();
-        if ($user->valid === 0){
-
-            return 'لم يتم تأكيد حسابك بعد ';
+        if ($user->valid === 0) {
+            abort(404, 'لم يتم تأكيد حسابك بعد');
         }
-        if ($user->valid === -2){
-
-            return 'الحساب غير موجود';
+        if ($user->valid === -2) {
+            abort(404, 'الحساب غير موجود');
         }
         $userCenter = $user->userCenters()->where('valid', -1)->first();
         $centerId = $userCenter ? $userCenter->centerID : null;
@@ -1070,7 +1068,7 @@ public function addPatientInfo(array $data)
     
     
     
-    
+        
         
     });
 
@@ -1315,6 +1313,7 @@ public function getAllMedicalCenters()
  
      return $chair;
  }
+ 
  
 
 //  public function addShift(array $data)

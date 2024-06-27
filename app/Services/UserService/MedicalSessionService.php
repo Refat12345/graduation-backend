@@ -93,11 +93,21 @@ class MedicalSessionService implements MedicalSessionServiceInterface
         try {
             $dialysisSession = DialysisSession::create($validatedData);
     
+
+
+       
+
             if (isset($data['medicines'])) {
                 foreach ($data['medicines'] as $medicineData) {
-                    $this->addSessionMedicine($medicineData, $dialysisSession->id);
+                  
+                    if (isset($medicineData['medicineType']) && $medicineData['medicineType'] === 'medicine') {
+                        $this->addSessionMedicine($medicineData, $dialysisSession->id);
+                    } else {
+                        $this->addSessionDisbursedMaterial($medicineData, $dialysisSession->id);
+                    }
                 }
             }
+
     
             if (isset($data['bloodPressures'])) {
                 foreach ($data['bloodPressures'] as $bloodPressureData) {
@@ -283,7 +293,7 @@ class MedicalSessionService implements MedicalSessionServiceInterface
 
 public function getCompleteDialysisSessionDetails($sessionId)
 {
-    $dialysisSession = DialysisSession::with(['medicineTakens.medicine', 'bloodPressureMeasurements', 'appointment'])
+    $dialysisSession = DialysisSession::with(['medicineTakens.medicine', 'medicineTakens.disbursedMaterial','bloodPressureMeasurements', 'appointment'])
                                       ->find($sessionId);
 
     if (!$dialysisSession) {
@@ -311,12 +321,23 @@ public function getCompleteDialysisSessionDetails($sessionId)
         'venousPressure' => $dialysisSession->venousPressure,
         'status' => $dialysisSession->status,
         'medicines' => $dialysisSession->medicineTakens->map(function ($medicineTaken) {
-            return [
-                'medicineTakenID' => $medicineTaken->id,
-                'medicineID' => $medicineTaken->medicine->id,
-                'medicineName' => $medicineTaken->medicine->name,
-                'value' => $medicineTaken->value,
-            ];
+            if (isset($medicineTaken->medicine)) {
+                return [
+                    'type' =>'medicine',
+                    'medicineTakenID' => $medicineTaken->id,
+                    'medicineID' => $medicineTaken->medicine->id,
+                    'medicineName' => $medicineTaken->medicine->name,
+                    'value' => $medicineTaken->value,
+                ];
+            } elseif (isset($medicineTaken->disbursedMaterial)) {
+                return [
+                    'type' =>'material',
+                    'medicineTakenID' => $medicineTaken->id,
+                    'medicineID' => $medicineTaken->disbursedMaterial->disbursedMaterial->id,
+                    'medicineName' => $medicineTaken->disbursedMaterial->disbursedMaterial->materialName,
+                    'value' => $medicineTaken->value,
+                ];
+            }
         })->toArray(),
         'bloodPressures' => $dialysisSession->bloodPressureMeasurements->toArray(),
         'sessionNotes' => $dialysisSession->notes->toArray(),
@@ -345,6 +366,38 @@ public function getCompleteDialysisSessionDetails($sessionId)
         $validatedData['sessionID'] = $sessionId;
     
         return MedicineTaken::create($validatedData);
+    }
+
+    public function addSessionDisbursedMaterial(array $data, $sessionId)
+    {
+        $validator = Validator::make($data, [
+            'disbursedMaterialID' => 'required|exists:disbursed_materials_users,id',
+            'value' => 'required|numeric|min:0'
+        ]);
+    
+        if ($validator->fails()) {
+            throw new InvalidArgumentException($validator->errors()->first());
+        }
+    
+        $validatedData = $validator->validated();
+        $validatedData['sessionID'] = $sessionId;
+       
+
+$disbursedMaterialsUser = DisbursedMaterialsUser::findOrFail($validatedData['disbursedMaterialID']);
+
+if ($disbursedMaterialsUser->expenseQuantity+$validatedData['value'] > $disbursedMaterialsUser->quantity)
+{ 
+    echo 'كمية الدواء المدخلة غير متوفرة لدى المستخدم';
+}
+
+else{
+    $disbursedMaterialsUser->expenseQuantity=$disbursedMaterialsUser->expenseQuantity+$validatedData['value'];
+}
+$disbursedMaterialsUser->save();
+
+         $m=MedicineTaken::create($validatedData);
+         $m->disbursedMaterialID =$disbursedMaterialsUser->id;
+         $m->save();
     }
     
     
@@ -496,18 +549,18 @@ public function getNurseDialysisSessions($sessionStatus, $day = null, $month = n
 
 
 
-function formatTimeToArabic($time) {
-    $time = Carbon::createFromFormat('H:i:s', $time);
-    $hours = $time->format('g');
-    $minutes = $time->format('i');
-    $meridiem = $time->format('A') === 'AM' ? 'صباحاً' : 'مساءً';
+// function formatTimeToArabic($time) {
+//     $time = Carbon::createFromFormat('H:i:s', $time);
+//     $hours = $time->format('g');
+//     $minutes = $time->format('i');
+//     $meridiem = $time->format('A') === 'AM' ? 'صباحاً' : 'مساءً';
 
-    $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-    $arabicNumbers = str_replace(range(0, 9), $numbers, $hours . ':' . $minutes);
-    $text = 'الساعة ' . $arabicNumbers . ' ' . $meridiem;
+//     $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+//     $arabicNumbers = str_replace(range(0, 9), $numbers, $hours . ':' . $minutes);
+//     $text = 'الساعة ' . $arabicNumbers . ' ' . $meridiem;
 
-    return $text;
-}
+//     return $text;
+// }
 
 
 

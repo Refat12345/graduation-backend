@@ -23,7 +23,5 @@ interface MedicalSessionServiceInterface
     public function getNurseDialysisSessions($sessionStatus, $day = null, $month = null, $year = null);
     public function startAppointment($appointmentId);
     
-
-   
-    
+ 
 }

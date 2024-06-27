@@ -15,7 +15,12 @@ return new class extends Migration
             $table->id();
             $table->integer('value');
             $table->unsignedBigInteger('sessionID');
-            $table->unsignedBigInteger('medicineID');
+            $table->unsignedBigInteger('medicineID')->nullable();
+
+            $table->unsignedBigInteger('disbursedMaterialID')->nullable();
+            $table->foreign('disbursedMaterialID')->references('id')->on('disbursed_materials_users');
+
+
             $table->foreign('sessionID')->references('id')->on('dialysis_sessions');
             $table->foreign('medicineID')->references('id')->on('medicines');
             $table->unsignedBigInteger('valid')->default(0);

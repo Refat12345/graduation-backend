@@ -22,6 +22,11 @@ class MedicineTaken extends Model
         return $this->belongsTo(Medicine::class, 'medicineID', 'id');
     }
 
+    public function disbursedMaterial()
+    {
+        return $this->belongsTo(DisbursedMaterialsUser::class, 'disbursedMaterialID', 'id')->with('disbursedMaterial');
+    }
+
 
   
 }

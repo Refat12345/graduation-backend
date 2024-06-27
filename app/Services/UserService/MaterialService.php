@@ -226,14 +226,34 @@ public function assignMaterialToUserCenter(array $assignmentData)
 
 
 
+// public function getDisbursedMaterialsDetailsForUser($userID) {
+//     $disbursedMaterials = DisbursedMaterialsUser::with(['disbursedMaterial', 'medicalCenter'])
+//                                 ->where('userID', $userID)
+//                                 ->get();
+
+//     return $disbursedMaterials;
+// }
+
 public function getDisbursedMaterialsDetailsForUser($userID) {
     $disbursedMaterials = DisbursedMaterialsUser::with(['disbursedMaterial', 'medicalCenter'])
                                 ->where('userID', $userID)
-                                ->get();
+                                ->get()
+                                ->map(function ($item) {
+                                    return [
+                                        'materialName' => $item->disbursedMaterial->materialName,
+                                        'quantity' => $item->quantity,
+                                        'expenseQuantity' => $item->expenseQuantity,
+                                        'availableQuantity' => $item->quantity-$item->expenseQuantity,
+                                        'centerName' => $item->medicalCenter->centerName,
+                                        'valid' => $item->valid
+                                        
+                                       
+                                       
+                                    ];
+                                });
 
     return $disbursedMaterials;
 }
-
 
 
 
