@@ -200,6 +200,7 @@ class UserService implements UserServiceInterface
     $user->valid= -1;
     $user->save(); 
 }    
+$user->save(); 
          DB::commit();
          return $user;
      } catch (\Exception $e) {
@@ -1237,6 +1238,7 @@ public function getAllMedicalCenters()
                                    ->get()
                                    ->map(function ($center) {
                                        return [
+                                        'id' => $center->id,
                                            'centerName' => $center->centerName,
                                            'telecom' => $center->centertelecoms->map(function ($telecom) {
                                                return [
