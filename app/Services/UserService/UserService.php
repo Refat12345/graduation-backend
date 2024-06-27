@@ -1005,8 +1005,8 @@ public function addPatientInfo(array $data)
                 $query->where('role', 'patient');
             }),
         ],
-        'childrenNumber' => 'required|integer',
-        'healthStateChildren' => 'required|string|max:255',
+        'childrenNumber' => 'nullable|integer',
+        'healthStateChildren' => 'nullable|string|max:255',
     
     ]);
 
@@ -1028,12 +1028,16 @@ public function addPatientInfo(array $data)
 
     DB::transaction(function () use ($data) {
         $generalPatientInfo = GeneralPatientInformation::create($data);
-        $maritalStatusData = [
-            'childrenNumber' => $data['childrenNumber'],
-            'healthStateChildren' => $data['healthStateChildren'],
-            'generalPatientInformationID' => $generalPatientInfo->id
-        ];
-        MaritalStatus::create($maritalStatusData);
+
+
+        if (isset($data['childrenNumber']) && isset($data['healthStateChildren'])) {
+            $maritalStatusData = [
+                'childrenNumber' => $data['childrenNumber'],
+                'healthStateChildren' => $data['healthStateChildren'],
+                'generalPatientInformationID' => $generalPatientInfo->id
+            ];
+            MaritalStatus::create($maritalStatusData);
+        }
 
 
         $companionData = [
