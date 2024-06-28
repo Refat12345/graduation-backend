@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('noteContent');
             $table->string('category');
             $table->string('type');
-            $table->date('date');
+           // $table->date('date');
             $table->unsignedBigInteger('sessionID')->nullable();
             $table->unsignedBigInteger('senderID');
             $table->unsignedBigInteger('receiverID')->nullable();

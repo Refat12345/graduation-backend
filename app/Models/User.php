@@ -272,7 +272,7 @@ public function permissions()
 
 public function center()
 {
-    return $this->hasOne(UserCenter::class, 'userID', 'id');
+    return $this->hasOne(UserCenter::class, 'userID', 'id')->where('valid', -1);
 }
 
 

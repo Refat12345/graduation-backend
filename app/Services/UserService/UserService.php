@@ -1729,19 +1729,21 @@ public function createNote(array $noteData)
         'noteContent' => 'required|string|max:1000',
         'category' => 'required|string|max:255',
         'type' => 'required|string|max:255',
-        'date' => 'required|date',
+      //  'date' => 'required|date',
         'sessionID' => 'nullable|integer|exists:dialysis_sessions,id',
         //'senderID' => 'required|integer|exists:users,id',
         'receiverID' => 'nullable|integer|exists:users,id',
-        'centerID' => 'required|integer|exists:medical_centers,id',
-    ]);   
+       // 'centerID' => 'required|integer|exists:medical_centers,id',
+    ]);  
 
     if ($validator->fails()) {
         throw new LogicException($validator->errors()->first());
     }
+    $user = auth('user')->user();
+    $centerId = $user->center->centerID;
    
-    $noteData['senderID'] = auth('user')->user()->id;
-
+    $noteData['senderID'] = $user->id;
+    $noteData['centerID'] = $centerId;
     $note = Note::create($noteData);
 
     return $note;
@@ -1817,31 +1819,9 @@ return  $details;
 
 
 
-// public function getNotesByMedicalCenter($centerId)
-// {
-//     $notes = Note::where('centerID', $centerId)->get();
-//     return $notes->map(function ($note) {
-//         return [
-//             'senderID' => $note->senderID,
-//             'receiverID' => $note->receiverID ? $note->receiverID : null, 
-//             'noteContent' => $note->noteContent,
-//             'category' => $note->category,
-//             'type' => $note->type,
-//             'date' => $note->date,
-//             'sessionID' => $note->sessionID,
-//             'senderName' => $note->sender->fullName, 
-         
-
-//             'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
-//         ];
-//     });
-// }
-
-
-
-public function getNotesByreceiverID($receiverID)
+public function getNotesByMedicalCenter($centerId)
 {
-    $notes = Note::where('receiverID', $receiverID)->get();
+    $notes = Note::where('centerID', $centerId)->get();
     return $notes->map(function ($note) {
         return [
             'senderID' => $note->senderID,
@@ -1849,7 +1829,39 @@ public function getNotesByreceiverID($receiverID)
             'noteContent' => $note->noteContent,
             'category' => $note->category,
             'type' => $note->type,
-            'date' => $note->date,
+            'date' => $note->updated_at->format('Y-m-d'),
+            'sessionID' => $note->sessionID,
+            'senderName' => $note->sender->fullName, 
+         
+
+            'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
+        ];
+    });
+}
+
+
+public function getNotesByreceiverID($receiverID)
+{
+    $centerID = UserCenter::where('userID', $receiverID)->where('valid', -1)->first()->centerID;
+    $user = User::findOrFail($receiverID);
+    
+    $notes = Note::where('receiverID', $receiverID)
+        ->orWhere(function ($query) use ($user, $centerID) {
+            $query->where('category', $user->role)
+                ->whereHas('medicalCenter', function ($query) use ($centerID) {
+                    $query->where('centerID', $centerID);
+                });
+        })
+        ->get();
+
+    return $notes->map(function ($note) {
+        return [
+            'senderID' => $note->senderID,
+            'receiverID' => $note->receiverID ? $note->receiverID : null, 
+            'noteContent' => $note->noteContent,
+            'category' => $note->category,
+            'type' => $note->type,
+            'date' => $note->updated_at->format('Y-m-d'),
             'sessionID' => $note->sessionID,
             'senderName' => $note->sender->fullName, 
             'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
