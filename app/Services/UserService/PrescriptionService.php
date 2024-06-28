@@ -218,7 +218,7 @@ public function updatePrescription($prescriptionId, array $data)
     $validator = Validator::make($data, [
         'patientID' => 'required|exists:users,id',
         'medicines' => 'required|array',
-    // 'medicines.*.id' => 'required|integer',
+        'medicines.*.id' => 'required|integer',
         'medicines.*.name' => 'required|string',
         'medicines.*.dateOfStart' => 'required|date',
         'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
@@ -240,15 +240,20 @@ public function updatePrescription($prescriptionId, array $data)
         ]);
 
         foreach ($validatedData['medicines'] as $medicineData) {
-            $medicine = Medicine::firstOrNew(['name' => $medicineData['name']]);
 
-            if (!$medicine->exists) {
-                // إذا لم يكن الدواء موجودًا، قم بإضافته
-                $medicine->fill($medicineData);
-                $medicine->save();
-            }
+            $medicine = Medicine::findOrFail($medicineData['id']);
 
-            $prescription->medicines()->attach($medicine->id, [
+            
+       //     $medicine = Medicine::firstOrNew(['name' => $medicineData['name']]);
+
+
+       $newMedicine = Medicine::create([
+                            'name' => $medicineData['name'],
+                        ]);
+
+
+                        $prescription->medicines()->detach($medicine->id);
+            $prescription->medicines()->attach($newMedicine->id, [
                 'dateOfStart' => $medicineData['dateOfStart'],
                 'dateOfEnd' => $medicineData['dateOfEnd'],
                 'amount' => $medicineData['amount'],
@@ -264,4 +269,72 @@ public function updatePrescription($prescriptionId, array $data)
         throw $e;
     }
 }
+
+
+// public function updatePrescription($prescriptionId, array $data)
+// {
+//     $validator = Validator::make($data, [
+//         'patientID' => 'required|exists:users,id',
+//         'medicines' => 'required|array',
+//         'medicines.*.id' => 'required|integer|exists:medicines,id',
+//         'medicines.*.name' => 'required|string',
+//         'medicines.*.dateOfStart' => 'required|date',
+//         'medicines.*.dateOfEnd' => 'required|date|after_or_equal:medicines.*.dateOfStart',
+//         'medicines.*.amount' => 'nullable|numeric|min:0',
+//         'medicines.*.details' => 'required|string|max:255',
+//     ]);
+
+//     if ($validator->fails()) {
+//         throw new InvalidArgumentException($validator->errors()->first());
+//     }
+
+//     $validatedData = $validator->validated();
+
+//     \DB::beginTransaction();
+//     try {
+//         $prescription = Prescription::findOrFail($prescriptionId);
+//         $prescription->update([
+//             'patientID' => $validatedData['patientID'],
+//         ]);
+
+//         foreach ($validatedData['medicines'] as $medicineData) {
+//             $medicine = Medicine::findOrFail($medicineData['id']);
+//             $existingPrescriptions = $medicine->prescriptions()->where('prescriptionID', '!=', $prescriptionId)->count();
+
+//             if ($existingPrescriptions > 0) {
+//                 // إذا كان الدواء مرتبطًا بوصفات أخرى، قم بإنشاء دواء جديد
+//                 $newMedicine = Medicine::create([
+//                     'name' => $medicineData['name'],
+//                 ]);
+//                 $medicineId = $newMedicine->id;
+//             } else {
+//                 // إذا كان الدواء مرتبطًا فقط بالوصفة الحالية، قم بتحديث اسمه
+//                 $medicine->update([
+//                     'name' => $medicineData['name'],
+//                 ]);
+//                 $medicineId = $medicine->id;
+//             }
+
+//             $prescription->medicines()->updateOrCreate(
+//                 ['medicineID' => $medicineId], // تغيير إلى 'medicineID'
+//                 [
+//                     'dateOfStart' => $medicineData['dateOfStart'],
+//                     'dateOfEnd' => $medicineData['dateOfEnd'],
+//                     'amount' => $medicineData['amount'],
+//                     'details' => $medicineData['details'],
+//                     'status' => 'nonActive',
+//                 ]
+//             );
+//         }
+
+//         \DB::commit();
+//         return $prescription;
+//     } catch (\Exception $e) {
+//         \DB::rollback();
+//         throw $e;
+//     }
+// }
+
+
+
 }

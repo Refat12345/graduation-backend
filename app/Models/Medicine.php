@@ -15,8 +15,17 @@ class Medicine extends Model
         return $this->hasOne(PrescriptionMedicine::class, 'medicineID', 'id');
     }
 
- 
+
+
+    public function prescriptions()
+    {
+        return $this->belongsToMany(Prescription::class, 'prescription_medicines', 'medicineID', 'prescriptionID')
+                    ->withPivot('dateOfStart', 'dateOfEnd', 'amount', 'details', 'status', 'medicineID');
+    }
 }
+
+ 
+
 
 
 
