@@ -26,6 +26,12 @@ class Appointment extends Model
         return $this->belongsTo(User::class, 'userID', 'id');
     }
     
+    public function nurse()
+    {
+        return $this->belongsTo(User::class, 'nurseID', 'id');
+    }
+
+    
     public function shift()
     {
         return $this->belongsTo(Shift::class, 'shiftID', 'id');

@@ -15,6 +15,6 @@ interface AppointmentServiceInterface
     public function addAppointment(array $data);
     public function getAppointmentsByCenter($centerId);
     public function getUserAppointments($userId);
-
+    public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day);
 
 }

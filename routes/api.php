@@ -65,6 +65,10 @@ Route::post('/updateShifts', [UserController::class, 'updateShifts']);
 
 Route::post('/appointments', [AppointmentController::class, 'createAppointment']);
 Route::get('/centerappointments/{centerId}', [AppointmentController::class, 'showAppointmentsByCenter']);
+
+Route::get('/getAppointmentsByCenterAndDate/{centerId}/{year}/{month}/{day}', [AppointmentController::class, 'getAppointmentsByCenterAndDate']);
+
+
 Route::get('/userappointments/{userId}', [AppointmentController::class, 'showUserAppointments']);
 
 

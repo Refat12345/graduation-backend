@@ -84,6 +84,45 @@ class AppointmentService implements AppointmentServiceInterface
 }
 
 
+public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
+{
+    return Appointment::where('centerID', $centerId)
+                      ->whereYear('appointmentTimeStamp', $year)
+                      ->whereMonth('appointmentTimeStamp', $month)
+                      ->whereDay('appointmentTimeStamp', $day)
+                      ->with(['shift', 'chair', 'user','nurse'])
+                      ->get()
+                      ->map(function ($appointment) {
+                        $appointmentTime = Carbon::parse($appointment->appointmentTimeStamp)->format('H:i');
+                          return [
+
+                            'id' => $appointment->id,
+                              'patientName' => $appointment->user->fullName,
+                              'nurseName' => $appointment->nurse->fullName,
+                              'roomName' => $appointment->chair->roomName,
+                              'chairName' => $appointment->chair->chairNumber,
+                              'appointmentTime' => $appointmentTime,
+                              'valid' => $appointment->valid,
+                              'sessionID' => $appointment->sessionID,
+                              
+                          ];
+                      });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 public function getUserAppointments($userId)

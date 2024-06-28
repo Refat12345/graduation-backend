@@ -45,9 +45,33 @@ class AppointmentController extends Controller
     
     
     }
+
+
+
+    public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
+    {
+        try{
+        $appointments = $this->service->getAppointmentsByCenterAndDate($centerId, $year, $month, $day);
+        return response()->json(['appointments'=> $appointments], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
     
     
-    
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     public function showUserAppointments($userId)
     {
         try { 
