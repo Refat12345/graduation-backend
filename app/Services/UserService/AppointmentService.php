@@ -97,6 +97,7 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
                           return [
 
                             'id' => $appointment->id,
+                            'patientId' => $appointment->user->id,
                               'patientName' => $appointment->user->fullName,
                               'nurseName' => $appointment->nurse->fullName,
                               'roomName' => $appointment->chair->roomName,
