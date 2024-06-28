@@ -1903,7 +1903,7 @@ public function getlogs($centerId)
 
 public function getMedicineNames($type)
 {
-    return Medicine::where('type', $type)->pluck('name');
+    return Medicine::where('type', $type)->get();
 }
 
 
