@@ -95,6 +95,7 @@ Route::get('/getNotesByreceiverID/{receiverID}', [UserController::class, 'getNot
 
 Route::get('/getDialysisSessionDetails/{sessionId}', [MedicalSessionController::class, 'getDialysisSessionDetails']);
 Route::post('/createDialysisSession', [MedicalSessionController::class, 'createDialysisSession']);
+Route::post('/updateDialysisSession', [MedicalSessionController::class, 'updateDialysisSession']);
 
 Route::get('/getNurseDialysisSessions/{sessionStatus}/{day?}/{month?}/{year?}', [MedicalSessionController::class, 'getNurseDialysisSessions']);
 Route::post('/startAppointment/{appointmentId}', [MedicalSessionController::class, 'startAppointment']);
@@ -148,9 +149,8 @@ Route::post('/addMedicalAnalysis', [MedicalAnalysisController::class, 'addMedica
 Route::post('/updateMedicalAnalysis', [MedicalAnalysisController::class, 'updateMedicalAnalysis']);
 
 
-
 Route::post('/addAnalysisType', [MedicalAnalysisController::class, 'addAnalysisType']);
-
+Route::get('/getAnalysisTypes', [MedicalAnalysisController::class, 'getAnalysisTypes']);
 
 Route::get('/getPatientDialysisSessions/{patientId?}/{month?}/{year?}', [MedicalSessionController::class, 'getPatientDialysisSessions']);
 Route::get('/getDialysisSessions/{centerId}/{month?}/{year?}', [MedicalSessionController::class, 'getDialysisSessions']);

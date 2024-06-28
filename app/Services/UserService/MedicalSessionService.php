@@ -570,6 +570,7 @@ public function startAppointment($appointmentId)
     try {
         $appointment = Appointment::findOrFail($appointmentId);
         $appointment->valid = 'active';
+        $appointment->start = Carbon::now('Asia/Damascus');
         $appointment->nurseID = $nurse->id;
         $appointment->save();
 
@@ -586,10 +587,64 @@ public function startAppointment($appointmentId)
 
 
 
+// public function updateDialysisSession($sessionId, array $data)
+// {
+//     $dialysisSession = DialysisSession::findOrFail($sessionId);
+
+//     $validator = Validator::make($data, [
+//         'sessionStartTime' => 'required|date',
+//         'sessionEndTime' => 'required|date|after:sessionStartTime',
+//         'weightBeforeSession' => 'required|numeric|min:0',
+//         'weightAfterSession' => 'required|numeric|min:0',
+//         'totalWithdrawalRate' => 'required|numeric|min:0',
+//         'withdrawalRateHourly' => 'required|numeric|min:0',
+//         'pumpSpeed' => 'required|numeric|min:0',
+//         'filterColor' => 'required|string|max:255',
+//         'filterType' => 'required|string|max:255',
+//         'vascularConnection' => 'required|string|max:255',
+//         'naConcentration' => 'required|numeric|min:0',
+//         'venousPressure' => 'required|integer|min:0',
+//         'status' => 'required|string|max:255',
+//         'sessionDate' => 'required|date',
+//         'patientID' => 'nullable|exists:users,id',
+//         'doctorID' => 'nullable|exists:users,id',
+//     ]);
+
+//     if ($validator->fails()) {
+//         throw new InvalidArgumentException($validator->errors()->first());
+//     }
+
+//     $validatedData = $validator->validated();
+    
+//     DB::beginTransaction();
+//     try {
+//         $dialysisSession->update($validatedData);
+
+//         // تعديل الأدوية
+//         if (isset($data['medicines'])) {
+//             foreach ($data['medicines'] as $medicineData) {
+//                 $this->updateSessionMedicine($medicineData);
+//             }
+//         }
+
+//         // تعديل قياسات ضغط الدم
+//         if (isset($data['bloodPressures'])) {
+//             foreach ($data['bloodPressures'] as $bloodPressureData) {
+//                 $this->updateBloodPressureMeasurement($bloodPressureData);
+//             }
+//         }
+
+//         DB::commit();
+//         return $dialysisSession;
+//     } catch (\Exception $e) {
+//         DB::rollback();
+//         throw $e;
+//     }
+// }
+
+
 public function updateDialysisSession($sessionId, array $data)
 {
-    $dialysisSession = DialysisSession::findOrFail($sessionId);
-
     $validator = Validator::make($data, [
         'sessionStartTime' => 'required|date',
         'sessionEndTime' => 'required|date|after:sessionStartTime',
@@ -614,24 +669,40 @@ public function updateDialysisSession($sessionId, array $data)
     }
 
     $validatedData = $validator->validated();
-    
+    // $nurse = auth('user')->user();
+    // $validatedData['nurseID'] = $nurse->id;
+    // $centerId = $nurse->medicalCenters()->first()->id;
+    // $validatedData['centerID'] = $centerId;
+
     DB::beginTransaction();
     try {
+        $dialysisSession = DialysisSession::findOrFail($sessionId);
         $dialysisSession->update($validatedData);
 
-        // تعديل الأدوية
         if (isset($data['medicines'])) {
             foreach ($data['medicines'] as $medicineData) {
-                $this->updateSessionMedicine($medicineData);
+                if (isset($medicineData['medicineType']) && $medicineData['medicineType'] === 'medicine') {
+                    $this->updateSessionMedicine($medicineData, $dialysisSession->id);
+                } else {
+                    $this->updateSessionDisbursedMaterial($medicineData, $dialysisSession->id);
+                }
             }
         }
 
-        // تعديل قياسات ضغط الدم
         if (isset($data['bloodPressures'])) {
             foreach ($data['bloodPressures'] as $bloodPressureData) {
                 $this->updateBloodPressureMeasurement($bloodPressureData);
             }
         }
+
+        // if (isset($data['appointmentID'])) {
+        //     $appointment = Appointment::find($data['appointmentID']);
+        //     if ($appointment) {
+        //         $appointment->sessionID = $dialysisSession->id;
+        //         $appointment->valid = 'finished';
+        //         $appointment->();
+        //     }
+        // }save
 
         DB::commit();
         return $dialysisSession;
@@ -641,10 +712,11 @@ public function updateDialysisSession($sessionId, array $data)
     }
 }
 
-public function updateSessionMedicine(  array $data)
+
+public function updateSessionMedicine(array $data, $sessionId)
 {
     $validator = Validator::make($data, [
-        'medicineTakenID'=> 'required|exists:medicine_takens,id',
+        'newMedicineID' => 'required|exists:medicines,id',
         'medicineID' => 'required|exists:medicines,id',
         'value' => 'required|numeric|min:0'
     ]);
@@ -654,18 +726,53 @@ public function updateSessionMedicine(  array $data)
     }
 
     $validatedData = $validator->validated();
-    $medicine = MedicineTaken::findOrFail($validatedData['medicineTakenID']);
-                           
+    $validatedData['sessionID'] = $sessionId;
 
-    if (!$medicine) {
-        throw new ModelNotFoundException('Medicine record not found for the given session.');
+    $medicineTaken = MedicineTaken::where('sessionID', $sessionId)
+                                  ->where('medicineID', $data['medicineID'])
+                                  ->firstOrFail();
+    $medicineTaken->update($validatedData);
+    $medicineTaken->medicineID=$validatedData['newMedicineID'];
+    $medicineTaken->save();
+    return $medicineTaken;
+}
+
+
+
+public function updateSessionDisbursedMaterial(array $data, $sessionId)
+{
+    $validator = Validator::make($data, [
+        'newDisbursedMaterialID' => 'required|exists:disbursed_materials_users,id',
+        'disbursedMaterialID' => 'required|exists:disbursed_materials_users,id',
+        'value' => 'required|numeric|min:0'
+    ]);
+
+    if ($validator->fails()) {
+        throw new InvalidArgumentException($validator->errors()->first());
     }
 
-    $medicine->update([
-        'value' => $validatedData['value'],
-       'medicineID' =>$validatedData['medicineID']
-    ]);
+    $validatedData = $validator->validated();
+    $validatedData['sessionID'] = $sessionId;
+
+    $disbursedMaterialsUser = DisbursedMaterialsUser::findOrFail($validatedData['disbursedMaterialID']);
+    $disbursedMaterialTaken = MedicineTaken::where('sessionID', $sessionId)
+                                           ->where('disbursedMaterialID', $data['disbursedMaterialID'])
+                                           ->firstOrFail();
+
+    $disbursedMaterialsUser->expenseQuantity -= $disbursedMaterialTaken->value ;
+    $disbursedMaterialsUser->save();
+    $disbursedMaterialTaken->delete(); 
+
+    $validatedData['disbursedMaterialID'] = $validatedData['newDisbursedMaterialID'];
+
+    $this->addSessionDisbursedMaterial( $validatedData, $sessionId);
+
+
+
+    return $disbursedMaterialTaken;
 }
+
+
 
 
 public function updateBloodPressureMeasurement(array $data)
@@ -686,6 +793,7 @@ public function updateBloodPressureMeasurement(array $data)
     $bloodPressure = BloodPressureMeasurement::findOrFail($validatedData['id']);
     $bloodPressure->update($validatedData);
 }
+
 
 
 

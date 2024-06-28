@@ -131,6 +131,13 @@ public function createAnalysisType(array $AnalysisTypeData)
 
 
 
+public function getAnalysisTypes()
+{
+    return AnalysisType::all(['id', 'analysisName', 'recurrenceInterval', 'unitOfMeasurement']);
+}
+
+
+
 
 
 public function getMedicalAnalysisWithAnalysisType($userID)

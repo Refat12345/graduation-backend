@@ -28,9 +28,6 @@ public function addMedicalAnalysis(Request $request)
 }
 
 
-
-
-
 public function addAnalysisType(Request $request)
 {
     $data = $request->all();
@@ -46,6 +43,10 @@ public function showMedicalAnalysis($userID)
 }
 
 
+public function getAnalysisTypes()
+{
+    return response()->json(['analysisTypes' => $this->medicalAnalysisService->getAnalysisTypes()], 200);
+}
 
 
 

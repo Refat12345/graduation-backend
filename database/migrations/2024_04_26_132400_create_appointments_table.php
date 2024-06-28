@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('shiftID');
             $table->unsignedBigInteger('chairID');
             $table->unsignedBigInteger('centerID');
-            
+            $table->time('start')->nullable();
             $table->unsignedBigInteger('sessionID')->nullable();
             $table->unsignedBigInteger('nurseID')->nullable();
             $table->foreign('userID')->references('id')->on('users');

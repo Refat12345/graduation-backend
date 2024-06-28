@@ -102,6 +102,7 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
                               'roomName' => $appointment->chair->roomName,
                               'chairName' => $appointment->chair->chairNumber,
                               'appointmentTime' => $appointmentTime,
+                              'startTime' => $appointment->start,
                               'valid' => $appointment->valid,
                               'sessionID' => $appointment->sessionID,
                               

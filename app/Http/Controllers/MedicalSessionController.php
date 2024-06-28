@@ -73,6 +73,29 @@ class MedicalSessionController extends Controller
 
 
 
+public function updateDialysisSession(Request $request)
+{
+
+    $id = $request->input('id');
+    $Medical = $request->except('id');
+  
+    try {
+       
+
+        $medicalss = $this->medicalSessionService->updateDialysisSession($id, $Medical);
+      
+
+        return response()->json([$medicalss], 200);
+        
+    } catch (LogicException $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+}
+
+
+
+
+
 public function getNurseDialysisSessions($sessionStatus, $day = null, $month = null, $year = null)
 {
 
