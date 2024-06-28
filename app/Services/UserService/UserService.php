@@ -634,6 +634,7 @@ public function approveTelecomEdits(User $editUser)
                  $processedRequest['type'] = $request->globalRequest->content;
                 // $processedRequest['content'] = $request->globalRequest->content;
                  $processedRequest['senderName'] = $request->globalRequest->requester->fullName;
+                 $processedRequest['senderid'] = $request->globalRequest->requester->id;
                  if ($request->globalRequest->requestable) {
                     $requestable = $request->globalRequest->requestable;
                     $requestableType = class_basename($requestable->getMorphClass());
@@ -681,12 +682,14 @@ public function approveTelecomEdits(User $editUser)
                  $destinationCenterName = $request->patientTransferRequest->destinationCenter->centerName;
                  $processedRequest['type'] = 'طلب نقل مريض';
                  $processedRequest['senderName'] = $user->fullName;
+                 $processedRequest['senderid'] = $user->id;
                  $processedRequest['content'] = "نريد نقل المريض " . $patientName . " من مركز " . $centerPatientName . " الى مركز " . $destinationCenterName . " بسبب " . $request->cause;
              } elseif ($request->requestModifyAppointment) {
 
                 $patientName = $request->requestModifyAppointment->user->fullName;
                  $processedRequest['type'] = 'طلب تعديل موعد';
                  $processedRequest['senderName'] = $user->fullName;
+                 $processedRequest['senderid'] = $user->id;
                   $oldTime= $request->requestModifyAppointment->newTime;
                 $newTime = $request->requestModifyAppointment->appointment->appointmentTimeStamp;
                  $processedRequest['content'] = "نريد تعديل موعد المريض " . $patientName . " من  " . $oldTime . " الى " .  $newTime . " بسبب " . $request->cause;
