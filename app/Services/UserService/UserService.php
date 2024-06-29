@@ -1359,6 +1359,9 @@ public function getCenterUsersByRole($centerId, $role, $pat)
     ->when($role !== 'all', function ($query) use ($role) {
         $query->where('role', $role);
     })
+    ->when($role === 'all', function ($query) {
+        $query->where('role', '!=', 'patient');
+    })
     ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth') 
     ->with(['telecom' => function ($query) {
         $query->where('system', 'phone') 
