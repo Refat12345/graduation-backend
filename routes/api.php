@@ -81,7 +81,7 @@ Route::get('/shifts/center/{centerId}', [UserController::class, 'showShiftsByCen
 Route::get('/doctors/shift/{shiftId}', [UserController::class, 'showDoctorsInShift']);
 
 
-
+Route::get('/getCenterDoctors/{centerId}', [UserController::class, 'getCenterDoctors']);
 Route::get('/getCenterUsersByRole/{centerId}/{role}/{pat?}', [UserController::class, 'getCenterUsersByRole']);
 Route::get('/user/{userId}', [UserController::class, 'showUserDetails']);
 

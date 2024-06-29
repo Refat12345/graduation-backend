@@ -81,7 +81,7 @@ interface UserServiceInterface
 
 
 
-
+    public function getCenterDoctors($centerId);
 
     ////////////////////////////// Request /////////////////////////////
 

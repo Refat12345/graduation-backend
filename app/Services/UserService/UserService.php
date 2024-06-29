@@ -585,6 +585,9 @@ public function getUserByVerificationCode(string $verificationCode)
        
     ];
 }
+
+
+
 public function verifyAccount(string $verificationCode, string $password)
 {
     $user = User::where('verificationCode', $verificationCode)->first();
@@ -710,7 +713,7 @@ public function loginUser(string $nationalNumber, string $password)
 
 
 
-public function addPatientCompanionWithTelecom(array $companionData, array $telecomDataArray)
+  public function addPatientCompanionWithTelecom(array $companionData, array $telecomDataArray)
 {
     $companionValidator = Validator::make($companionData, [
         'fullName' => 'required|string|max:255',
@@ -1384,7 +1387,30 @@ public function getCenterUsersByRole($centerId, $role, $pat)
     });
 }
 
-
+public function getCenterDoctors($centerId)
+{
+    return User::where('role', 'doctor')
+        ->when($centerId != 0, function ($query) use ($centerId) {
+            $query->whereHas('userCenter', function ($subQuery) use ($centerId) {
+                $subQuery->where('centerID', $centerId);
+            });
+        })
+        ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth')
+        ->with(['telecom' => function ($query) {
+            $query->where('system', 'phone')
+                  ->select('userID', 'value');
+        }, 'address.city' => function ($query) {
+            $query->select('id', 'cityName');
+        }])
+        ->get()
+        ->map(function ($user) {
+            $user->contactNumber = $user->telecom->pluck('value')->first() ?? null;
+            $user->city = $user->address->first()->city->cityName ?? null;
+            $user->age = Carbon::parse($user->dateOfBirth)->age;
+            unset($user->telecom, $user->address, $user->dateOfBirth);
+            return $user;
+        });
+}
 
 
 
@@ -1436,9 +1462,9 @@ public function getUserDetails($userId)
         'role' => $user->role,
       //  'userCenter' => $user->userCenters,
 
-'userCenter' => $user->userCenters->filter(function($userCenter) {
+  'userCenter' => $user->userCenters->filter(function($userCenter) {
     return $userCenter->valid == -1;
-})->first()->medicalCenter->centerName ?? null,
+  })->first()->medicalCenter->centerName ?? null,
 
 
 
@@ -1609,9 +1635,9 @@ public function getMedicalCenterDetails($centerId)
             'countryName' => $address->city->country->countryName
         ];
         $details['shifts'] = array_values($details['shifts']);
-}
+  }
 
-return  $details;
+  return  $details;
 
 
 
