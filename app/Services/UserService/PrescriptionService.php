@@ -143,7 +143,7 @@ public function getAllPrescriptionsForUser($userId) {
             'doctor' => $prescription->doctor->fullName ,
             'medicines' => $prescription->medicines->map(function ($medicine) {
                 return [
-                    'Id' => $medicine->id,
+                    'id' => $medicine->id,
                     'status' => $medicine->pivot->status,
                     'name' => $medicine->name,
                     'titer'=> $medicine->titer,
