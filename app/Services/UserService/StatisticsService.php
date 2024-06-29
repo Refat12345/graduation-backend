@@ -225,7 +225,7 @@ class StatisticsService implements StatisticsServiceInterface {
             $query->whereHas('userCenter', function ($query) use ($centerID) {
                 $query->where('centerID', $centerID);
             });
-        })->where('status', 'accepted')->count();
+        })->where('status', 'مقبول')->count();
     
         $statistics['dialysisSessions'] = DialysisSession::where('centerID', $centerID)->count();
     
@@ -233,7 +233,7 @@ class StatisticsService implements StatisticsServiceInterface {
             $query->whereHas('userCenter', function ($query) use ($centerID) {
                 $query->where('centerID', $centerID);
             });
-        })->where('status', 'waiting')->count();
+        })->where('status', 'انتظار')->count();
     
         return $statistics;
     }
@@ -254,13 +254,13 @@ class StatisticsService implements StatisticsServiceInterface {
     
         $statistics['patients'] = GeneralPatientInformation::whereHas('user', function ($query) {
             $query->whereHas('userCenter');
-        })->where('status', 'accepted')->count();
+        })->where('status', 'مقبول')->count();
     
         $statistics['dialysisSessions'] = DialysisSession::count();
     
         $statistics['waitingList'] = GeneralPatientInformation::whereHas('user', function ($query) {
             $query->whereHas('userCenter');
-        })->where('status', 'waiting')->count();
+        })->where('status', 'انتظار')->count();
     
         $statistics['nurses'] = User::where('role', 'nurse')->where('valid', -1)->count();
     

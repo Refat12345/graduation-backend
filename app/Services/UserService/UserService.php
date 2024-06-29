@@ -537,6 +537,8 @@ public function approveTelecomEdits(User $editUser)
     $user->medicalCenters()->attach($medicalCenter->id);
 }
 
+
+
 public function associateUserWithMyMedicalCenter(User $user, string $centerName)
 {
     $medicalCenter = MedicalCenter::firstOrCreate(['centerName' => $centerName]);
@@ -547,7 +549,7 @@ public function associateUserWithMyMedicalCenter(User $user, string $centerName)
         $user->medicalCenters()->wherePivot('valid', -1)->detach();
         }
 
-        $user->generalPatientInformation->status='accepted';
+        $user->generalPatientInformation->status='معلق';
         $user->generalPatientInformation->save();
         $user->medicalCenters()->attach($medicalCenter->id);
     

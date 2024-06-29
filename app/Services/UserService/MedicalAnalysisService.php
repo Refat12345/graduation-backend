@@ -62,12 +62,19 @@ class MedicalAnalysisService implements MedicalAnalysisServiceInterface
         }
     
         $analysisType = AnalysisType::where('analysisName', $MedicalAnalysisData['analysisName'])->first();
+    
+
         if (!$analysisType) {
-            throw new LogicException('نوع التحليل غير موجود.');
+          
+            $analysisType = $this->createAnalysisType([
+                'analysisName' => $MedicalAnalysisData['analysisName'],
+                'recurrenceInterval' => $MedicalAnalysisData['recurrenceInterval'] ?? null,
+                'unitOfMeasurement' => $MedicalAnalysisData['unitOfMeasurement'] ?? null,
+            ]);
         }
     
         $MedicalAnalysisData['analysisTypeID'] = $analysisType->id;
-    
+        $analysisType->save();
         $validator = Validator::make($MedicalAnalysisData, [
             'averageMin' => 'required|numeric',
             'averageMax' => 'required|numeric',
@@ -110,7 +117,7 @@ public function createAnalysisType(array $AnalysisTypeData)
             'max:255',
             Rule::unique('analysis_types', 'analysisName'),
         ],
-        'recurrenceInterval' => 'required|Integer',
+        'recurrenceInterval' => 'nullable|Integer',
      'unitOfMeasurement' => 'nullable|string|max:255',
     ]);
 

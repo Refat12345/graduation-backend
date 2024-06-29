@@ -173,7 +173,7 @@ Route::get('getMedicineNames/{type}', [UserController::class, 'getMedicineNames'
 
 
 
-
+Route::post('/addMedicalAnalysis', [MedicalAnalysisController::class, 'addMedicalAnalysis']);
 $secretary_doctor = ['secretary','doctor'];
 
 Route::middleware(CheckRole::class . ':' . implode(',', $secretary_doctor))->group(function () {
@@ -188,7 +188,7 @@ Route::post('/addPharmacologicalHistory', [MedicalRecordController::class, 'addP
 Route::post('add-general-patient-info', [UserController::class, 'addGeneralPatientInformation']);
 Route::post('add-patient-companion', [UserController::class, 'addPatientCompanion']);
 
-Route::post('/addMedicalAnalysis', [MedicalAnalysisController::class, 'addMedicalAnalysis']);
+
 Route::post('/updateMedicalAnalysis', [MedicalAnalysisController::class, 'updateMedicalAnalysis']);
 
 Route::post('/createAllergicCondition', [MedicalRecordController::class, 'createAllergicCondition']);
