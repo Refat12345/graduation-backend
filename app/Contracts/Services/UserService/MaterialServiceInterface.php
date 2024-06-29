@@ -16,7 +16,7 @@ interface MaterialServiceInterface
 
     public function addNewMedicine(array $data);
     public function getAllMedicines();
-
+    public function getAllUsersWithDisbursedMaterials();
     public function createDisbursedMaterial(array $materialData);
     public function assignMaterialToUserCenter(array $assignmentData);
     public function getDisbursedMaterialsDetailsForUser($userID);

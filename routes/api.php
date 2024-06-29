@@ -127,6 +127,10 @@ Route::post('/updatePatientStatus/{patientID}/{status}', [UserController::class,
 Route::post('/createDisbursedMaterial', [DisbursedMaterialController::class, 'createDisbursedMaterial']);
 Route::post('assignMaterialToUserCenter', [DisbursedMaterialController::class, 'assignMaterialToUserCenter']);
 Route::get('/getDisbursedMaterialsDetailsForUser', [DisbursedMaterialController::class, 'getDisbursedMaterialsDetailsForUser']);
+
+Route::get('/getAllUsersWithDisbursedMaterials', [DisbursedMaterialController::class, 'getAllUsersWithDisbursedMaterials']);
+
+
 Route::get('/getDisbursedMaterialsForCenterInTimeRange', [DisbursedMaterialController::class, 'getDisbursedMaterialsForCenterInTimeRange']);
 
 
