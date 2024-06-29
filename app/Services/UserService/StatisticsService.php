@@ -94,7 +94,7 @@ class StatisticsService implements StatisticsServiceInterface {
     $user = auth('user')->user();
     $centerId = $user->userCenter->centerID;
     
-    $materials = ['heparin', 'iron', 'epoetin'];
+    $materials = ['الهيبارين', 'الحديد', 'الايبوتين'];
     $totalValues = [];
     
     foreach ($materials as $material) {

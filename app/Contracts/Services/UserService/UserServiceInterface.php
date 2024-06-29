@@ -92,7 +92,7 @@ interface UserServiceInterface
     public function addChair(array $data);
     public function addShift(array $data);
     
-
+    public function getAllCenters();
 
 
     //////////// appointment ///////////

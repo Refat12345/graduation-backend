@@ -1585,6 +1585,12 @@ public function createNote(array $noteData)
     return $note;
 }
 
+public function getAllCenters()
+{
+    return MedicalCenter::select('id', 'centerName')->get();
+}
+
+
 
 public function getMedicalCenterDetails($centerId)
 {

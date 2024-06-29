@@ -182,6 +182,13 @@ public function associateUserWithMedicalCenter(Request $request)
         return response()->json(['error' => $e->getMessage()], 400);
     }
     }
+
+
+    public function getAllCenters()
+    {
+        $centers = $this->userService->getAllCenters();
+        return response()->json(['centers' =>$centers]);
+    }
   
 
 
