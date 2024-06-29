@@ -278,60 +278,6 @@ class StatisticsService implements StatisticsServiceInterface {
 
 
 
-    public function getCterStatistics()
-    {
-        $statistics = MedicalCenter::withCount([
-            'users as doctors_count' => function ($query) {
-                $query->where('role', 'doctor');
-            },
-            'users as nurses_count' => function ($query) {
-                $query->where('role', 'nurse');
-            },
-            'users as secretaries_count' => function ($query) {
-                $query->where('role', 'secretary');
-            },
-            'users as patients_count' => function ($query) {
-                $query->whereHas('generalPatientInformation', function ($subQuery) {
-                    $subQuery->where('status', 'accepted');
-                });
-            },
-            'dialysisSessions_count' => function ($query) {
-                $query->where('valid', 1);
-            },
-            'users as waiting_list_count' => function ($query) {
-                $query->whereHas('generalPatientInformation', function ($subQuery) {
-                    $subQuery->where('status', 'waiting');
-                });
-            }
-        ])->get();
-    
-        $totalDoctors = 0;
-        $totalNurses = 0;
-        $totalSecretaries = 0;
-        $totalPatients = 0;
-        $totalDialysisSessions = 0;
-        $totalWaitingList = 0;
-    
-        foreach ($statistics as $center) {
-            $totalDoctors += $center->doctors_count;
-            $totalNurses += $center->nurses_count;
-            $totalSecretaries += $center->secretaries_count;
-            $totalPatients += $center->patients_count;
-            $totalDialysisSessions += $center->dialysisSessions_count;
-            $totalWaitingList += $center->waiting_list_count;
-        }
-    
-        $totalStatistics = [
-            'totalDoctors' => $totalDoctors,
-            'totalNurses' => $totalNurses,
-            'totalSecretaries' => $totalSecretaries,
-            'totalPatients' => $totalPatients,
-            'totalDialysisSessions' => $totalDialysisSessions,
-            'totalWaitingList' => $totalWaitingList
-        ];
-    
-        return $totalStatistics;
-    }
     
     
     }

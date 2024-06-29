@@ -23,6 +23,11 @@ class StatisticsController extends Controller {
         return response()->json(['pieChart' => $this->service->getPieCharts($month, $year)], 200);
     }
 
+    public function getAllPieCharts($month = null, $year = null)
+    {
+        return response()->json(['pieChart' => $this->service->getAllPieCharts($month, $year)], 200);
+    }
+
 
     public function causeRenalFailure()
     {
@@ -36,5 +41,9 @@ class StatisticsController extends Controller {
     }
 
 
+    public function getAllCenterStatistics()
+    {
+        return response()->json([$this->service->getAllCenterStatistics()], 200);
+    }
     
 }

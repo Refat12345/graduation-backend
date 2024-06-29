@@ -258,11 +258,14 @@ Route::post('/updateShifts', [UserController::class, 'updateShifts']);
 
 });
 
+Route::get('getAllPieCharts/{month?}/{year?}', [StatisticsController::class, 'getAllPieCharts']);
 
-
+Route::get('getAllCenterStatistics', [StatisticsController::class, 'getAllCenterStatistics']);
 
 Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatistics']);
 
+Route::get('getPieCharts/{month?}/{year?}', [StatisticsController::class, 'getPieCharts']);
+    
 $admin = ['admin'];
 Route::middleware(CheckRole::class . ':' . implode(',', $admin))->group(function () {
 
@@ -280,7 +283,7 @@ Route::middleware(CheckRole::class . ':' . implode(',', $admin))->group(function
     Route::get('getChairsInCenter/{centerId}', [UserController::class, 'getChairsInCenter']);
     Route::get('getAllPatientInfoRequests/{centerId}', [RequestController::class, 'getAllPatientInfoRequests']);
     
-    Route::get('getPieCharts/{month?}/{year?}', [StatisticsController::class, 'getPieCharts']);
+ 
 
     Route::post('assign-permissions', [UserController::class, 'assignPermissions']);
     Route::post('updatePermissionsUser', [UserController::class, 'updatePermissionsUser']);
