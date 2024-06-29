@@ -58,6 +58,8 @@ Route::post('/change', [UserController::class, 'changeStatus']);
 
 Route::post('/associateUserWithMedicalCenter', [UserController::class, 'associateUserWithMedicalCenter']);
 
+Route::post('/associateUserWithMyMedicalCenter', [UserController::class, 'associateUserWithMyMedicalCenter']);
+
 
 
 

@@ -150,7 +150,7 @@ public function getUserByVerificationCode(Request $request)
     }
     }
 
-
+    
 
 
 
@@ -167,7 +167,18 @@ public function associateUserWithMedicalCenter(Request $request)
 }
 }
 
-
+public function associateUserWithMyMedicalCenter(Request $request)
+{
+    try {
+    $centerName = $request->input('centerName');
+    $user = User::findOrFail($request->input('userID'));
+    $this->userService->associateUserWithMyMedicalCenter( $user ,$centerName );
+    return response()->json(['message' => 'user associated successfully']);
+} catch (\Exception $e) {
+           
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+}
 
     public function changeStatus(Request $request)
     {

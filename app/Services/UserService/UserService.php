@@ -537,7 +537,23 @@ public function approveTelecomEdits(User $editUser)
     $user->medicalCenters()->attach($medicalCenter->id);
 }
 
-     
+public function associateUserWithMyMedicalCenter(User $user, string $centerName)
+{
+    $medicalCenter = MedicalCenter::firstOrCreate(['centerName' => $centerName]);
+
+    $existingAssociation = $user->center()->where('centerID', $medicalCenter->id)->exists();
+
+    if ($existingAssociation) {
+        $user->medicalCenters()->wherePivot('valid', -1)->detach();
+        }
+
+        $user->generalPatientInformation->status='accepted';
+        $user->generalPatientInformation->save();
+        $user->medicalCenters()->attach($medicalCenter->id);
+    
+ 
+    return $user->medicalCenters;
+}
 
 
      public function findUserBy(string $value): Collection
