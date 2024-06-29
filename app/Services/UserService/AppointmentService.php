@@ -95,6 +95,7 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
                       ->map(function ($appointment) {
                         
                         $appointmentTime = Carbon::parse($appointment->appointmentTimeStamp)->format('H:i');
+                        
                           return [
 
                             'id' => $appointment->id,
@@ -102,7 +103,7 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
                               'patientName' => $appointment->user->fullName,
                               'nurseName' => $appointment->nurse->fullName,
                               'roomName' => $appointment->chair->roomName,
-                              'chairName' => $appointment->chair->chairNumber,
+                              'chair' => $appointment->chair->chairNumber,
                               'appointmentTime' => $appointmentTime,
                               'startTime' => $appointment->start,
                               'valid' => $appointment->valid,
