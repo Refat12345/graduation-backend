@@ -231,6 +231,9 @@ class MedicalSessionService implements MedicalSessionServiceInterface
         $dialysisSessions = $query->get()
             ->map(function ($appointment) {
                 $appointmentTime = Carbon::parse($appointment->appointmentTimeStamp)->format('H:i');
+
+                $startTime = Carbon::parse($appointment->session->sessionStartTime)->format('H:i');
+                $endTime = Carbon::parse($appointment->session->sessionEndTime)->format('H:i');
                 
                 return [
                     'id' => $appointment->session->id,
@@ -240,6 +243,8 @@ class MedicalSessionService implements MedicalSessionServiceInterface
                     'nurseName' => $appointment->session->nurse->fullName,
                     'sessionStartTime' => $appointment->session->sessionStartTime,
                     'sessionEndTime' => $appointment->session->sessionEndTime,
+                    'startTime' => $startTime,
+                    'endTime' => $endTime,
                     'chair' => $appointment->chair->chairNumber,
                     'roomName' => $appointment->chair->roomName,
                     'valid' => $appointment->valid

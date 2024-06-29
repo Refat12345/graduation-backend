@@ -80,6 +80,13 @@ class MedicalCenter extends Model
             return $this->hasMany(Chair::class, 'centerID', 'id');
         }
 
+
+
+        public function dialysisSessions_count()
+        {
+            return $this->hasMany(DialysisSession::class, 'centerID', 'id');
+        }
+
 /////////////////////////// belongsToMany ///////////////////////////////
 
 

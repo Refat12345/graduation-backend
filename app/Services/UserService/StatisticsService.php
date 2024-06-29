@@ -89,6 +89,35 @@ class StatisticsService implements StatisticsServiceInterface {
     //     return $totalValues;
     // }
 
+    public function getAllPieCharts($month = null, $year = null)
+{
+    $materials = ['الهيبارين', 'الحديد', 'الايبوتين'];
+    $totalValues = [];
+    
+    foreach ($materials as $material) {
+        $disbursedQuery = DisbursedMaterialsUser::whereHas('disbursedMaterial', function ($query) use ($material) {
+            $query->where('materialName', $material);
+        })->where('valid', -1);
+        
+        $takenQuery = MedicineTaken::whereHas('medicine', function ($query) use ($material) {
+            $query->where('name', $material);
+        })->whereHas('dialysisSession');
+
+        if ($month !== null && $year !== null) {
+            $dateString = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+            $disbursedQuery->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString]);
+            $takenQuery->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$dateString]);
+        }
+
+        $disbursedValue = $disbursedQuery->sum('quantity');
+        $takenValue = $takenQuery->sum('value');
+        
+        $totalValues[$material] = $disbursedValue + $takenValue;
+    }
+    
+    return $totalValues;
+}
+
     public function getPieCharts($month = null, $year = null)
 {
     $user = auth('user')->user();
@@ -208,9 +237,103 @@ class StatisticsService implements StatisticsServiceInterface {
     
         return $statistics;
     }
+
+
+
+
+    public function getAllCenterStatistics()
+    {
+        $statistics = [
+            'patients' => 0,
+            'dialysisSessions' => 0,
+            'waitingList' => 0,
+            'nurses' => 0,
+            'doctors' => 0,
+            'secretaries' => 0
+        ];
     
+        $statistics['patients'] = GeneralPatientInformation::whereHas('user', function ($query) {
+            $query->whereHas('userCenter');
+        })->where('status', 'accepted')->count();
+    
+        $statistics['dialysisSessions'] = DialysisSession::count();
+    
+        $statistics['waitingList'] = GeneralPatientInformation::whereHas('user', function ($query) {
+            $query->whereHas('userCenter');
+        })->where('status', 'waiting')->count();
+    
+        $statistics['nurses'] = User::where('role', 'nurse')->where('valid', -1)->count();
+    
+        $statistics['doctors'] = User::where('role', 'doctor')->where('valid', -1)->count();
+    
+        $statistics['secretaries'] = User::where('role', 'secretary')->where('valid', -1)->count();
+    
+        return $statistics;
+    }
 
 
+
+
+
+
+
+
+    public function getCterStatistics()
+    {
+        $statistics = MedicalCenter::withCount([
+            'users as doctors_count' => function ($query) {
+                $query->where('role', 'doctor');
+            },
+            'users as nurses_count' => function ($query) {
+                $query->where('role', 'nurse');
+            },
+            'users as secretaries_count' => function ($query) {
+                $query->where('role', 'secretary');
+            },
+            'users as patients_count' => function ($query) {
+                $query->whereHas('generalPatientInformation', function ($subQuery) {
+                    $subQuery->where('status', 'accepted');
+                });
+            },
+            'dialysisSessions_count' => function ($query) {
+                $query->where('valid', 1);
+            },
+            'users as waiting_list_count' => function ($query) {
+                $query->whereHas('generalPatientInformation', function ($subQuery) {
+                    $subQuery->where('status', 'waiting');
+                });
+            }
+        ])->get();
+    
+        $totalDoctors = 0;
+        $totalNurses = 0;
+        $totalSecretaries = 0;
+        $totalPatients = 0;
+        $totalDialysisSessions = 0;
+        $totalWaitingList = 0;
+    
+        foreach ($statistics as $center) {
+            $totalDoctors += $center->doctors_count;
+            $totalNurses += $center->nurses_count;
+            $totalSecretaries += $center->secretaries_count;
+            $totalPatients += $center->patients_count;
+            $totalDialysisSessions += $center->dialysisSessions_count;
+            $totalWaitingList += $center->waiting_list_count;
+        }
+    
+        $totalStatistics = [
+            'totalDoctors' => $totalDoctors,
+            'totalNurses' => $totalNurses,
+            'totalSecretaries' => $totalSecretaries,
+            'totalPatients' => $totalPatients,
+            'totalDialysisSessions' => $totalDialysisSessions,
+            'totalWaitingList' => $totalWaitingList
+        ];
+    
+        return $totalStatistics;
+    }
+    
+    
     }
 
 

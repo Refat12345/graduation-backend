@@ -261,13 +261,13 @@ Route::post('/updateShifts', [UserController::class, 'updateShifts']);
 
 
 
-
+Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatistics']);
 
 $admin = ['admin'];
 Route::middleware(CheckRole::class . ':' . implode(',', $admin))->group(function () {
 
     Route::get('causeRenalFailure', [StatisticsController::class, 'causeRenalFailure']);
-    Route::get('getCenterStatistics', [StatisticsController::class, 'getCenterStatistics']);
+   
 
     Route::post('acceptaddShift', [UserController::class, 'acceptaddShift']);
     Route::post('acceptAddChair', [UserController::class, 'acceptAddChair']);
