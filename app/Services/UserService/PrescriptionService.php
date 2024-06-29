@@ -240,19 +240,13 @@ public function updatePrescription($prescriptionId, array $data)
         ]);
 
         foreach ($validatedData['medicines'] as $medicineData) {
+         
+            $prescription->medicines()->detach($medicineData['id']);
 
-            $medicine = Medicine::findOrFail($medicineData['id']);
+            $newMedicine = Medicine::create([
+                'name' => $medicineData['name'],
+            ]);
 
-            
-       //     $medicine = Medicine::firstOrNew(['name' => $medicineData['name']]);
-
-
-       $newMedicine = Medicine::create([
-                            'name' => $medicineData['name'],
-                        ]);
-
-
-                        $prescription->medicines()->detach($medicine->id);
             $prescription->medicines()->attach($newMedicine->id, [
                 'dateOfStart' => $medicineData['dateOfStart'],
                 'dateOfEnd' => $medicineData['dateOfEnd'],
