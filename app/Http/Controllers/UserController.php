@@ -493,7 +493,7 @@ public function getCenterUsersByRole( $centerId, $role , $pat=null)
 {
     try{
     $staff = $this->userService->getCenterUsersByRole($centerId, $role, $pat);
-    return response()->json([$staff], 200);
+    return response()->json($staff, 200);
 } catch (\Exception $e) {
            
     return response()->json(['error' => $e->getMessage()], 400);
