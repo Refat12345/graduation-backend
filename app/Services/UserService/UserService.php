@@ -1706,21 +1706,14 @@ public function getlogs($centerId)
 
 
 
-
-
 public function getMedicineNames($type)
 {
-    return Medicine::where('type', $type)->get();
+    if ($type === 'global') {
+        return Medicine::where('type', 'global')->distinct()->pluck('name');
+    } else {
+        return Medicine::where('type', $type)->get();
+    }
 }
-
-
-
-
-
-
-
-
-
 
 
 
