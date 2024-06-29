@@ -23,12 +23,9 @@ interface UserServiceInterface
 
 
 
-
-     public function addPatientTransferRequest(array $data);
-     public function addRequestModifyAppointment(array $data);
-     public function getAllRequests();
+     
      public function addGlobalRequest(array $data);
-     public function updateStatus( $requestId, $newStatus);
+    
      public function createUser(array $userData): User;
      public function loginUser(string $nationalNumber, string $password);
   
@@ -139,15 +136,12 @@ interface UserServiceInterface
 
 
 
-public function acceptaddShift($shiftId, $status);
-public function acceptAddChair($chairID, $status);
-public function acceptAddMedicalRecord($medicalRecordID, $status);
-public function acceptAddDisbursedMaterialsUser($disbursedMaterialdID, $status);
-public function acceptPatientInformation($userId, $status);
-public function getAddShiftsRequests($centerId);
-public function getMedicalRecordRequests($centerId);
+
+
+
+
 public function getChairsInCenter($centerId);
-public function getAllPatientInfoRequests($centerId);
+
 
 public function updatePermissionsUser($userId, array $permissionNames);
 

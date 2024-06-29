@@ -115,19 +115,6 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 public function getUserAppointments($userId)
 {
     return Appointment::where('userID', $userId)

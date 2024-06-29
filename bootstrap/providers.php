@@ -10,6 +10,6 @@ return [
     App\Providers\MaterialProvider::class,
     App\Providers\StatisticsProvider::class,
     App\Providers\AppointmentProvider::class,
+ //   App\Providers\RequestsServiceProvider::class,
     App\Providers\RequestsServiceProvider::class,
-    
 ];

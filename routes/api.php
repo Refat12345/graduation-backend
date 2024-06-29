@@ -43,10 +43,13 @@ Route::post('/createMedicalCenter', [UserController::class, 'createMedicalCenter
 
 
 Route::post('/global-requests', [UserController::class, 'createGlobalRequest']);
-Route::post('/patient-transfer-requests', [UserController::class, 'createPatientTransferRequest']);
-Route::post('/modify-appointment-requests', [UserController::class, 'createRequestModifyAppointment']);
-Route::get('/all-requests', [UserController::class, 'getAllRequests']);
 
+
+
+Route::post('/patient-transfer-requests', [RequestController::class, 'createPatientTransferRequest']);
+Route::post('/modify-appointment-requests', [RequestController::class, 'createRequestModifyAppointment']);
+Route::get('/all-requests', [RequestController::class, 'getAllRequests']);
+Route::post('/change-request-status', [RequestController::class, 'changeReruestStatus']);
 
 
 Route::post('/associateUserWithMedicalCenter', [UserController::class, 'associateUserWithMedicalCenter']);
@@ -113,7 +116,7 @@ Route::get('/getPrescriptionsByPatient/{patientID?}', [PrescriptionController::c
 
 Route::get('/getPatientPrescriptions', [PrescriptionController::class, 'getPatientPrescriptions']);
 
-Route::post('/change-request-status', [UserController::class, 'changeReruestStatus']);
+
 
 Route::post('/addPatientInfo', [UserController::class, 'addPatientInfo']);
 
@@ -177,10 +180,10 @@ Route::post('acceptAddMedicalRecord', [UserController::class, 'acceptAddMedicalR
 Route::post('acceptAddDisbursedMaterialsUser', [UserController::class, 'acceptAddDisbursedMaterialsUser']);
 Route::post('acceptPatientInformation', [UserController::class, 'acceptPatientInformation']);
 
-Route::get('getAddShiftsRequests/{centerId}', [UserController::class, 'getAddShiftsRequests']);
-Route::get('getMedicalRecordRequests/{centerId}', [UserController::class, 'getMedicalRecordRequests']);
+Route::get('getAddShiftsRequests/{centerId}', [RequestController::class, 'getAddShiftsRequests']);
+Route::get('getMedicalRecordRequests/{centerId}', [RequestController::class, 'getMedicalRecordRequests']);
 Route::get('getChairsInCenter/{centerId}', [UserController::class, 'getChairsInCenter']);
-Route::get('getAllPatientInfoRequests/{centerId}', [UserController::class, 'getAllPatientInfoRequests']);
+Route::get('getAllPatientInfoRequests/{centerId}', [RequestController::class, 'getAllPatientInfoRequests']);
 
 
 // Route::post('/acceptaddShift', 'UserController@acceptaddShift');
