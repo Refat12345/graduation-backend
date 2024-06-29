@@ -257,6 +257,56 @@ public function getDisbursedMaterialsDetailsForUser($userID) {
 
 
 
+
+
+public function getAllUsersWithDisbursedMaterials() {
+    $users = User::select('id', 'fullName', 'nationalNumber')
+        ->with([
+    
+            'disbursedMaterialsUser.disbursedMaterial',
+            'disbursedMaterialsUser.medicalCenter'
+        ])
+        ->whereHas('disbursedMaterialsUser', function ($query) {
+            $query->where('valid', -1);
+        })
+        ->get();
+
+    $usersWithDisbursedMaterials = $users->map(function ($user) {
+        $disbursedMaterials = $this->getDisbursedMaterialsDetailsForUser($user->id);
+        
+        // فلترة معلومات المستخدم
+        $filteredUserDetails = [
+            'id' => $user->id,
+            'fullName' => $user->fullName,
+            'nationalNumber' => $user->nationalNumber,
+        
+        ];
+
+        return [
+            'userDetails' => $filteredUserDetails,
+            'disbursedMaterials' => $disbursedMaterials
+        ];
+    });
+
+    return $usersWithDisbursedMaterials;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public function getDisbursedMaterialsForCenterInTimeRange($centerID, $startDate = null, $endDate = null) {
     $query = DisbursedMaterialsUser::with(['disbursedMaterial', 'user'])
                                     ->where('centerID', $centerID);

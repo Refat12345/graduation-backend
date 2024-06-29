@@ -90,8 +90,28 @@ public function getDisbursedMaterialsDetailsForUser(Request $request)
  catch (Exception $e) {
     return response()->json(['error' => $e->getMessage()], 400);
 }
+
+
     
 }
+
+public function getAllUsersWithDisbursedMaterials()
+{
+    try {
+
+   $data = $this->service->getAllUsersWithDisbursedMaterials();
+    return response()->json([$data], 200);
+    }
+
+ catch (Exception $e) {
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+
+
+    
+}
+
+
 
 
 public function getMaterialNames()

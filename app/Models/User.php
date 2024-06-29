@@ -282,5 +282,12 @@ public function globalRequests()
 }
 
 
+
+
+public function disbursedMaterialsUser()
+{
+    return $this->hasMany(DisbursedMaterialsUser::class, 'userID', 'id');
+}
+
 }
 
