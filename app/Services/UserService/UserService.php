@@ -1381,7 +1381,7 @@ public function getCenterUsersByRole($centerId, $role, $pat)
         $query->where('role', $role);
     })
     ->when($role === 'all', function ($query) {
-        $query->where('role', '!=', 'patient');
+        $query->whereNotIn('role', ['admin', 'patient', 'superAdmin']);
     })
     ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth') 
     ->with(['telecom' => function ($query) {

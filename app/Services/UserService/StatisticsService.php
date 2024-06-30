@@ -191,7 +191,7 @@ class StatisticsService implements StatisticsServiceInterface {
     $user = auth('user')->user();
     $centerID = $user->userCenter->centerID;
 
-    $causes = ['diabetes', 'heartDiseases', 'bloodPressure'];
+    $causes = ['داء السكري', 'أمراض قلبية', 'ضغط الدم'];
     $totalCounts = [];
 
     foreach ($causes as $cause) {
@@ -221,7 +221,7 @@ class StatisticsService implements StatisticsServiceInterface {
 public function allCauseRenalFailure($centerID)
 {
  
-    $causes = ['diabetes', 'heartDiseases', 'bloodPressure'];
+    $causes = ['داء السكري', 'أمراض قلبية', 'ضغط الدم'];
     $totalCounts = [];
 
     foreach ($causes as $cause) {
@@ -375,10 +375,6 @@ public function allCauseRenalFailure($centerID)
 
 
 
-
-
-
-    
     
     }
 
