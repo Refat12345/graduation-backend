@@ -37,11 +37,11 @@ Route::post('/search', [UserController::class, 'findUser']);
 
 
 
-$admin_superAdmin_secretary = [ 'admin','superAdmin','secretary'];
-Route::middleware(CheckRole::class . ':' . implode(',', $admin_superAdmin_secretary))->group(function () {
+//$admin_superAdmin_secretary = [ 'admin','superAdmin','secretary'];
+//Route::middleware(CheckRole::class . ':' . implode(',', $admin_superAdmin_secretary))->group(function () {
     Route::post('/createUser', 'App\Http\Controllers\UserController@createUser');
  
-});
+//});
 
 
 
@@ -174,22 +174,22 @@ Route::get('getMedicineNames/{type}', [UserController::class, 'getMedicineNames'
 
 
 
-$secretary_doctor = ['secretary','doctor'];
+//$secretary_doctor = ['secretary','doctor'];
 
-Route::middleware(CheckRole::class . ':' . implode(',', $secretary_doctor))->group(function () {
+//Route::middleware(CheckRole::class . ':' . implode(',', $secretary_doctor))->group(function () {
 
 
    
    
    
   
-    $general = ['general'];
-    $record = ['medicalRecord'];
-Route::middleware(CheckPermission::class . ':' . implode(',', $record))->group(function () {
+   // $general = ['general'];
+   // $record = ['medicalRecord'];
+//Route::middleware(CheckPermission::class . ':' . implode(',', $record))->group(function () {
 
 Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
 Route::post('/updateMedicalRecord', [MedicalRecordController::class, 'updateMedicalRecord']);
-});
+//});
 
 
 Route::post('/addSurgicalHistory', [MedicalRecordController::class, 'addSurgicalHistory']);
@@ -201,11 +201,11 @@ Route::post('add-general-patient-info', [UserController::class, 'addGeneralPatie
 Route::post('add-patient-companion', [UserController::class, 'addPatientCompanion']);
 
 
-$analysis = ['analysis'];
-Route::middleware(CheckPermission::class . ':' . implode(',', $analysis))->group(function () {
+//$analysis = ['analysis'];
+//Route::middleware(CheckPermission::class . ':' . implode(',', $analysis))->group(function () {
     Route::post('/updateMedicalAnalysis', [MedicalAnalysisController::class, 'updateMedicalAnalysis']);
     Route::post('/addMedicalAnalysis', [MedicalAnalysisController::class, 'addMedicalAnalysis']);
-}); 
+//}/); 
 
 
 
@@ -219,56 +219,56 @@ Route::post('/addPatientInfo', [UserController::class, 'addPatientInfo']);
 
 
 
-$prescription = ['prescription'];
-Route::middleware(CheckPermission::class . ':' . implode(',', $prescription))->group(function () {
+//$prescription = ['prescription'];
+//Route::middleware(CheckPermission::class . ':' . implode(',', $prescription))->group(function () {
 
 Route::post('/addPrescription', [PrescriptionController::class, 'addPrescription']);
 Route::post('/updatePrescription/{PrescriptionId}', [PrescriptionController::class, 'updatePrescription']);
 
-});
- });
+//});
+// });
 
 
 
 
 
 
-$secretary = ['secretary'];
-Route::middleware(CheckRole::class . ':' . implode(',', $secretary))->group(function () {
+//$secretary = ['secretary'];
+//Route::middleware(CheckRole::class . ':' . implode(',', $secretary))->group(function () {
 
 Route::post('assignMaterialToUserCenter', [DisbursedMaterialController::class, 'assignMaterialToUserCenter']);
 Route::post('/appointments', [AppointmentController::class, 'createAppointment']);
 
-});
+//});
 
 
-$nurse = ['nurse'];
-Route::middleware(CheckRole::class . ':' . implode(',', $nurse))->group(function () {
+//$nurse = ['nurse'];
+//Route::middleware(CheckRole::class . ':' . implode(',', $nurse))->group(function () {
 
     Route::post('/createDialysisSession', [MedicalSessionController::class, 'createDialysisSession']);
 
 
-    $session = ['session'];
-    Route::middleware(CheckPermission::class . ':' . implode(',', $session))->group(function () {
+   // $session = ['session'];
+    //Route::middleware(CheckPermission::class . ':' . implode(',', $session))->group(function () {
     
         Route::post('/updateDialysisSession', [MedicalSessionController::class, 'updateDialysisSession']);
-    });
+  //  });
 
 
 
 
 
 
-});
+//}//);
 
 
 
 
 
 
-$secretary_admin = ['secretary','admin'];
+//$secretary_admin = ['secretary','admin'];
 
-Route::middleware(CheckRole::class . ':' . implode(',', $secretary_admin))->group(function () {
+//Route::middleware(CheckRole::class . ':' . implode(',', $secretary_admin))->group(function () {
 
 Route::get('/getAllUsersWithDisbursedMaterials', [DisbursedMaterialController::class, 'getAllUsersWithDisbursedMaterials']);
 
@@ -286,7 +286,7 @@ Route::post('/updateShifts', [UserController::class, 'updateShifts']);
 
 
 
-});
+//}/);
 
 Route::get('getAllPieCharts/{centerId}/{month?}/{year?}', [StatisticsController::class, 'getAllPieCharts']);
 
@@ -301,8 +301,8 @@ Route::get('allCauseRenalFailure/{centerId}', [StatisticsController::class, 'all
 
 
 
-$admin = ['admin'];
-Route::middleware(CheckRole::class . ':' . implode(',', $admin))->group(function () {
+//$admin = ['admin'];
+//Route::middleware(CheckRole::class . ':' . implode(',', $admin))->group(function () {
 
     Route::get('causeRenalFailure', [StatisticsController::class, 'causeRenalFailure']);
     
@@ -327,7 +327,7 @@ Route::middleware(CheckRole::class . ':' . implode(',', $admin))->group(function
     Route::post('/change-request-status', [RequestController::class, 'changeReruestStatus']);
     
 Route::post('/patient-transfer-requests', [RequestController::class, 'createPatientTransferRequest']);
-});
+//});
 Route::get('getUserPermissions/{userId}', [UserController::class, 'getUserPermissions']);
 
 
