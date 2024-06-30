@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->append(EnsureFrontendRequestsAreStateful::class);
       // $middleware->append(CheckRole::class);
-        $middleware->append(CheckPermission::class);
+       // $middleware->append(CheckPermission::class);
      $middleware->append(CorsMiddleware::class);
       // App\Http\Middleware\CorsMiddleware::class,
     })

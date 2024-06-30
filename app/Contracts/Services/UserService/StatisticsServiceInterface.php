@@ -18,7 +18,7 @@ interface StatisticsServiceInterface
     public function getPieCharts($month, $year);
     public function causeRenalFailure();
     public function getCenterStatistics();
-
+    public function AllCauseRenalFailure($centerID);
 
 
 

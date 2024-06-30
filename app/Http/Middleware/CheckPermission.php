@@ -29,17 +29,26 @@ class CheckPermission
 
     public function handle($request, Closure $next, ...$permissions)
     {
+
+       
+      //  $user = $request->user();
+        $user=  auth('user')->user();
+        if ($user->role == 'secretary') {
+          
         $hasPermission = false;
         foreach ($permissions as $permission) {
-            if ($request->user() && $request->user()->permissions->contains('permissionName', $permission)) {
+            if (!$user->permissions->contains('permissionName', $permission)) {
+               
                 $hasPermission = true;
                 break; 
             }
         }
 
         if ($hasPermission) {
-            return response()->json(['error' => 'You do not have permission to perform this action'], 403);
+            return response()->json(['error' => 'You do not have permission'], 403);
         }
+
+    }
         return $next($request);
     }
 }

@@ -1965,7 +1965,7 @@ public function updateUser($id, array $userData): User
     DB::beginTransaction();
     try {
         $user = User::findOrFail($id);
-
+        $oldData = $user->toArray();
         $validator = Validator::make($userData, [
             'fullName' => 'sometimes|string|max:255',
        'nationalNumber' => 'sometimes|string|max:11|unique:users,nationalNumber,' . $user->id,
@@ -2028,7 +2028,20 @@ public function updateUser($id, array $userData): User
         // if (isset($userData['role']) && $userData['role'] === 'secretary' && isset($userData['permissionNames'])) {
         //     $this->updatePermissionsToUser($user->id, $userData['permissionNames']);
         // }
+        // Capture new data
+        $newData = $user->fresh()->toArray();
 
+        // Create logging record
+        Logging::create([
+            'operation' => 'update',
+            'destinationOfOperation' => 'User',
+            'oldData' => json_encode($oldData),
+            'newData' => json_encode($newData),
+            'affectedUserID' => $user->id,
+            'affectorUserID' => auth('user')->id(),
+            'sessionID' => null, // or provide the session ID if available
+            'valid' => -1
+        ]);
         DB::commit();
 
         return $user;
