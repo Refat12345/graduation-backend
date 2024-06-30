@@ -57,11 +57,7 @@ use App\Models\Requests;
        try{
         $result = $this->requestsService->addPatientTransferRequest($request->all());
 
-        if ($result instanceof PatientTransferRequest) {
-            return response()->json([$result], 200);
-        }
-
-        return response()->json([$result], 400);
+        return response()->json([$result], 200);
         } catch (\Exception $e) {
            
         return response()->json(['error' => $e->getMessage()], 400);

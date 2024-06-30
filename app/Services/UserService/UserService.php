@@ -1080,7 +1080,7 @@ public function getAllMedicalCenters()
 
      $globalRequestData = [
         'operation' => 'اضافة كرسي',
-        'requestable_id' => $user->id,
+        'requestable_id' => $chair->id,
         'requestable_type' => Chair::class,
         'requestStatus' => 'pending',
         'cause' => '.'
@@ -1773,7 +1773,6 @@ public function getMedicineNames($type)
 
 
 
-
 ////////////////////////// accept ///////////////////////
 
 // public function acceptAddUser($userId)
@@ -1981,7 +1980,7 @@ public function updateUser($id, array $userData): User
             'fullName' => 'sometimes|string|max:255',
             'nationalNumber' => 'sometimes|string|max:11|unique:users,nationalNumber,' . $user->id,
             'dateOfBirth' => 'sometimes|date',
-            'gender' => 'sometimes|in:male,female,other',
+            'gender' => 'sometimes|string',
             'role' => 'sometimes|string|max:255',
             'telecom' => 'sometimes|array',
             'telecom.*.system' => 'sometimes|string|max:255',

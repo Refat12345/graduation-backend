@@ -335,7 +335,7 @@ public function associateUserWithMyMedicalCenter(Request $request)
     public function getCenterUnAcceptedPatients($centerId){
         try{
             $staff = $this->userService->getCenterUnAcceptedPatients($centerId);
-            return response()->json([$staff], 200);
+            return response()->json(['patients' =>$staff], 200);
         }catch (\Exception $e) {
                
             return response()->json(['error' => $e->getMessage()], 400);
