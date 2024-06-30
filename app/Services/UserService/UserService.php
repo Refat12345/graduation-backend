@@ -1385,7 +1385,7 @@ public function getCenterUsersByRole($centerId, $role, $pat)
     })
     ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth') 
     ->with(['telecom' => function ($query) {
-        $query->where('system', 'phone') 
+        $query->where('system', 'موبايل') 
               ->select('userID', 'value');
     }, 'address.city' => function ($query) {
         $query->select('id', 'cityName');
@@ -1415,7 +1415,7 @@ public function getCenterDoctors($centerId)
         })
         ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth')
         ->with(['telecom' => function ($query) {
-            $query->where('system', 'phone')
+            $query->where('system', 'موبايل')
                   ->select('userID', 'value');
         }, 'address.city' => function ($query) {
             $query->select('id', 'cityName');
@@ -2132,9 +2132,9 @@ public function getPatientsByCenter($centerID)
                 })
                 ->where('role', 'patient')
                 ->with(['patientCompanions.telecoms' => function ($query) {
-                    $query->where('system', 'phone');
+                    $query->where('system', 'موبايل');
                 }, 'telecom' => function ($query) {
-                    $query->where('system', 'phone');
+                    $query->where('system', 'موبايل');
                 }, 'address.city.country'])
                 ->get();
 
@@ -2152,10 +2152,10 @@ public function getPatientsByCenter($centerID)
         if ($patient->patientCompanions->isNotEmpty()) {
             $companion = $patient->patientCompanions->first();
             $companionName = $companion->fullName;
-            $companionPhone = $companion->telecoms->where('system', 'phone')->first()->value ?? null;
+            $companionPhone = $companion->telecoms->where('system', 'موبايل')->first()->value ?? null;
         }
 
-        $phone = $patient->telecom->where('system', 'phone')->first()->value ?? null;
+        $phone = $patient->telecom->where('system', 'موبايل')->first()->value ?? null;
 
         $formattedPatients[] = [
             'fullName' => $patient->fullName,

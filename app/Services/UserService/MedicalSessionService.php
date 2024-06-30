@@ -70,7 +70,7 @@ class MedicalSessionService implements MedicalSessionServiceInterface
             'filterType' => 'required|string|max:255',
             'vascularConnection' => 'required|string|max:255',
             'naConcentration' => 'required|numeric|min:0',
-            'venousPressure' => 'required|integer|min:0',
+            'venousPressure' => 'required|numeric|min:0',
             'status' => 'required|string|max:255',
             'sessionDate' => 'required|date',
             'patientID' => 'nullable|exists:users,id',
