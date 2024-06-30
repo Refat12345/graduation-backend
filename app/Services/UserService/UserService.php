@@ -913,11 +913,11 @@ public function addMedicalCenterWithUser(array $centerData)
         'telecom.*.system' => 'required|string|max:255',
         'telecom.*.value' => 'required|string|max:255',
         'telecom.*.use' => 'required|string|max:255',
-        'address' => 'required|array',
-        'address.use' => 'required|string|max:255',
-        'address.line' => 'required|string',
-        'address.cityName' => 'required|string|max:255',
-        'address.countryName' => 'required|string|max:255',
+        // 'address' => 'required|array',
+        // 'address.*.use' => 'required|string|max:255',
+        // 'address.*.line' => 'required|string',
+        // 'address.*.cityName' => 'required|string|max:255',
+        // 'address.*.countryName' => 'required|string|max:255',
        
     ]);
 
@@ -947,7 +947,7 @@ public function addMedicalCenterWithUser(array $centerData)
         }
 
        
-        $this->createCenterAddress($medicalCenter, $centerData['address']);
+       // $this->createCenterAddress($medicalCenter, $centerData['address']);
 
         UserCenter::create([
             'userID' => $user->id,
@@ -2256,6 +2256,25 @@ public function updatePatientInfo($patientId, array $data)
     });
 
     return 'تم تعديل معلومات المستخدم';
+}
+
+
+public function getCenterUnAcceptedPatients($centerId){
+
+    return User::when($centerId != 0, function ($query) use ($centerId) {
+        $query->whereHas('userCenter', function ($subQuery) use ($centerId) {
+            $subQuery->where('centerID', $centerId);
+        });
+    })
+    ->where('role', 'patient')->doesnthave('generalPatientInformation')
+    ->get()
+    ->map(function ($user) {
+        $user->contactNumber = $user->telecom->pluck('value')->first() ?? null; 
+        $user->city = $user->address->first()->city->cityName ?? null;
+        $user->age = Carbon::parse($user->dateOfBirth)->age; 
+        unset($user->telecom, $user->address, $user->dateOfBirth);
+        return $user;
+    });
 }
 
 

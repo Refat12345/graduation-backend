@@ -104,7 +104,7 @@ interface UserServiceInterface
     public function assignUserToShift(array $data);
     public function getShiftsByCenter($centerId);
     public function getDoctorsInShift($shiftId);
-
+    public function getCenterUnAcceptedPatients($centerId);
 
  
     public function getCenterUsersByRole($centerId, $role ,$pat);

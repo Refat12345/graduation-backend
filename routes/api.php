@@ -77,7 +77,7 @@ Route::post('/modify-appointment-requests', [RequestController::class, 'createRe
 
 
 
-
+Route::get('/getCenterUnAcceptedPatients/{centerId}', [UserController::class, 'getCenterUnAcceptedPatients']);
 
 
 

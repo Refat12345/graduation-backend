@@ -78,7 +78,7 @@ class MedicalAnalysisService implements MedicalAnalysisServiceInterface
         $validator = Validator::make($MedicalAnalysisData, [
             'averageMin' => 'required|numeric',
             'averageMax' => 'required|numeric',
-            'value' => 'required|numeric',
+            'value' => 'required|string',
             'analysisDate' => 'required|date',
             'notes' => 'required|string|max:255',
             'analysisTypeID' => 'required|integer|exists:analysis_types,id',

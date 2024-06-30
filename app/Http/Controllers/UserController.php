@@ -330,6 +330,17 @@ public function associateUserWithMyMedicalCenter(Request $request)
         return response()->json(['error' => $e->getMessage()], 400);
     }
     }
+
+
+    public function getCenterUnAcceptedPatients($centerId){
+        try{
+            $staff = $this->userService->getCenterUnAcceptedPatients($centerId);
+            return response()->json([$staff], 200);
+        }catch (\Exception $e) {
+               
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
     
 
 
