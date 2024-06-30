@@ -183,8 +183,8 @@ Route::middleware(CheckRole::class . ':' . implode(',', $secretary_doctor))->gro
    
    
   
-    $general = ['إدارة المعلومات العامة'];
-    $record = ['إدارة السجل الطبي'];
+    $general = ['general'];
+    $record = ['medicalRecord'];
 Route::middleware(CheckPermission::class . ':' . implode(',', $record))->group(function () {
 
 Route::post('/createMedicalRecord', [MedicalRecordController::class, 'createMedicalRecord']);
@@ -201,7 +201,7 @@ Route::post('add-general-patient-info', [UserController::class, 'addGeneralPatie
 Route::post('add-patient-companion', [UserController::class, 'addPatientCompanion']);
 
 
-$analysis = ['إدارة التحاليل الطبية'];
+$analysis = ['analysis'];
 Route::middleware(CheckPermission::class . ':' . implode(',', $analysis))->group(function () {
     Route::post('/updateMedicalAnalysis', [MedicalAnalysisController::class, 'updateMedicalAnalysis']);
     Route::post('/addMedicalAnalysis', [MedicalAnalysisController::class, 'addMedicalAnalysis']);
@@ -219,7 +219,7 @@ Route::post('/addPatientInfo', [UserController::class, 'addPatientInfo']);
 
 
 
-$prescription = ['إدارة الوصفات الطبية'];
+$prescription = ['prescription'];
 Route::middleware(CheckPermission::class . ':' . implode(',', $prescription))->group(function () {
 
 Route::post('/addPrescription', [PrescriptionController::class, 'addPrescription']);
@@ -248,7 +248,7 @@ Route::middleware(CheckRole::class . ':' . implode(',', $nurse))->group(function
     Route::post('/createDialysisSession', [MedicalSessionController::class, 'createDialysisSession']);
 
 
-    $session = ['إدارة جلسات الغسيل'];
+    $session = ['session'];
     Route::middleware(CheckPermission::class . ':' . implode(',', $session))->group(function () {
     
         Route::post('/updateDialysisSession', [MedicalSessionController::class, 'updateDialysisSession']);

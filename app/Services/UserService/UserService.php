@@ -1964,12 +1964,17 @@ public function updateUser($id, array $userData): User
 {
     DB::beginTransaction();
     try {
+       // $user = auth('user')->user();
+        $oldData = $this->getUserDetails($id);
         $user = User::findOrFail($id);
         $oldData = $user->toArray();
+        
+        // تسجيل البيانات المدخلة
+        $inputData = json_encode($userData);
+
         $validator = Validator::make($userData, [
             'fullName' => 'sometimes|string|max:255',
-       'nationalNumber' => 'sometimes|string|max:11|unique:users,nationalNumber,' . $user->id,
-
+            'nationalNumber' => 'sometimes|string|max:11|unique:users,nationalNumber,' . $user->id,
             'dateOfBirth' => 'sometimes|date',
             'gender' => 'sometimes|in:male,female,other',
             'role' => 'sometimes|string|max:255',
@@ -2007,27 +2012,20 @@ public function updateUser($id, array $userData): User
                 $address = Address::findOrFail($addressData['id']);
                 if ($address->userID === $user->id) {
                     $address->update($addressData);
-                $address->city->cityName = $addressData['cityName'];
-                $address->city->country->countryName = $addressData['countryName'];
-                $address->city->save();
-                $address->city->country->save();
-
-
+                    $address->city->cityName = $addressData['cityName'];
+                    $address->city->country->countryName = $addressData['countryName'];
+                    $address->city->save();
+                    $address->city->country->save();
                 } else {
                     throw new LogicException('Address ID does not belong to the given user.');
                 }
             }
         }
 
-                if (isset($userData['role']) && $userData['role'] === 'secretary' && isset($userData['permissionNames'])) {
+        if (isset($userData['role']) && $userData['role'] === 'secretary' && isset($userData['permissionNames'])) {
             $this->updatePermissionsToUser($user->id, $userData['permissionNames']);
         }
 
-
-
-        // if (isset($userData['role']) && $userData['role'] === 'secretary' && isset($userData['permissionNames'])) {
-        //     $this->updatePermissionsToUser($user->id, $userData['permissionNames']);
-        // }
         // Capture new data
         $newData = $user->fresh()->toArray();
 
@@ -2036,7 +2034,8 @@ public function updateUser($id, array $userData): User
             'operation' => 'update',
             'destinationOfOperation' => 'User',
             'oldData' => json_encode($oldData),
-            'newData' => json_encode($newData),
+            'newData' => json_encode($inputData),
+           // 'oldData' => $inputData, // تسجيل البيانات المدخلة
             'affectedUserID' => $user->id,
             'affectorUserID' => auth('user')->id(),
             'sessionID' => null, // or provide the session ID if available
@@ -2050,6 +2049,7 @@ public function updateUser($id, array $userData): User
         throw new LogicException('Error updating user: ' . $e->getMessage());
     }
 }
+
 
 
 
