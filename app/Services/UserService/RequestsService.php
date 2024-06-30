@@ -117,7 +117,7 @@ class RequestsService implements RequestsServiceInterface{
                            break;
 
                        case 'User':
-                           $processedRequest['content'] = "تم اضافة المستخدم " . $requestable->fullName;
+                           $processedRequest['content'] = "تم اضافة المستخدم ". $requestable->fullName;
                            break;
 
                        case 'DisbursedMaterialsUser':
