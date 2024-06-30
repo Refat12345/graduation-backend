@@ -538,14 +538,20 @@ public function getNurseDialysisSessions($sessionStatus, $day = null, $month = n
     $dialysisSessions = $query->get()
         ->map(function ($appointment) {
 
-            $sessionStartTime = Carbon::parse($appointment->session->sessionStartTime);
-            $sessionEndTime = Carbon::parse($appointment->session->sessionEndTime);
+            $sessionStartTime = Carbon::parse($appointment->start);
+           $u=0;
+           if($appointment->nurse->id === $user->id)
+           {
+            $u=1;
+            
+           } 
+          
             return [
-                'id' => $appointment->session->id,
-                'patientName' => $appointment->session->patient->fullName,
-                'nurseName' => $appointment->session->nurse->fullName,
-                'sessionStartTime' => $sessionStartTime->format('h:i:s'),
-                'sessionEndTime' => $sessionEndTime->format('h:i:s'),
+                'id' => $appointment->id,
+                'patientName' => $appointment->user->fullName,
+                'nurseName' => $appointment->nurse->fullName,
+                'startTime' => $sessionStartTime->format('h:i:s'),
+                'isMe' => $u,
                 'chair' => $appointment->chair->chairNumber,
                 'roomName' => $appointment->chair->roomName,
                 'sessionStatus' => $appointment->valid 

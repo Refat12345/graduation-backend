@@ -134,7 +134,7 @@ class UserService implements UserServiceInterface
        //  'password' => 'required|string|min:8',
          'nationalNumber' => 'required|string|max:11|unique:users',
          'dateOfBirth' => 'required|date',
-         'gender' => 'required|in:male,female,other',
+         'gender' => 'required|string',
        //  'accountStatus' => 'required|string|max:255',
          'role' => 'required|string|max:255',
          'telecom' => 'required|array',
@@ -168,7 +168,9 @@ class UserService implements UserServiceInterface
 
         }
 
-         $userData['verificationCode'] = rand(100000, 999999);
+         $userData['verificationCode'] = 
+         
+         rand(100000, 999999);
         // $userData['password'] = Hash::make($userData['password']);
          $user = User::create($userData);
        
@@ -615,7 +617,7 @@ public function verifyAccount(string $verificationCode, string $password)
     }
 
     if ($user->valid != -1) {
-        throw new LogicException('الحساب لم ');
+        throw new LogicException('الحساب لم يوافق عليه بعد');
     }
 
     $hashedPassword = Hash::make($password);
@@ -1385,7 +1387,7 @@ public function getCenterUsersByRole($centerId, $role, $pat)
     })
     ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth') 
     ->with(['telecom' => function ($query) {
-        $query->where('system', 'موبايل') 
+        $query->where('system', 'الهاتف') 
               ->select('userID', 'value');
     }, 'address.city' => function ($query) {
         $query->select('id', 'cityName');
@@ -1405,6 +1407,9 @@ public function getCenterUsersByRole($centerId, $role, $pat)
     });
 }
 
+
+
+
 public function getCenterDoctors($centerId)
 {
     return User::where('role', 'doctor')
@@ -1415,7 +1420,7 @@ public function getCenterDoctors($centerId)
         })
         ->select('id', 'fullName', 'accountStatus', 'gender', 'role', 'dateOfBirth')
         ->with(['telecom' => function ($query) {
-            $query->where('system', 'موبايل')
+            $query->where('system', 'الهاتف')
                   ->select('userID', 'value');
         }, 'address.city' => function ($query) {
             $query->select('id', 'cityName');
@@ -2132,9 +2137,9 @@ public function getPatientsByCenter($centerID)
                 })
                 ->where('role', 'patient')
                 ->with(['patientCompanions.telecoms' => function ($query) {
-                    $query->where('system', 'موبايل');
+                    $query->where('system', 'الهاتف');
                 }, 'telecom' => function ($query) {
-                    $query->where('system', 'موبايل');
+                    $query->where('system', 'الهاتف');
                 }, 'address.city.country'])
                 ->get();
 
@@ -2152,10 +2157,10 @@ public function getPatientsByCenter($centerID)
         if ($patient->patientCompanions->isNotEmpty()) {
             $companion = $patient->patientCompanions->first();
             $companionName = $companion->fullName;
-            $companionPhone = $companion->telecoms->where('system', 'موبايل')->first()->value ?? null;
+            $companionPhone = $companion->telecoms->where('system', 'الهاتف')->first()->value ?? null;
         }
 
-        $phone = $patient->telecom->where('system', 'موبايل')->first()->value ?? null;
+        $phone = $patient->telecom->where('system', 'الهاتف')->first()->value ?? null;
 
         $formattedPatients[] = [
             'fullName' => $patient->fullName,
