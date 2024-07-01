@@ -289,7 +289,7 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
     public function getMedicalRecordWithDetails($userID)
     {
         $medicalRecord = MedicalRecord::with(['allergicConditions', 'pathologicalHistories', 'pharmacologicalHistories', 'surgicalHistories'])
-                                      ->where('userID', $userID)->first();
+                                      ->where('userID', $userID)->where('valid', -1)->first();
     
         if (!$medicalRecord) {
             return 'لا يوجد سجل طبي لهذاالمريض';

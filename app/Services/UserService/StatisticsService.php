@@ -241,7 +241,7 @@ public function allCauseRenalFailure($centerID)
         $query->whereNotIn('causeRenalFailure', $causes);
         if ($centerID != 0) {
             $query->whereHas('user.userCenter', function ($query) use ($centerID) {
-                $query->where('centerID', $centerID);
+                $query->where('centerID', $centerID)->where('valid', -1);
             });
         }
     })->count();
