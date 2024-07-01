@@ -100,7 +100,7 @@ public function getAllUsersWithDisbursedMaterials()
     try {
 
    $data = $this->service->getAllUsersWithDisbursedMaterials();
-    return response()->json([$data], 200);
+    return response()->json(['data' => $data], 200);
     }
 
  catch (Exception $e) {
