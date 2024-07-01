@@ -93,6 +93,8 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
                       ->get()
                       ->map(function ($appointment) {
                         $user=  auth('user')->user();
+
+                        $u=0;
                         if($appointment->nurse->id === $user->id)
                         {
                          $u=1;
