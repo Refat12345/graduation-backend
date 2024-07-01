@@ -86,37 +86,29 @@ class AppointmentService implements AppointmentServiceInterface
 public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
 {
     return Appointment::where('centerID', $centerId)
-                      ->whereYear('appointmentTimeStamp', $year)
-                      ->whereMonth('appointmentTimeStamp', $month)
-                      ->whereDay('appointmentTimeStamp', $day)
-                      ->with(['shift', 'chair', 'user','nurse'])
-                      ->get()
-                      ->map(function ($appointment) {
+                    ->whereYear('appointmentTimeStamp', $year)
+                    ->whereMonth('appointmentTimeStamp', $month)
+                    ->whereDay('appointmentTimeStamp', $day)
+                    ->with(['shift', 'chair', 'user','nurse'])
+                    ->get()
+                    ->map(function ($appointment) {
                         $user=  auth('user')->user();
-
-                        $u=0;
-                        if($appointment->nurse->id === $user->id)
-                        {
-                         $u=1;
-                        }
                         $appointmentTime = Carbon::parse($appointment->appointmentTimeStamp)->format('H:i');
                     
-                          return [
-
+                        return [
                             'id' => $appointment->id,
                             'patientId' => $appointment->user->id,
-                              'patientName' => $appointment->user->fullName,
-                              'nurseName' => $appointment->nurse->fullName,
-                              'roomName' => $appointment->chair->roomName,
-                              'chair' => $appointment->chair->chairNumber,
-                              'appointmentTime' => $appointmentTime,
-                              'startTime' => $appointment->start,
-                              'valid' => $appointment->valid,
-                              'sessionID' => $appointment->sessionID,
-                              
-                              'isMe' => $u,
-                          ];
-                      });
+                            'patientName' => $appointment->user->fullName,
+                            'nurseName' => $appointment->nurse->fullName,
+                            'roomName' => $appointment->chair->roomName,
+                            'chair' => $appointment->chair->chairNumber,
+                            'appointmentTime' => $appointmentTime,
+                            'startTime' => $appointment->start,
+                            'valid' => $appointment->valid,
+                            'sessionID' => $appointment->sessionID,
+                            'nurseId' => $appointment->nurse->id,
+                        ];
+                    });
 }
 
 
