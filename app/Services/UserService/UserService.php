@@ -1885,7 +1885,7 @@ public function changeAccountStatus(User $user, string $newStatus)
 
 public function getChairsInCenter($centerId)
 {
-    $chairs = Chair::where('centerID', $centerId)->get();
+    $chairs = Chair::where('centerID', $centerId)->where('valid', -1)->get();
     return $chairs;
 }
 
