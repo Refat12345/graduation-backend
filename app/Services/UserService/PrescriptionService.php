@@ -136,19 +136,25 @@ class PrescriptionService implements PrescriptionServiceInterface
 
 public function getAllPrescriptionsForUser($userId) {
     $prescriptions = Prescription::where('patientID', $userId)->with(['medicines', 'doctor'])->get();
-
+    
     return $prescriptions->map(function ($prescription) {
         return [
-            'prescriptionID' => $prescription->id ,
-            'doctor' => $prescription->doctor->fullName ,
+            'prescriptionID' => $prescription->id,
+            'doctor' => $prescription->doctor->fullName,
             'medicines' => $prescription->medicines->map(function ($medicine) {
+                $currentDate = Carbon::now();
+                $dateOfStart = Carbon::parse($medicine->pivot->dateOfStart);
+                $dateOfEnd = Carbon::parse($medicine->pivot->dateOfEnd);
+
+                $status = ($currentDate->greaterThanOrEqualTo($dateOfStart) && $currentDate->lessThanOrEqualTo($dateOfEnd)) ? 'active' : 'nonActive';
+
                 return [
                     'id' => $medicine->id,
-                    'status' => $medicine->pivot->status,
+                    'status' => $status,
                     'name' => $medicine->name,
-                    'titer'=> $medicine->titer,
-                    'dateOfStart' => Carbon::parse($medicine->pivot->dateOfStart)->format('Y-m-d'),
-                    'dateOfEnd' => Carbon::parse($medicine->pivot->dateOfEnd)->format('Y-m-d'),
+                    'titer' => $medicine->titer,
+                    'dateOfStart' => $dateOfStart->format('Y-m-d'),
+                    'dateOfEnd' => $dateOfEnd->format('Y-m-d'),
                     'details' => $medicine->pivot->details
                 ];
             })
