@@ -83,7 +83,6 @@ class AppointmentService implements AppointmentServiceInterface
                       ->get();
 }
 
-
 public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
 {
     return Appointment::where('centerID', $centerId)
@@ -93,9 +92,13 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
                       ->with(['shift', 'chair', 'user','nurse'])
                       ->get()
                       ->map(function ($appointment) {
-                        
+                        $user=  auth('user')->user();
+                        if($appointment->nurse->id === $user->id)
+                        {
+                         $u=1;
+                        }
                         $appointmentTime = Carbon::parse($appointment->appointmentTimeStamp)->format('H:i');
-                        
+                    
                           return [
 
                             'id' => $appointment->id,
@@ -109,6 +112,7 @@ public function getAppointmentsByCenterAndDate($centerId, $year, $month, $day)
                               'valid' => $appointment->valid,
                               'sessionID' => $appointment->sessionID,
                               
+                              'isMe' => $u,
                           ];
                       });
 }

@@ -26,6 +26,7 @@ use App\Models\Chair;
 use App\Models\UserShift;
 use App\Models\DialysisSession;
 use App\Models\Note;
+use App\Models\Logging;
 use App\Models\Medicine;
 use App\Models\MedicineTaken;
 use App\Models\BloodPressureMeasurement;
@@ -344,8 +345,8 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
 
  public function updateMedicalRecord($id, array $MedicalRecordData)
  {
-     $MedicalRecord = MedicalRecord::findOrFail($id);
- 
+    // $MedicalRecord = MedicalRecord::findOrFail($id);
+     $MedicalRecord = MedicalRecord::with(['pathologicalHistories', 'pharmacologicalHistories', 'surgicalHistories'])->findOrFail($id);
      $validator = Validator::make($MedicalRecordData, [
          'dialysisStartDate' => 'sometimes|date',
          'dryWeight' => 'sometimes|numeric',
@@ -363,6 +364,8 @@ class MedicalRecordService  implements MedicalRecordServiceInterface
  
      DB::beginTransaction();
      try {
+        $this->logChanges($MedicalRecord, $MedicalRecordData, 'MedicalRecord');
+
          $MedicalRecord->update($MedicalRecordData);
  
          $allAllergicConditionsData = request()->input('allergicConditions');
@@ -438,6 +441,8 @@ public function updatePathologicalHistory(array $PathologicalHistoryData)
     }
 
     $PathologicalHistory = PathologicalHistory::findOrFail($PathologicalHistoryData['id']);
+
+    $this->logChanges($PathologicalHistory, $PathologicalHistoryData, 'PathologicalHistory');
     $PathologicalHistory->update($PathologicalHistoryData);
     return $PathologicalHistory;
 }
@@ -462,6 +467,9 @@ public function updatePharmacologicalHistory(array $PharmacologicalHistoryData)
     }
 
     $PharmacologicalHistory = PharmacologicalHistory::findOrFail($PharmacologicalHistoryData['id']);
+
+    $this->logChanges($PharmacologicalHistory, $PharmacologicalHistoryData, 'PharmacologicalHistory');
+
     $PharmacologicalHistory->update($PharmacologicalHistoryData);
     return $PharmacologicalHistory;
 }
@@ -485,6 +493,9 @@ public function updateSurgicalHistory(array $SurgicalHistoryData)
     }
 
     $SurgicalHistory = SurgicalHistory::findOrFail($SurgicalHistoryData['id']);
+
+    $this->logChanges($SurgicalHistory, $SurgicalHistoryData, 'SurgicalHistory');
+
     $SurgicalHistory->update($SurgicalHistoryData);
     return $SurgicalHistory;
 }
@@ -493,6 +504,23 @@ public function updateSurgicalHistory(array $SurgicalHistoryData)
 
 
 
+private function logChanges($oldData, $newData, $type)
+{
+    foreach ($newData as $key => $value) {
+        if ($oldData->$key != $value) {
+            Logging::create([
+                'operation' => 'update',
+                'destinationOfOperation' => $type,
+                'oldData' => json_encode([$key => $oldData->$key]),
+                'newData' => json_encode([$key => $value]),
+                'affectedUserID' => $oldData->userID,
+                'affectorUserID' => auth('user')->id(),
+                'sessionID' => null,
+                'valid' => -1
+            ]);
+        }
+    }
+}
 
 
 
