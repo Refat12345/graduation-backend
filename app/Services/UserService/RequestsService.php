@@ -125,7 +125,7 @@ class RequestsService implements RequestsServiceInterface{
                            break;
 
                            case 'GeneralPatientInformation':
-                               $processedRequest['content'] = " تم اضافة معلومات الحالة الاحتماعية للمريض" . $requestable->user->fullName;
+                               $processedRequest['content'] = " تم اضافة معلومات الحالة الاجتماعية للمريض " . $requestable->user->fullName;
                                break;
                    }
 
