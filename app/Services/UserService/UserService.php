@@ -911,11 +911,12 @@ public function addMedicalCenterWithUser(array $centerData)
         'telecom.*.system' => 'required|string|max:255',
         'telecom.*.value' => 'required|string|max:255',
         'telecom.*.use' => 'required|string|max:255',
-        'address' => 'required|array',
-        'address.use' => 'required|string|max:255',
-        'address.line' => 'required|string',
-        'address.cityName' => 'required|string|max:255',
-        'address.countryName' => 'required|string|max:255',
+         'address' => 'required|array',
+          'address.*.use' => 'required|string|max:255',
+          'address.*.line' => 'required|string',
+         'address.*.cityName' => 'required|string|max:255',
+        'address.*.countryName' => 'required|string|max:255',
+       
     ]);
 
     if ($validator->fails()) {
@@ -930,18 +931,20 @@ public function addMedicalCenterWithUser(array $centerData)
         if (!$medicalCenter) {
             throw new LogicException('No medical center associated with the user.');
         }
+   
 
         $medicalCenter->update([
-            'centerName' => $centerData['centerName'],
-            'description' => $centerData['description'],
-            'charityName' => $centerData['charityName'] ?? null,
-        ]);
+                'centerName' => $centerData['centerName'],
+                'description' => $centerData['description'],
+                'charityName' => $centerData['charityName'] ?? null,
+            ]);
 
         foreach ($centerData['telecom'] as $telecom) {
             $telecom['centerID'] = $medicalCenter->id;
             Telecom::create($telecom);
         }
 
+       
         $this->createCenterAddress($medicalCenter, $centerData['address']);
 
         UserCenter::create([
