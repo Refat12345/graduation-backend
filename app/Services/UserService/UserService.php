@@ -911,12 +911,11 @@ public function addMedicalCenterWithUser(array $centerData)
         'telecom.*.system' => 'required|string|max:255',
         'telecom.*.value' => 'required|string|max:255',
         'telecom.*.use' => 'required|string|max:255',
-         'address' => 'required|array',
-          'address.*.use' => 'required|string|max:255',
-          'address.*.line' => 'required|string',
-         'address.*.cityName' => 'required|string|max:255',
-        'address.*.countryName' => 'required|string|max:255',
-       
+        'address' => 'required|array',
+        'address.use' => 'required|string|max:255',
+        'address.line' => 'required|string',
+        'address.cityName' => 'required|string|max:255',
+        'address.countryName' => 'required|string|max:255',
     ]);
 
     if ($validator->fails()) {
@@ -931,20 +930,18 @@ public function addMedicalCenterWithUser(array $centerData)
         if (!$medicalCenter) {
             throw new LogicException('No medical center associated with the user.');
         }
-   
 
         $medicalCenter->update([
-                'centerName' => $centerData['centerName'],
-                'description' => $centerData['description'],
-                'charityName' => $centerData['charityName'] ?? null,
-            ]);
+            'centerName' => $centerData['centerName'],
+            'description' => $centerData['description'],
+            'charityName' => $centerData['charityName'] ?? null,
+        ]);
 
         foreach ($centerData['telecom'] as $telecom) {
             $telecom['centerID'] = $medicalCenter->id;
             Telecom::create($telecom);
         }
 
-       
         $this->createCenterAddress($medicalCenter, $centerData['address']);
 
         UserCenter::create([
@@ -959,6 +956,7 @@ public function addMedicalCenterWithUser(array $centerData)
         throw new LogicException('Error creating medical center: ' . $e->getMessage());
     }
 }
+
 
 
 
@@ -1139,10 +1137,10 @@ public function addShift(array $data)
 {
     $validatedData = Validator::make($data, [
        
-        'centerID' => 'required|integer|exists:medical_centers,id',
-        'shiftStart' => 'required|date_format:H:i', 
-        'shiftEnd' => 'required|date_format:H:i|after:shiftStart', 
-        'name' => 'required|string|max:255',
+    'centerID' => 'required|integer|exists:medical_centers,id',
+    'shiftStart' => 'required|date_format:H:i', 
+    'shiftEnd' => 'required|date_format:H:i|after:shiftStart', 
+    'name' => 'required|string|max:255',
     ])->validate();
 
   //  $user = auth('user')->user();
@@ -1971,13 +1969,12 @@ public function updateUser($id, array $userData): User
         $user = User::findOrFail($id);
         $oldData = $user->toArray();
         
-        // تسجيل البيانات المدخلة
         $inputData = json_encode($userData);
 
         $validator = Validator::make($userData, [
             'fullName' => 'sometimes|string|max:255',
             'nationalNumber' => 'sometimes|string|max:11|unique:users,nationalNumber,' . $user->id,
-            'dateOfBirth' => 'sometimes|date',
+            'dateOfBirth' => 'sometimes',
             'gender' => 'sometimes|string',
             'role' => 'sometimes|string|max:255',
             'telecom' => 'sometimes|array',
