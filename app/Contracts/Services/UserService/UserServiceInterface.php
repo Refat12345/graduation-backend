@@ -93,7 +93,7 @@ interface UserServiceInterface
     public function addShift(array $data);
     
     public function getAllCenters();
-
+    public function readNote($noteID);
 
     //////////// appointment ///////////
 
@@ -112,7 +112,7 @@ interface UserServiceInterface
     public function getUserDetails($userId);
     public function getMedicalCenterDetails($centerId);
 
-
+    public function getNotesBySenderID($senderID);
 
     public function createCenterTelecoms($centerId, array $telecomsData);
     public function createNote(array $userData);

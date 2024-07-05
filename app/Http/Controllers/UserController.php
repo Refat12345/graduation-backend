@@ -448,13 +448,35 @@ public function createShift(Request $request)
 
 
 
-
-
 public function assignUserToShift(Request $request)
 {
     try{
     $userShift = $this->userService->assignUserToShift($request->all());
     return response()->json([$userShift], 200);
+} catch (\Exception $e) {
+           
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+}
+
+
+public function readNote($noteID)
+{
+    try{
+    $note = $this->userService->readNote($noteID);
+    return response()->json([$note], 200);
+} catch (\Exception $e) {
+           
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+}
+
+
+public function putNoteInFavorite($noteID)
+{
+    try{
+    $note = $this->userService->putNoteInFavorite($noteID);
+    return response()->json([$note], 200);
 } catch (\Exception $e) {
            
     return response()->json(['error' => $e->getMessage()], 400);
@@ -601,7 +623,16 @@ public function getNotesByreceiverID($receiverID)
 
 
 
-
+public function getNotesBySenderID($senderID)
+{
+    try {
+    $notes = $this->userService->getNotesBySenderID($senderID);
+    return response()->json(['notes' =>$notes], 200);
+} catch (\Exception $e) {
+         
+    return response()->json(['error' => $e->getMessage()], 400);
+}
+}
 
 
 public function getNotesByMedicalCenter($centerId)

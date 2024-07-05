@@ -1604,6 +1604,176 @@ public function createNote(array $noteData)
     return $note;
 }
 
+
+public function readNote($noteID)
+{
+
+    $user = auth('user')->user();
+ 
+    $note = Note::findOrFail($noteID);
+    $note->valid = $user->id;
+    $note->save();
+
+    return $note;
+
+}
+
+
+
+public function putNoteInFavorite($noteID)
+{
+
+    $user = auth('user')->user();
+ 
+    $note = Note::findOrFail($noteID);
+    $note->favorite = $user->id;
+    $note->save();
+
+    return $note;
+
+}
+
+
+
+
+public function getNotesByMedicalCenter($centerId)
+{
+    $user=  auth('user')->user();
+   //$centerId= $user->center->centerID;
+
+    $notes = Note::where('centerID', $centerId)->get();
+
+
+   
+
+    return $notes->map(function ($note) use ($user)  {
+
+        $isRead = 0;
+        $inFavorite = 0;
+        if ($note->valid == $user->id)
+        {
+            $isRead = 1;
+    
+        }
+        if ($note->favorite == $user->id)
+        {
+            $inFavorite = 1;
+    
+        }
+        return [
+            'senderID' => $note->senderID,
+            'receiverID' => $note->receiverID ? $note->receiverID : null, 
+            'noteContent' => $note->noteContent,
+            'category' => $note->category,
+            'type' => $note->type,
+            'date' => $note->updated_at->format('Y-m-d'),
+            'sessionID' => $note->sessionID,
+            'senderName' => $note->sender->fullName, 
+            'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
+
+            'isRead' => $isRead,
+            'inFavorite' => $inFavorite,
+        ];
+    });
+}
+
+
+public function getNotesByreceiverID($receiverID)
+{
+    $centerID = UserCenter::where('userID', $receiverID)->where('valid', -1)->first()->centerID;
+    $user = User::findOrFail($receiverID);
+    
+    $notes = Note::where('receiverID', $receiverID)
+        ->orWhere(function ($query) use ($user, $centerID) {
+            $query->where('category', $user->role)->where('centerID',$centerID);
+                // ->whereHas('medicalCenter', function ($query) use ($centerID) {
+                //     $query->where('centerID', $centerID);
+                // });
+        })
+        ->get();
+
+    return $notes->map(function ($note) use ($receiverID) {
+
+        $isRead = 0;
+        $inFavorite = 0;
+        if ($note->valid == $receiverID)
+        {
+            $isRead = 1;
+    
+        }
+        if ($note->favorite == $receiverID)
+        {
+            $inFavorite = 1;
+    
+        }
+
+        return [
+            'senderID' => $note->senderID,
+            'receiverID' => $note->receiverID ? $note->receiverID : null, 
+            'noteContent' => $note->noteContent,
+            'category' => $note->category,
+            'type' => $note->type,
+            'date' => $note->updated_at->format('Y-m-d'),
+            'sessionID' => $note->sessionID,
+            'senderName' => $note->sender->fullName, 
+            'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
+
+             
+            'isRead' => $isRead,
+            'inFavorite' => $inFavorite,
+        ];
+    });
+}
+
+
+public function getNotesBySenderID($senderID)
+{
+
+    $notes = Note::where('senderID', $senderID)->get();
+
+
+    return $notes->map(function ($note)use ($senderID) {
+
+        $isRead = 0;
+        $inFavorite = 0;
+        if ($note->valid == $senderID)
+        {
+            $isRead = 1;
+    
+        }
+        if ($note->favorite == $senderID)
+        {
+            $inFavorite = 1;
+    
+        }
+
+    
+        return [
+            'senderID' => $note->senderID,
+            'receiverID' => $note->receiverID ? $note->receiverID : null, 
+            'noteContent' => $note->noteContent,
+            'category' => $note->category,
+            'type' => $note->type,
+            'date' => $note->updated_at->format('Y-m-d'),
+            'sessionID' => $note->sessionID,
+            'senderName' => $note->sender->fullName, 
+            'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
+
+            
+            'isRead' => $isRead,
+            'inFavorite' => $inFavorite,
+            
+        ];
+    });
+}
+
+
+
+
+
+
+
+
 public function getAllCenters()
 {
     return MedicalCenter::select('id', 'centerName')->get();
@@ -1676,59 +1846,6 @@ public function getMedicalCenterDetails($centerId)
 //     return $notes;
 // }
 
-
-
-
-
-public function getNotesByMedicalCenter($centerId)
-{
-    $notes = Note::where('centerID', $centerId)->get();
-    return $notes->map(function ($note) {
-        return [
-            'senderID' => $note->senderID,
-            'receiverID' => $note->receiverID ? $note->receiverID : null, 
-            'noteContent' => $note->noteContent,
-            'category' => $note->category,
-            'type' => $note->type,
-            'date' => $note->updated_at->format('Y-m-d'),
-            'sessionID' => $note->sessionID,
-            'senderName' => $note->sender->fullName, 
-         
-
-            'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
-        ];
-    });
-}
-
-
-public function getNotesByreceiverID($receiverID)
-{
-    $centerID = UserCenter::where('userID', $receiverID)->where('valid', -1)->first()->centerID;
-    $user = User::findOrFail($receiverID);
-    
-    $notes = Note::where('receiverID', $receiverID)
-        ->orWhere(function ($query) use ($user, $centerID) {
-            $query->where('category', $user->role)
-                ->whereHas('medicalCenter', function ($query) use ($centerID) {
-                    $query->where('centerID', $centerID);
-                });
-        })
-        ->get();
-
-    return $notes->map(function ($note) {
-        return [
-            'senderID' => $note->senderID,
-            'receiverID' => $note->receiverID ? $note->receiverID : null, 
-            'noteContent' => $note->noteContent,
-            'category' => $note->category,
-            'type' => $note->type,
-            'date' => $note->updated_at->format('Y-m-d'),
-            'sessionID' => $note->sessionID,
-            'senderName' => $note->sender->fullName, 
-            'receiverName' => $note->receiver ? $note->receiver->fullName : null, 
-        ];
-    });
-}
 
 
 

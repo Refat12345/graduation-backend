@@ -26,6 +26,10 @@ return new class extends Migration
             $table->foreign('receiverID')->references('id')->on('users');
             $table->foreign('centerID')->references('id')->on('medical_centers');
             $table->unsignedBigInteger('valid')->default(0);
+
+            $table->unsignedBigInteger('favorite')->nullable();
+            $table->foreign('favorite')->references('id')->on('users');
+           
             $table->timestamps();
 
             $table->index('centerID');
