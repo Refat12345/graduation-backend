@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Contracts\Services\UserService\UserServiceInterface;      
-
 use App\Models\User;
 use App\Models\GlobalRequest;
 use App\Models\PatientTransferRequest;
@@ -80,11 +79,6 @@ public function addPatientInfo(Request $request)
 
 
 
-
-
-
-
-
     public function createUser(Request $request)
     {
         try{
@@ -103,6 +97,9 @@ public function addPatientInfo(Request $request)
     }
 
    
+
+
+
 
 
     public function loginUser(Request $request)
@@ -125,6 +122,8 @@ public function addPatientInfo(Request $request)
 
 
 
+
+
 public function getUserByVerificationCode(Request $request)
 {
     try {
@@ -138,6 +137,9 @@ public function getUserByVerificationCode(Request $request)
     }
 }
   
+
+
+
 
     public function findUser(Request $request)
     {
@@ -154,6 +156,8 @@ public function getUserByVerificationCode(Request $request)
 
 
 
+
+
 public function associateUserWithMedicalCenter(Request $request)
 {
     try {
@@ -166,6 +170,9 @@ public function associateUserWithMedicalCenter(Request $request)
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
+
+
+
 
 public function associateUserWithMyMedicalCenter(Request $request)
 {
@@ -180,6 +187,10 @@ public function associateUserWithMyMedicalCenter(Request $request)
 }
 }
 
+
+
+
+
     public function changeStatus(Request $request)
     {
         try {    
@@ -193,6 +204,10 @@ public function associateUserWithMyMedicalCenter(Request $request)
         return response()->json(['error' => $e->getMessage()], 400);
     }
     }
+
+
+
+
 
 
     public function getAllCenters()
@@ -293,6 +308,9 @@ public function associateUserWithMyMedicalCenter(Request $request)
     }
 
  
+
+
+
     public function updatePermissionsUser(Request $request)
     {
         $userId = $request->input('userId');
@@ -307,6 +325,9 @@ public function associateUserWithMyMedicalCenter(Request $request)
     }
 
 
+
+
+
     public function getUserPermissions($userId)
     {
 
@@ -317,6 +338,9 @@ public function associateUserWithMyMedicalCenter(Request $request)
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
+
+
+
 
 
     public function createMedicalCenter(Request $request)
@@ -330,6 +354,10 @@ public function associateUserWithMyMedicalCenter(Request $request)
         return response()->json(['error' => $e->getMessage()], 400);
     }
     }
+
+
+
+
 
 
     public function getCenterUnAcceptedPatients($centerId){
@@ -350,6 +378,9 @@ public function associateUserWithMyMedicalCenter(Request $request)
 
 
 /////////////////////////   shift & chair  //////////////
+
+
+
 public function createChair(Request $request)
 {
     try{
@@ -361,6 +392,10 @@ public function createChair(Request $request)
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
+
+
+
+
 
 
 public function createCenterTelecoms(Request $request)
@@ -388,6 +423,10 @@ public function createCenterTelecoms(Request $request)
 
 
 
+
+
+
+
 public function createShift(Request $request)
 { 
     try {
@@ -407,6 +446,10 @@ public function createShift(Request $request)
 
 
 
+
+
+
+
 public function assignUserToShift(Request $request)
 {
     try{
@@ -417,6 +460,9 @@ public function assignUserToShift(Request $request)
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
+
+
+
 
 
 
@@ -435,6 +481,9 @@ public function showShiftsByCenter($centerId)
 
 
 
+
+
+
 public function showDoctorsInShift($shiftId)
 {
     try {
@@ -445,6 +494,9 @@ public function showDoctorsInShift($shiftId)
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
+
+
+
 
 
 
@@ -461,6 +513,9 @@ public function getCenterUsersByRole( $centerId, $role , $pat=null)
 }
 
 
+
+
+
 public function getCenterDoctors($centerId)
 {
     try{
@@ -471,6 +526,10 @@ public function getCenterDoctors($centerId)
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
+
+
+
+
 
 
 
@@ -490,6 +549,8 @@ public function showUserDetails( $userId)
 
 
 
+
+
 public function showMedicalCenterDetails( $centerId)
 {
     try{
@@ -500,6 +561,10 @@ public function showMedicalCenterDetails( $centerId)
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
+
+
+
+
 
 
 
@@ -520,6 +585,9 @@ try {
 
 
 
+
+
+
 public function getNotesByreceiverID($receiverID)
 {
     try {
@@ -534,6 +602,8 @@ public function getNotesByreceiverID($receiverID)
 
 
 
+
+
 public function getNotesByMedicalCenter($centerId)
 {
     try {
@@ -544,6 +614,12 @@ public function getNotesByMedicalCenter($centerId)
     return response()->json(['error' => $e->getMessage()], 400);
 }
 }
+
+
+
+
+
+
 
 public function getlogs($centerId)
 {
@@ -623,6 +699,10 @@ public function getAllMedicalCenters()
 
 
 
+
+
+
+
 public function getMedicineNames($type)
 {
     $medicineNames = $this->userService->getMedicineNames($type);
@@ -639,25 +719,15 @@ public function getMedicineNames($type)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 public function getChairsInCenter($centerId)
 {
   //  return $this->userService->getChairsInCenter($centerId);
     return response()->json(['message' =>  $this->userService->getChairsInCenter($centerId)]);
 
 }
+
+
+
 
 
 
@@ -688,6 +758,11 @@ public function updateUser(Request $request)
 }
 
 
+
+
+
+
+
 public function updateMedicalCenter(Request $request)
 {
    
@@ -714,6 +789,13 @@ public function updateMedicalCenter(Request $request)
 }
 
 
+
+
+
+
+
+
+
 public function updatePatientInfo(Request $request)
 {
 
@@ -736,6 +818,9 @@ public function updatePatientInfo(Request $request)
         ], 400);
     }
 }
+
+
+
 
 
 
@@ -768,6 +853,8 @@ public function updateShift(Request $request)
 
 
 
+
+
 public function updateShifts(Request $request)
 {
     $shiftsData = $request->input('shifts');
@@ -785,6 +872,12 @@ public function updateShifts(Request $request)
         ], 400);
     }
 }
+
+
+
+
+
+
 
 
 public function updateChair(Request $request)
@@ -835,6 +928,10 @@ public function updateChair(Request $request)
 // }
 
 
+
+
+
+
 public function getPatientsByCenter($centerID)
 {
    // $centerID = $request->input('center_id'); 
@@ -847,6 +944,10 @@ public function getPatientsByCenter($centerID)
 }
 
 
+
+
+
+
 public function updatePatientStatus($patientID, $newStatus)
 {
     $message = $this->userService->updatePatientStatus($patientID, $newStatus);
@@ -856,6 +957,7 @@ public function updatePatientStatus($patientID, $newStatus)
         'message' => $message
     ]);
 }
+
 
 
 }
