@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\UserService;
 
+use App\Services\UserService\NotificationService;
 use App\Contracts\Services\UserService\RequestsServiceInterface;
 use App\Models\Request;
 use App\Models\User;
@@ -60,11 +61,35 @@ class RequestsService implements RequestsServiceInterface{
 
 
 
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
+
+
+    // $this->notificationService->sendNotification(
+    //     'user_token', // Replace with actual user token
+    //     'New Request',
+    //     'You have a new request.'
+    // );
+
+
+
+
+
     public function getAllRequests()
     {
         $user = auth('user')->user();
         $centerId = $user->center->centerID; // تأكد من أن العلاقة center محددة بشكل صحيح في نموذج المستخدم
-    
+       $this->notificationService->sendNotification(
+        'user_token', // Replace with actual user token
+        'New Request',
+        'You have a new request.'
+    );
+
         // تحديث الاستعلامات للتحقق من center_id في جدول Requests
         $requests = Requests::where('center_id', $centerId)
             ->whereHas('globalRequest', function ($query) use ($centerId) {

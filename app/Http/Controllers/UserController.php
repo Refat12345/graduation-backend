@@ -100,14 +100,13 @@ public function addPatientInfo(Request $request)
 
 
 
-
-
     public function loginUser(Request $request)
 {
     try {
         $nationalNumber = $request->input('nationalNumber');
         $password = $request->input('password');
-        $user = $this->userService->loginUser($nationalNumber, $password);
+        $deviceToken = $request->input('deviceToken');
+        $user = $this->userService->loginUser($nationalNumber, $password , $deviceToken);
         
         if (!$user) {
             throw new \Exception('Invalid nationalNumber or password');
@@ -119,6 +118,23 @@ public function addPatientInfo(Request $request)
     }
 }
 
+
+public function logoutUser(Request $request)
+{
+    try {
+     
+        $deviceToken = $request->input('deviceToken');
+        $user = $this->userService->logoutUser($deviceToken);
+        
+        if (!$user) {
+            throw new \Exception('Invalid nationalNumber or password');
+        }
+
+        return  $user;
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+}
 
 
 
@@ -340,7 +356,17 @@ public function associateUserWithMyMedicalCenter(Request $request)
     }
 
 
+    
+    public function getCenterUsers($centerId)
+    {
 
+        try {
+            return $this->userService->getCenterUsers($centerId);
+          
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
 
 
     public function createMedicalCenter(Request $request)

@@ -12,4 +12,5 @@ return [
     App\Providers\AppointmentProvider::class,
  //   App\Providers\RequestsServiceProvider::class,
     App\Providers\RequestsServiceProvider::class,
+    Kreait\Laravel\Firebase\ServiceProvider::class,
 ];

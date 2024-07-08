@@ -123,6 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+
+    'aliases' => [
+      
+        'Firebase' => Kreait\Laravel\Firebase\Facades\Firebase::class,
+    ],
+
     
 
 ];

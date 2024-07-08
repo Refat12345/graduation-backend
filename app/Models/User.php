@@ -289,5 +289,12 @@ public function disbursedMaterialsUser()
     return $this->hasMany(DisbursedMaterialsUser::class, 'userID', 'id');
 }
 
+
+
+public function deviceTokens()
+{
+    return $this->hasMany(DeviceToken::class, 'userID', 'id');
+}
+
 }
 

@@ -33,6 +33,8 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 Route::post('/updateUser', 'App\Http\Controllers\UserController@updateUser');
 
 Route::post('/login', [UserController::class, 'loginUser']);
+Route::post('/logout', [UserController::class, 'logoutUser']);
+
 Route::post('/search', [UserController::class, 'findUser']);
 
 
@@ -84,6 +86,8 @@ Route::get('/getCenterUnAcceptedPatients/{centerId}', [UserController::class, 'g
 Route::get('/centerappointments/{centerId}', [AppointmentController::class, 'showAppointmentsByCenter']);
 
 Route::get('/getAppointmentsByCenterAndDate/{centerId}/{year}/{month}/{day}', [AppointmentController::class, 'getAppointmentsByCenterAndDate']);
+
+Route::get('/getCenterUsers/{centerId}', [UserController::class, 'getCenterUsers']);
 
 
 Route::get('/userappointments/{userId}', [AppointmentController::class, 'showUserAppointments']);

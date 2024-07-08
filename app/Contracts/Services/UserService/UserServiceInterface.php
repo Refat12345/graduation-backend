@@ -27,7 +27,7 @@ interface UserServiceInterface
      public function addGlobalRequest(array $data);
     
      public function createUser(array $userData): User;
-     public function loginUser(string $nationalNumber, string $password);
+     public function loginUser(string $nationalNumber, string $password , string $deviceToken);
   
 
 
@@ -121,12 +121,12 @@ interface UserServiceInterface
     public function getNotesByreceiverID($receiverID);
     public function getlogs($centerId);
 
-
+    public function logoutUser(string $deviceToken);
     public function addPatientInfo(array $data);
 
     //public function getMedicineNames();
     
-
+    public function getCenterUsers($centerId);
 
 
 

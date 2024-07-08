@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Address;
+use App\Models\DeviceToken;
 use Illuminate\Http\Request;
 
-class AddressController extends Controller
+class DeviceTokenController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class AddressController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Address $address)
+    public function show(DeviceToken $deviceToken)
     {
         //
     }
@@ -42,7 +42,7 @@ class AddressController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Address $address)
+    public function edit(DeviceToken $deviceToken)
     {
         //
     }
@@ -50,7 +50,7 @@ class AddressController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Address $address)
+    public function update(Request $request, DeviceToken $deviceToken)
     {
         //
     }
@@ -58,7 +58,7 @@ class AddressController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Address $address)
+    public function destroy(DeviceToken $deviceToken)
     {
         //
     }
