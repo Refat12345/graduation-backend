@@ -1894,6 +1894,7 @@ public function getNotesByMedicalCenter($centerId)
             'date' => $note->updated_at->format('Y-m-d'),
             'sessionID' => $note->sessionID,
             'senderName' => $note->sender->fullName,
+            'senderRole' => $note->sender->role,
             'receiverName' => $note->receiver ? $note->receiver->fullName : null,
             'isRead' => $isRead,
             'inFavorite' => $inFavorite,
@@ -1926,6 +1927,7 @@ public function getNotesByreceiverID($receiverID)
             'date' => $note->updated_at->format('Y-m-d'),
             'sessionID' => $note->sessionID,
             'senderName' => $note->sender->fullName,
+            'senderRole' => $note->sender->role,
             'receiverName' => $note->receiver ? $note->receiver->fullName : null,
             'isRead' => $isRead,
             'inFavorite' => $inFavorite,
@@ -1951,7 +1953,9 @@ public function getNotesBySenderID($senderID)
             'date' => $note->updated_at->format('Y-m-d'),
             'sessionID' => $note->sessionID,
             'senderName' => $note->sender->fullName,
+            'senderRole' => $note->sender->role,
             'receiverName' => $note->receiver ? $note->receiver->fullName : null,
+            
             'isRead' => $isRead,
             'inFavorite' => $inFavorite,
         ];
