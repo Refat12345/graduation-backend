@@ -1886,6 +1886,7 @@ public function getNotesByMedicalCenter($centerId)
         $inFavorite = $noteStatus ? $noteStatus->is_favorite : 0;
 
         return [
+            'id' => $note->id,
             'senderID' => $note->senderID,
             'receiverID' => $note->receiverID ? $note->receiverID : null,
             'noteContent' => $note->noteContent,
@@ -1919,6 +1920,7 @@ public function getNotesByreceiverID($receiverID)
         $inFavorite = $noteStatus ? $noteStatus->is_favorite : 0;
 
         return [
+            'id' => $note->id,
             'senderID' => $note->senderID,
             'receiverID' => $note->receiverID ? $note->receiverID : null,
             'noteContent' => $note->noteContent,
@@ -1945,6 +1947,7 @@ public function getNotesBySenderID($senderID)
         $inFavorite = $noteStatus ? $noteStatus->is_favorite : 0;
 
         return [
+            'id' => $note->id,
             'senderID' => $note->senderID,
             'receiverID' => $note->receiverID ? $note->receiverID : null,
             'noteContent' => $note->noteContent,
