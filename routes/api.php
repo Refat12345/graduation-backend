@@ -87,7 +87,7 @@ Route::get('/centerappointments/{centerId}', [AppointmentController::class, 'sho
 
 Route::get('/getAppointmentsByCenterAndDate/{centerId}/{year}/{month}/{day}', [AppointmentController::class, 'getAppointmentsByCenterAndDate']);
 
-Route::get('/getCenterUsers/{centerId}', [UserController::class, 'getCenterUsers']);
+Route::get('/getCenterUsers/{centerId}/{role}', [UserController::class, 'getCenterUsers']);
 
 
 Route::get('/userappointments/{userId}', [AppointmentController::class, 'showUserAppointments']);

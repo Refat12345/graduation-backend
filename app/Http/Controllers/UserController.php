@@ -358,11 +358,11 @@ public function associateUserWithMyMedicalCenter(Request $request)
 
 
     
-    public function getCenterUsers($centerId)
+    public function getCenterUsers($centerId, $role)
     {
 
         try {
-            return $this->userService->getCenterUsers($centerId);
+            return $this->userService->getCenterUsers($centerId, $role);
           
         } catch (InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);

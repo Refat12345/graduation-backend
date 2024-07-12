@@ -1429,7 +1429,7 @@ public function getCenterUsersByRole($centerId, $role, $pat)
 
 
 
-public function getCenterUsers($centerId)
+public function getCenterUsers($centerId,$role)
 {
     $pat='مقبول';
     $users = User::when($centerId != 0, function ($query) use ($centerId) {
@@ -1445,8 +1445,8 @@ public function getCenterUsers($centerId)
         $query->select('id', 'cityName');
     }])
    
-    ->get()    ->filter(function ($user) use ($pat) {
-        if ($user->role === 'patient') {
+    ->get()    ->filter(function ($user) use ($pat,$role ) {
+        if ($user->role === 'patient' && $role === 'patient' ) {
             return isset($user->generalPatientInformation) && $user->generalPatientInformation->status === $pat && $user->generalPatientInformation->valid == -1;
         }
         return true;
@@ -1460,8 +1460,13 @@ public function getCenterUsers($centerId)
     });
 
     $groupedUsers = $users->groupBy('role');
+if ($role === 'patient') { 
+    return response()->json($groupedUsers['patient']);
 
+} else {
+    unset($groupedUsers['patient']); 
     return response()->json($groupedUsers);
+}
 }
 
 

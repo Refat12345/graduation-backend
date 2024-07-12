@@ -126,7 +126,7 @@ interface UserServiceInterface
 
     //public function getMedicineNames();
     
-    public function getCenterUsers($centerId);
+    public function getCenterUsers($centerId, $role);
 
 
 
