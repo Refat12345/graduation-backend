@@ -105,7 +105,8 @@ public function addPatientInfo(Request $request)
     try {
         $nationalNumber = $request->input('nationalNumber');
         $password = $request->input('password');
-        $deviceToken = $request->input('deviceToken');
+       // $deviceToken = $request->input('deviceToken');
+       $deviceToken = 'eeee';
         $user = $this->userService->loginUser($nationalNumber, $password , $deviceToken);
         
         if (!$user) {
