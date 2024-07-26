@@ -13,6 +13,8 @@ use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\DisbursedMaterialController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckPermission;
+use App\Http\Controllers\NotificationController;
+
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 //Route::post('/createUser', [UserController::class, 'createUser']); 
 
@@ -36,6 +38,14 @@ Route::post('/login', [UserController::class, 'loginUser']);
 Route::post('/logout', [UserController::class, 'logoutUser']);
 
 Route::post('/search', [UserController::class, 'findUser']);
+
+
+
+
+Route::post('/sendNotification', [UserController::class, 'sendNotification']);
+Route::post('/senddeviceTokenDeviceID', [UserController::class, 'senddeviceTokenDeviceID']);
+
+
 
 
 
@@ -84,6 +94,12 @@ Route::get('/getCenterUnAcceptedPatients/{centerId}', [UserController::class, 'g
 
 
 Route::get('/centerappointments/{centerId}', [AppointmentController::class, 'showAppointmentsByCenter']);
+Route::post('/updateAppointmentsStatus/{centerId}', [AppointmentController::class, 'updateAppointmentsStatus']);
+
+
+
+
+
 
 Route::get('/getAppointmentsByCenterAndDate/{centerId}/{year}/{month}/{day}', [AppointmentController::class, 'getAppointmentsByCenterAndDate']);
 
@@ -91,9 +107,9 @@ Route::get('/getCenterUsers/{centerId}/{role}', [UserController::class, 'getCent
 
 
 Route::get('/userappointments/{userId}', [AppointmentController::class, 'showUserAppointments']);
+Route::post('/assignAppointmentToUser/{appointmentId}/{userId}', [AppointmentController::class, 'assignAppointmentToUser']);
 
-
-
+Route::post('/swapAppointmentsBetweenUsers/{appointmentId1}/{appointmentId2}', [AppointmentController::class, 'swapAppointmentsBetweenUsers']);
 Route::post('/user-shifts', [UserController::class, 'assignUserToShift']);
 Route::get('/shifts/center/{centerId}', [UserController::class, 'showShiftsByCenter']);
 Route::get('/doctors/shift/{shiftId}', [UserController::class, 'showDoctorsInShift']);
@@ -293,7 +309,7 @@ Route::post('/shifts', [UserController::class, 'createShift']);
 Route::post('/updateShift', [UserController::class, 'updateShift']);
 
 Route::post('/updateShifts', [UserController::class, 'updateShifts']);
-
+Route::post('/populateAppointments/{centerId}', [AppointmentController::class, 'populateAppointments']);
 
 
 

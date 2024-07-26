@@ -10,7 +10,7 @@ class DeviceToken extends Model
     
         use HasFactory;
     
-        protected $fillable = ['userID', 'deviceToken'];
+        protected $fillable = ['userID', 'deviceToken','deviceID'];
     
         public function user()
         {

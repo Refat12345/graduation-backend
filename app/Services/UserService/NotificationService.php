@@ -25,4 +25,23 @@ class NotificationService
 
         $this->messaging->send($message);
     }
+
+
+
+
+    public function  senddeviceTokenDeviceID ( $deviceToken , $deviceID )
+    {
+
+        $user = auth('user')->user();
+        $devicetoken = new DeviceToken([
+            'deviceToken' => $deviceToken,
+            'deviceID' => $deviceID,
+            'userID' => $user->id, 
+        ]);
+   
+        $user->deviceTokens()->save($devicetoken);
+        
+    }
+
+  
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('dialysis_sessions', function (Blueprint $table) {
             $table->id(); 
-            $table->timestamp('sessionStartTime')->nullable();
+            $table->time('sessionStartTime')->nullable();
             $table->timestamp('sessionEndTime')->nullable();
             $table->float('weightBeforeSession');
             $table->float('weightAfterSession');
@@ -31,6 +31,10 @@ return new class extends Migration
             $table->unsignedBigInteger('nurseID');
             $table->unsignedBigInteger('doctorID')->nullable();
             $table->unsignedBigInteger('centerID');
+
+            $table->unsignedBigInteger('appointmentID')->nullable();
+            $table->foreign('appointmentID')->references('id')->on('appointments');
+
             $table->foreign('patientID')->references('id')->on('users');
             $table->foreign('nurseID')->references('id')->on('users');
             $table->foreign('doctorID')->references('id')->on('users');

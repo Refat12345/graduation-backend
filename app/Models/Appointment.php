@@ -10,12 +10,18 @@ class Appointment extends Model
     use HasFactory;
 
  
-    protected $fillable = ['appointmentTimeStamp', 'userID', 'shiftID', 'chairID','centerID', 'sessionID','valid','nurseID'];
+    protected $fillable = ['appointmentTimeStamp','day', 'userID', 'shiftID', 'chairID','centerID', 'valid','nurseID','isValid'];
     
 
     public function updateappointmentTime($new)
     {
         $this->appointmentTimeStamp = $new;
+        $this->save();
+    }
+
+    public function updateappointmentDay($new)
+    {
+        $this->day = $new;
         $this->save();
     }
 
@@ -47,8 +53,5 @@ class Appointment extends Model
         return $this->belongsTo(MedicalCenter::class, 'centerID', 'id');
     }
 
-    public function session()
-    {
-        return $this->belongsTo(DialysisSession::class, 'sessionID', 'id');
-    }
+  
 }

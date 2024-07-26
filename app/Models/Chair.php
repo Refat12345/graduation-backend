@@ -11,7 +11,7 @@ class Chair extends Model
 
     protected $fillable = ['chairNumber', 'roomName', 'centerID','valid'];
     
-    public function medicalCenter(): BelongsTo
+    public function medicalCenter()
     {
         return $this->belongsTo(MedicalCenter::class, 'centerID', 'id');
     }

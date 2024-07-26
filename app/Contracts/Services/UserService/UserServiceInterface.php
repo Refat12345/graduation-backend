@@ -27,7 +27,7 @@ interface UserServiceInterface
      public function addGlobalRequest(array $data);
     
      public function createUser(array $userData): User;
-     public function loginUser(string $nationalNumber, string $password , string $deviceToken);
+     public function loginUser(string $nationalNumber, string $password );
   
 
 

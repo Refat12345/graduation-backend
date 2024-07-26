@@ -37,7 +37,63 @@ class AppointmentController extends Controller
     {
         try{
         $appointments = $this->service->getAppointmentsByCenter($centerId);
+        return response()->json(['appointments' =>$appointments], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    
+    
+    }
+
+    
+    public function assignAppointmentToUser($appointmentId, $userId)
+    {
+        try{
+        $appointment = $this->service->assignAppointmentToUser($appointmentId, $userId);
+        return response()->json(['appointment' =>$appointment], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    
+    
+    }
+
+    public function swapAppointmentsBetweenUsers($appointmentId1, $appointmentId2)
+    {
+        try{
+        $appointment = $this->service->swapAppointmentsBetweenUsers($appointmentId1, $appointmentId2);
+        return response()->json(['appointment' =>$appointment], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    
+    
+    }
+
+ 
+
+    public function populateAppointments($centerId)
+    {
+        try{
+        $appointments = $this->service->populateAppointments($centerId);
         return response()->json([$appointments], 200);
+    } catch (\Exception $e) {
+               
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+    
+    
+    }
+
+  
+    public function updateAppointmentsStatus($centerId)
+    {
+        try{
+        $ss = $this->service->updateAppointmentsStatus($centerId);
+        return response()->json([$ss], 200);
     } catch (\Exception $e) {
                
         return response()->json(['error' => $e->getMessage()], 400);

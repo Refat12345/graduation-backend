@@ -106,8 +106,8 @@ public function addPatientInfo(Request $request)
         $nationalNumber = $request->input('nationalNumber');
         $password = $request->input('password');
        // $deviceToken = $request->input('deviceToken');
-       $deviceToken = 'eeee';
-        $user = $this->userService->loginUser($nationalNumber, $password , $deviceToken);
+     
+        $user = $this->userService->loginUser($nationalNumber, $password );
         
         if (!$user) {
             throw new \Exception('Invalid nationalNumber or password');
@@ -1015,6 +1015,62 @@ public function updatePatientStatus($patientID, $newStatus)
         'message' => $message
     ]);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////   Notification  ///////////////////////////////
+
+
+
+public function sendNotification ( Request $request)
+{
+
+    $token = $request->input('token');
+    $title = $request->input('title'); 
+    $body = $request->input('body'); 
+
+    $this->userService->sendNotification($token, $title, $body);
+
+    return response()->json(['message' => 'Notification sent successfully']);
+}
+
+
+
+public function senddeviceTokenDeviceID ( Request $request)
+{  
+
+    $deviceToken = $request->input('deviceToken');
+    $deviceID = $request->input('deviceID');
+
+    $this->userService->senddeviceTokenDeviceID ( $deviceToken , $deviceID );
+    return response()->json(['message' => 'data sent successfully']);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

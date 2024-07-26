@@ -11,7 +11,7 @@ class Shift extends Model
 
     protected $fillable = ['shiftStart', 'shiftEnd','name', 'centerID','valid'];
     
-    public function medicalCenter(): BelongsTo
+    public function medicalCenter()
     {
         return $this->belongsTo(MedicalCenter::class, 'centerID', 'id');
     }
@@ -21,5 +21,17 @@ class Shift extends Model
 {
     return $this->morphMany(GlobalRequest::class, 'requestable');
 }
+
+public function appointments()
+{
+    return $this->hasMany(Appointment::class, 'shiftID', 'id')
+                ;
+}
+
+
+
+
+
+
 
 }

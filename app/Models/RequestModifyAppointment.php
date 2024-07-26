@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RequestModifyAppointment extends Model
 {
-    protected $fillable = ['newTime', 'requestID', 'requesterID', 'appointmentID','valid'];
+    protected $fillable = ['newAppointmentID', 'requestID', 'requesterID', 'appointmentID','valid'];
     
     public function request()
     {
@@ -22,5 +22,10 @@ class RequestModifyAppointment extends Model
     public function appointment()
     {
         return $this->belongsTo(Appointment::class, 'appointmentID', 'id');
+    }
+    
+    public function newAppointment()
+    {
+        return $this->belongsTo(Appointment::class, 'newAppointmentID', 'id');
     }
 }

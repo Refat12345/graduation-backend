@@ -16,8 +16,9 @@ return new class extends Migration
 
             $table->unsignedBigInteger('userID');
             $table->foreign('userID')->references('id')->on('users');
-            $table->text('deviceToken');
-        
+            $table->text('deviceToken');   
+            $table->string('deviceID'); 
+
 
             $table->timestamps();
         });

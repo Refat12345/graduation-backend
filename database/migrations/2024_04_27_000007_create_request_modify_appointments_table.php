@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('request_modify_appointments', function (Blueprint $table) {
             $table->id(); 
-            $table->timestamp('newTime')->nullable();
+            $table->unsignedBigInteger('newAppointmentID');
             $table->unsignedBigInteger('requestID');
             $table->unsignedBigInteger('requesterID');
             $table->unsignedBigInteger('appointmentID');
             $table->foreign('requestID')->references('id')->on('requests');
             $table->foreign('requesterID')->references('id')->on('users');
             $table->foreign('appointmentID')->references('id')->on('appointments');
+            $table->foreign('newAppointmentID')->references('id')->on('appointments');
             $table->timestamps();
             $table->unsignedBigInteger('valid')->default(0);
 

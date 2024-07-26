@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "64553243591",
+    "project_id": "daamukum-hayat",
+    "storage_bucket": "daamukum-hayat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64553243591:android:cd820ae1385823bf7affe2",
+        "android_client_info": {
+          "package_name": "com.uoca_sy.daamukumhayat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmh91f0PtWDaL5x-ziL2U-heKsO6BKspg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

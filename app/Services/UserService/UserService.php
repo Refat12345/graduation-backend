@@ -56,17 +56,36 @@ use LogicException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+
+
+
+
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use Kreait\Firebase\Messaging;
+
+
+
+
+
+
+
+
+
 class UserService implements UserServiceInterface
 {
 
-    protected $userModel;
-    protected $requestsModel;
 
-    public function __construct(User $userModel, Requests $requestsModel)
-    {
-        $this->userModel = $userModel;
-        $this->requestsModel = $requestsModel;
-    }
+    // protected $messaging;
+    // protected $userModel;
+    // protected $requestsModel;
+
+    // public function __construct(User $userModel, Requests $requestsModel, Messaging $messaging)
+    // {
+    //     $this->userModel = $userModel;
+    //     $this->requestsModel = $requestsModel;
+    //     $this->messaging = $messaging;
+    // }
 
     public function addGlobalRequest(array $data)
     {
@@ -646,7 +665,7 @@ public function verifyAccount(string $verificationCode, string $password)
 
 // }
 
-public function loginUser(string $nationalNumber, string $password , string $deviceToken)
+public function loginUser(string $nationalNumber, string $password )
 {
     if (Auth::attempt(['nationalNumber' => $nationalNumber, 'password' => $password])) {
         $user = Auth::user();
@@ -665,13 +684,7 @@ public function loginUser(string $nationalNumber, string $password , string $dev
         $user->centerID =  $centerId;
         $user->centerName =  $centerName;
 
-        $devicetoken = new DeviceToken([
-            'deviceToken' => $deviceToken,
-            'userID' => $user->id, 
-        ]);
-   
-        $user->deviceTokens()->save($devicetoken);
-        
+  
         return $user;
     }
 
@@ -924,21 +937,82 @@ public function createCompanionAddress(PatientCompanion $user, array $addressDat
 
 
 
+// public function addMedicalCenterWithUser(array $centerData)
+// {
+//     $validator = Validator::make($centerData, [
+//         'centerName' => 'nullable|string|max:255',
+//         'description' => 'nullable|string|max:1000',
+//         'charityName' => 'nullable|string|max:255',
+//         'telecom' => 'nullable|array',
+//         'telecom.*.system' => 'nullable|string|max:255',
+//         'telecom.*.value' => 'nullable|string|max:255',
+//         'telecom.*.use' => 'nullable|string|max:255',
+//         'address' => 'nullable|array',
+//         'address.use' => 'nullable|string|max:255',
+//         'address.line' => 'nullable|string',
+//         'address.cityName' => 'nullable|string|max:255',
+//         'address.countryName' => 'nullable|string|max:255',
+//     ]);
+
+//     if ($validator->fails()) {
+//         throw new LogicException($validator->errors()->first());
+//     }
+
+//     DB::beginTransaction();
+//     try {
+//         $user = auth('user')->user();
+//         $medicalCenters = $user->userCenter()->first();
+//         $medicalCenter = MedicalCenter::find($medicalCenters->centerID);
+//         if (!$medicalCenter) {
+//             throw new LogicException('No medical center associated with the user.');
+//         }
+
+//         $medicalCenter->update([
+//             'centerName' => $centerData['centerName'],
+//             'description' => $centerData['description'],
+//             'charityName' => $centerData['charityName'] ?? null,
+//         ]);
+
+
+//   if ($centerData['telecom']) {
+//         foreach ($centerData['telecom'] as $telecom) {
+//             $telecom['centerID'] = $medicalCenter->id;
+//             Telecom::create($telecom);
+//         }
+//     }
+
+
+//         if ($centerData['address']) {
+//         $this->createCenterAddress($medicalCenter, $centerData['address']);
+//       }
+//         UserCenter::create([
+//             'userID' => $user->id,
+//             'centerID' => $medicalCenter->id,
+//         ]);
+
+//         DB::commit();
+//         return $medicalCenter;
+//     } catch (\Exception $e) {
+//         DB::rollBack();
+//         throw new LogicException('Error creating medical center: ' . $e->getMessage());
+//     }
+// }
+
 public function addMedicalCenterWithUser(array $centerData)
 {
     $validator = Validator::make($centerData, [
-        'centerName' => 'required|string|max:255',
-        'description' => 'required|string|max:1000',
+        'centerName' => 'nullable|string|max:255',
+        'description' => 'nullable|string|max:1000',
         'charityName' => 'nullable|string|max:255',
-        'telecom' => 'required|array',
-        'telecom.*.system' => 'required|string|max:255',
-        'telecom.*.value' => 'required|string|max:255',
-        'telecom.*.use' => 'required|string|max:255',
-        'address' => 'required|array',
-        'address.use' => 'required|string|max:255',
-        'address.line' => 'required|string',
-        'address.cityName' => 'required|string|max:255',
-        'address.countryName' => 'required|string|max:255',
+        'telecom' => 'nullable|array',
+        'telecom.*.system' => 'nullable|string|max:255',
+        'telecom.*.value' => 'nullable|string|max:255',
+        'telecom.*.use' => 'nullable|string|max:255',
+        'address' => 'nullable|array',
+        'address.use' => 'nullable|string|max:255',
+        'address.line' => 'nullable|string',
+        'address.cityName' => 'nullable|string|max:255',
+        'address.countryName' => 'nullable|string|max:255',
     ]);
 
     if ($validator->fails()) {
@@ -955,22 +1029,26 @@ public function addMedicalCenterWithUser(array $centerData)
         }
 
         $medicalCenter->update([
-            'centerName' => $centerData['centerName'],
-            'description' => $centerData['description'],
-            'charityName' => $centerData['charityName'] ?? null,
+            'centerName' => $centerData['centerName'] ?? $medicalCenter->centerName,
+            'description' => $centerData['description'] ?? $medicalCenter->description,
+            'charityName' => $centerData['charityName'] ?? $medicalCenter->charityName,
         ]);
 
-        foreach ($centerData['telecom'] as $telecom) {
-            $telecom['centerID'] = $medicalCenter->id;
-            Telecom::create($telecom);
+        if (isset($centerData['telecom'])) {
+            foreach ($centerData['telecom'] as $telecom) {
+                $telecom['centerID'] = $medicalCenter->id;
+                Telecom::create($telecom);
+            }
         }
 
-        $this->createCenterAddress($medicalCenter, $centerData['address']);
+        if (isset($centerData['address'])) {
+            $this->createCenterAddress($medicalCenter, $centerData['address']);
+        }
 
-        UserCenter::create([
-            'userID' => $user->id,
-            'centerID' => $medicalCenter->id,
-        ]);
+        // UserCenter::create([
+        //     'userID' => $user->id,
+        //     'centerID' => $medicalCenter->id,
+        // ]);
 
         DB::commit();
         return $medicalCenter;
@@ -979,7 +1057,6 @@ public function addMedicalCenterWithUser(array $centerData)
         throw new LogicException('Error creating medical center: ' . $e->getMessage());
     }
 }
-
 
 
 
@@ -1219,10 +1296,49 @@ public function updateShift($shiftId, array $data)
         'name' => $validatedData['name'],
         'centerID' => $validatedData['centerID'],
     ]);
+    $appointments = $shift->appointments;
 
+    foreach ($appointments as $appointment) {
+        $appointment->update([
+            'appointmentTimeStamp' => $shiftStart,
+        ]);
+    }
     return $shift;
 }
 
+
+
+
+// public function updateShifts(array $shiftsData)
+// {
+//     $updatedShifts = collect();
+
+//     foreach ($shiftsData as $shiftData) {
+//         $validatedData = Validator::make($shiftData, [
+//             'id' => 'required|integer|exists:shifts,id',
+//             'centerID' => 'required|integer|exists:medical_centers,id',
+//             'shiftStart' => 'required|date_format:H:i:s',
+//             'shiftEnd' => 'required|date_format:H:i:s|after:shiftStart',
+//             'name' => 'required|string|max:255',
+//         ])->validate();
+
+//         $shift = Shift::findOrFail($validatedData['id']);
+
+//         $shiftStart = Carbon::createFromFormat('H:i:s', $validatedData['shiftStart'])->toTimeString();
+//         $shiftEnd = Carbon::createFromFormat('H:i:s', $validatedData['shiftEnd'])->toTimeString();
+
+//         $shift->update([
+//             'shiftStart' => $shiftStart,
+//             'shiftEnd' => $shiftEnd,
+//             'name' => $validatedData['name'],
+//             'centerID' => $validatedData['centerID'],
+//         ]);
+
+//         $updatedShifts->push($shift);
+//     }
+
+//     return $updatedShifts;
+// }
 
 
 
@@ -1251,10 +1367,19 @@ public function updateShifts(array $shiftsData)
             'centerID' => $validatedData['centerID'],
         ]);
 
-        $updatedShifts->push($shift);
+        $appointments = $shift->appointments;
+
+        foreach ($appointments as $appointment) {
+            $appointment->update([
+                'appointmentTimeStamp' => $shiftStart,
+            ]);
+        }
+
+        $updatedShifts->push($shift->only(['id', 'shiftStart', 'shiftEnd', 'centerID', 'created_at', 'updated_at', 'name', 'valid']));
     }
 
-    return $updatedShifts;
+    return  $updatedShifts ;
+
 }
 
 
@@ -2000,7 +2125,7 @@ public function getMedicalCenterDetails($centerId)
 
     $totalChairs = $medicalCenter->chairs->where('valid', -1)->count();
 
-    $managerName = $medicalCenter->users->where('role', 'admin')->pluck('fullName')->implode(', ');
+    $managerName = $medicalCenter->users->where('role', 'admin')->pluck('fullName');
 
 
     $contactDetails = $medicalCenter->centertelecoms;
@@ -2581,7 +2706,7 @@ public function getCenterUnAcceptedPatients($centerId){
             $subQuery->where('centerID', $centerId);
         });
     })
-    ->where('role', 'patient')->doesnthave('generalPatientInformation')
+    ->where('role', 'patient')->doesnthave('generalPatientInformation')->doesntHave('medicalRecord')
     ->get()
     ->map(function ($user) {
         $user->contactNumber = $user->telecom->pluck('value')->first() ?? null; 
@@ -2591,6 +2716,56 @@ public function getCenterUnAcceptedPatients($centerId){
         return $user;
     });
 }
+
+
+
+
+
+
+/////////////////////////////////   Notification   /////////////////////////////////
+
+
+
+public function sendNotification($token, $title, $body)
+{
+    $notification = Notification::create($title, $body);
+    $message = CloudMessage::withTarget('token', $token)
+        ->withNotification($notification);
+
+    $this->messaging->send($message);
+}
+
+
+
+
+public function  senddeviceTokenDeviceID ( $deviceToken , $deviceID )
+{
+
+    $user = auth('user')->user();
+    $devicetoken = new DeviceToken([
+        'deviceToken' => $deviceToken,
+        'deviceID' => $deviceID,
+        'userID' => $user->id, 
+    ]);
+
+    $user->deviceTokens()->save($devicetoken);
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\UserService;
 
 use App\Services\UserService\NotificationService;
+use App\Services\UserService\AppointmentService;
+
 use App\Contracts\Services\UserService\RequestsServiceInterface;
 use App\Models\Request;
 use App\Models\User;
@@ -63,9 +65,9 @@ class RequestsService implements RequestsServiceInterface{
 
     protected $notificationService;
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(AppointmentService $appointmentService)
     {
-        $this->notificationService = $notificationService;
+        $this->appointmentService = $appointmentService;
     }
 
 
@@ -84,11 +86,11 @@ class RequestsService implements RequestsServiceInterface{
     {
         $user = auth('user')->user();
         $centerId = $user->center->centerID; // تأكد من أن العلاقة center محددة بشكل صحيح في نموذج المستخدم
-       $this->notificationService->sendNotification(
-        'user_token', // Replace with actual user token
-        'New Request',
-        'You have a new request.'
-    );
+    //    $this->notificationService->sendNotification(
+    //     'user_token', // Replace with actual user token
+    //     'New Request',
+    //     'You have a new request.'
+    // );
 
         // تحديث الاستعلامات للتحقق من center_id في جدول Requests
         $requests = Requests::where('center_id', $centerId)
@@ -177,18 +179,81 @@ class RequestsService implements RequestsServiceInterface{
                 $processedRequest['content'] = "نريد نقل المريض " . $patientName . " من مركز " . $centerPatientName . " الى مركز " . $destinationCenterName . " بسبب " . $request->cause;
             } elseif ($request->requestModifyAppointment) {
 
-               $patientName = $request->requestModifyAppointment->user->fullName;
-                $processedRequest['type'] = 'طلب تعديل موعد';
-                $processedRequest['senderName'] = $user->fullName;
-                $processedRequest['senderid'] = $user->id;
-                 $oldTime= $request->requestModifyAppointment->newTime;
-               $newTime = $request->requestModifyAppointment->appointment->appointmentTimeStamp;
-                $processedRequest['content'] = "نريد تعديل موعد المريض " . $patientName . " من  " . $oldTime . " الى " .  $newTime . " بسبب " . $request->cause;
+            //    $patientName = $request->requestModifyAppointment->user->fullName;
+            //     $processedRequest['type'] = 'طلب تعديل موعد';
+            //     $processedRequest['senderName'] = $user->fullName;
+            //     $processedRequest['senderid'] = $user->id;
+            //      $oldTime= $request->requestModifyAppointment->newTime;
+            //    $newTime = $request->requestModifyAppointment->appointment->appointmentTimeStamp;
+            //     $processedRequest['content'] = "نريد تعديل موعد المريض " . $patientName . " من  " . $oldTime . " الى " .  $newTime . " بسبب " . $request->cause;
+
+            $patientName = $request->requestModifyAppointment->user->fullName;
+            $processedRequest['type'] = 'طلب تعديل موعد';
+            $processedRequest['senderName'] = $user->fullName;
+            $processedRequest['senderid'] = $user->id;
+            
+            $oldAppointment = $request->requestModifyAppointment->appointment;
+            $newAppointment = $request->requestModifyAppointment->newAppointment;
+            
+            $oldTime11 = $oldAppointment->appointmentTimeStamp;
+            $newTime11 = $newAppointment->appointmentTimeStamp;
+            
+            $oldTime = $this->convertTimeToArabic($oldTime11);
+            $newTime = $this->convertTimeToArabic($newTime11);
+            
+
+
+
+            $oldDay = $oldAppointment->day;
+            $newDay = $newAppointment->day;
+        
+            $oldChair11 = $oldAppointment->chair->chairNumber;
+            $newChair11 = $newAppointment->chair->chairNumber;
+
+            $oldRoomName = $oldAppointment->chair->roomName;
+            $newRoomName = $newAppointment->chair->roomName;
+
+
+            $oldRoomName = $this->convertStringToArabic($oldRoomName);
+            $newRoomName = $this->convertStringToArabic($newRoomName);
+
+            $oldChair = $this->convertNumberToArabic($oldChair11);
+            $newChair = $this->convertNumberToArabic($newChair11);
+            
+
+       
+            $processedRequest['content'] = "نريد تعديل موعد المريض " . $patientName . " من "
+             . $oldDay . " " . $oldTime . " الغرفة " . $oldRoomName . " كرسي رقم " . $oldChair . "الى "
+             . $newDay . " " . $newTime . " الغرفة " . $newRoomName . " كرسي رقم " . $newChair ;
+
             }
-    
             return $processedRequest;
         });
     }
+
+    function convertTimeToArabic($time) {
+        $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        return str_replace($englishNumbers, $arabicNumbers, $time);
+    }
+
+    function convertNumberToArabic($number) {
+        $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        return str_replace($englishNumbers, $arabicNumbers, strval($number));
+    }
+    function convertStringToArabic($string) {
+        $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+      
+        $string = str_replace($englishNumbers, $arabicNumbers, $string);
+       
+    
+        return $string;
+    }
+
+
+
 
 
 
@@ -227,39 +292,76 @@ class RequestsService implements RequestsServiceInterface{
 
 
 
+    // public function addRequestModifyAppointment(array $data)
+    // {
+        
+    //     $validator = Validator::make($data, [
 
+        
+    //         'newTime' => 'required|date_format:H:i',
+    //         'newDay' => 'sometimes|required|string',
+    //         'appointmentID' => 'required|exists:appointments,id',
+    //       //  'requesterID' => 'required|exists:users,id',
+    //         'requestStatus' => 'required|in:pending,approved,rejected',
+    //         'cause' => 'sometimes|required|string'
+    //     ]);
+    
+    //     if ($validator->fails()) {
+    //         return $validator->errors();
+    //     }
+    //     $request = new Requests();
+    //     $user=  auth('user')->user();
+    //     $request->center_id=$user->center->centerID;
+    //     $request->requestStatus = $data['requestStatus'];
+    //     $request->cause = $data['cause'] ?? null;
+    //     $request->save();
+    
+        
+    //     $requestModifyAppointment = new RequestModifyAppointment();
+    //     $requestModifyAppointment->newTime = $data['newTime'];
+    //     $requestModifyAppointment->appointmentID = $data['appointmentID'];
+    //     $requestModifyAppointment->requestID = $request->id;
+    //     $requestModifyAppointment->requesterID =  $user->id;
+    //     $requestModifyAppointment->save();
+    
+    //     return $requestModifyAppointment;
+    // }
 
     public function addRequestModifyAppointment(array $data)
-{
-        
+    {
         $validator = Validator::make($data, [
-            'newTime' => 'required|date_format:Y-m-d H:i:s',
+            'newAppointmentID' => 'required|exists:appointments,id',
             'appointmentID' => 'required|exists:appointments,id',
-          //  'requesterID' => 'required|exists:users,id',
-            'requestStatus' => 'required|in:pending,approved,rejected',
+            //'requestStatus' => 'required|in:pending,approved,rejected',
             'cause' => 'sometimes|required|string'
         ]);
     
         if ($validator->fails()) {
             return $validator->errors();
         }
+    
         $request = new Requests();
-        $user=  auth('user')->user();
-        $request->center_id=$user->center->centerID;
-        $request->requestStatus = $data['requestStatus'];
+        $user = auth('user')->user();
+        $request->center_id = $user->center->centerID;
+        $request->requestStatus = 'pending';
         $request->cause = $data['cause'] ?? null;
         $request->save();
     
-        
         $requestModifyAppointment = new RequestModifyAppointment();
-        $requestModifyAppointment->newTime = $data['newTime'];
+        $requestModifyAppointment->newAppointmentID = $data['newAppointmentID'];
         $requestModifyAppointment->appointmentID = $data['appointmentID'];
         $requestModifyAppointment->requestID = $request->id;
-        $requestModifyAppointment->requesterID =  $user->id;
+        $requestModifyAppointment->requesterID = $user->id;
         $requestModifyAppointment->save();
     
         return $requestModifyAppointment;
     }
+
+
+
+
+
+
 
 
     
@@ -302,6 +404,7 @@ public function updateStatus( $requestId, $newStatus)
     switch ($requestableType) {
         case 'Chair':
         return $this->acceptAddChair($id, $newStatus);
+
             break;
         case 'Shift':
             return $this->acceptaddShift($id, $newStatus);
@@ -347,14 +450,29 @@ public function updateStatus( $requestId, $newStatus)
 
 
 
-    elseif ($requestModel->requestModifyAppointment  && $newStatus === 'approved') {
+    // elseif ($requestModel->requestModifyAppointment  && $newStatus === 'approved') {
 
      
-      $appointment= Appointment::findOrFail($requestModel->requestModifyAppointment->appointment->id);
+    //   $appointment= Appointment::findOrFail($requestModel->requestModifyAppointment->appointment->id);
    
-        $appointment->updateappointmentTime($requestModel->requestModifyAppointment->newTime);
+    //     $appointment->updateappointmentTime($requestModel->requestModifyAppointment->newTime);
      
+    // }
+
+    elseif ($requestModel->requestModifyAppointment && $newStatus === 'approved') {
+
+        $oldAppointment = Appointment::findOrFail($requestModel->requestModifyAppointment->appointment->id);
+        $newAppointment = Appointment::findOrFail($requestModel->requestModifyAppointment->newAppointment->id);
+    
+    
+        $oldAppointment->update([
+            'userID' => null,
+            'valid' => 'available',
+        ]);
+
+        $this->appointmentService->assignAppointmentToUser($newAppointment->id, $requestModel->requestModifyAppointment->requesterID);
     }
+    
 
 
 }
@@ -374,6 +492,10 @@ public function acceptaddShift($shiftId, $status)
 {
     if ($status === 'approved') {
         Shift::where('id', $shiftId)->update(['valid' => -1]);
+        $shift = Shift::where('id', $shiftId)->first();
+        $appointmentService = resolve('App\Services\UserService\AppointmentService');
+        $appointmentService->populateAppointments($shift->medicalCenter->id);
+     
         return 'تم قبول الوردية ';
     } elseif ($status === 'rejected') {
         Shift::where('id', $shiftId)->update(['valid' => -2]);
@@ -387,6 +509,11 @@ public function acceptAddChair($chairID, $status)
 {
     if ($status === 'approved') {
         Chair::where('id', $chairID)->update(['valid' => -1]);
+        $chair = Chair::where('id', $chairID)->first();
+
+        $appointmentService = resolve('App\Services\UserService\AppointmentService');
+        $appointmentService->populateAppointments($chair->medicalCenter->id);
+     
         return 'تم قبول إضافة الكرسي ';
     } elseif ($status === 'rejected') {
         Chair::where('id', $chairID)->update(['valid' => -2]);
