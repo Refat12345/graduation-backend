@@ -96,11 +96,11 @@ class MedicalSessionService implements MedicalSessionServiceInterface
             if (isset($data['appointmentID'])) {
                 $appointment = Appointment::find($data['appointmentID']);
                 if ($appointment) {
-                    // تعيين المنطقة الزمنية بشكل صريح
+                    
                     //$startTime = Carbon::parse($appointment->start, 'Asia/Damascus');
                  //  $currentDate = Carbon::now('Asia/Damascus');
                     
-                    // تعيين التاريخ والوقت مع المنطقة الزمنية الصحيحة
+                  
                     $validatedData['sessionStartTime'] = $appointment->start;
                     
                     //Carbon::parse($currentDate->toDateString() . ' ' . $startTime->toTimeString(), 'Asia/Damascus');

@@ -2471,19 +2471,19 @@ public function updateUser($id, array $userData): User
             $this->updatePermissionsToUser($user->id, $userData['permissionNames']);
         }
 
-        // Capture new data
+       
         $newData = $user->fresh()->toArray();
 
-        // Create logging record
+        
         Logging::create([
             'operation' => 'update',
             'destinationOfOperation' => 'User',
             'oldData' => json_encode($oldData),
             'newData' => json_encode($inputData),
-           // 'oldData' => $inputData, // تسجيل البيانات المدخلة
+           // 'oldData' => $inputData,
             'affectedUserID' => $user->id,
             'affectorUserID' => auth('user')->id(),
-            'sessionID' => null, // or provide the session ID if available
+            'sessionID' => null,
             'valid' => -1
         ]);
         DB::commit();

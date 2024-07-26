@@ -85,14 +85,14 @@ class RequestsService implements RequestsServiceInterface{
     public function getAllRequests()
     {
         $user = auth('user')->user();
-        $centerId = $user->center->centerID; // تأكد من أن العلاقة center محددة بشكل صحيح في نموذج المستخدم
+        $centerId = $user->center->centerID; 
     //    $this->notificationService->sendNotification(
     //     'user_token', // Replace with actual user token
     //     'New Request',
     //     'You have a new request.'
     // );
 
-        // تحديث الاستعلامات للتحقق من center_id في جدول Requests
+       
         $requests = Requests::where('center_id', $centerId)
             ->whereHas('globalRequest', function ($query) use ($centerId) {
                 $query->where('center_id', $centerId);
@@ -647,7 +647,7 @@ public function getAllPatientInfoRequests($centerId)
         $allPatientInfo[] = $formattedPatientInfo;
     }
 
-    // إرجاع جميع المعلومات المنسقة
+  
     return response()->json($allPatientInfo);
 }
 

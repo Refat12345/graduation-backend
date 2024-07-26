@@ -88,7 +88,7 @@ class PrescriptionService implements PrescriptionServiceInterface
               $medicine = Medicine::firstOrNew(['name' => $medicineData['name']]);
     
               if (!$medicine->exists) {
-                  // إذا لم يكن الدواء موجودًا، قم بإضافته
+                 
                   $medicine->fill($medicineData);
                   $medicine->save();
               }

@@ -274,7 +274,7 @@ public function getAllUsersWithDisbursedMaterials() {
     $usersWithDisbursedMaterials = $users->map(function ($user) {
         $disbursedMaterials = $this->getDisbursedMaterialsDetailsForUser($user->id);
         
-        // فلترة معلومات المستخدم
+      
         $filteredUserDetails = [
             'id' => $user->id,
             'fullName' => $user->fullName,
